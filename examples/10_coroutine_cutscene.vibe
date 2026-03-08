@@ -1,0 +1,148 @@
+-- ============================================
+-- Example 10: 코루틴 기반 컷신 (yield 활용)
+-- 컷신: NPC 대화 + 카메라 순회 -> 게임 플레이 전환
+-- Features: yield, coroutine, tween, camera_follow, go_scene
+-- ============================================
+
+const W = 800
+const H = 600
+
+@entity
+struct Dialog
+  speaker: String = ""
+  text: String = ""
+  alpha: Float = 0.0
+  visible: Bool = false
+
+@entity
+@tag("npc")
+struct NPC
+  pos: Vec2
+  name: String
+  color: Color
+  talking: Bool = false
+
+@entity
+struct Player
+  pos: Vec2
+  can_move: Bool = false
+
+@entity
+struct CamAnchor
+  pos: Vec2
+
+@scene
+struct CutScene
+  letterbox: Float = 0.0
+  fade: Float = 1.0
+
+@scene
+struct PlayScene
+  objective: String = "Explore the world"
+
+@on("enter")
+fn cut_enter(scene: CutScene)
+  let elder = spawn(NPC, pos: Vec2(300, 400), name: "Elder", color: Color(0.7, 0.55, 0.4, 1))
+  let guard = spawn(NPC, pos: Vec2(600, 400), name: "Guard", color: Color(0.6, 0.65, 0.8, 1))
+  let player = spawn(Player, pos: Vec2(100, 400))
+  let cam = spawn(CamAnchor, pos: Vec2(400, 380))
+  spawn(Dialog)
+  start_coroutine(fn()
+    run_cutscene(scene, player, elder, guard, cam)
+  )
+
+-- 컷신 코루틴 본체
+fn run_cutscene(scene: CutScene, player: Player, elder: NPC, guard: NPC, cam: CamAnchor)
+  tween(scene, "letterbox", to: 50.0, duration: 0.8, ease: "quad_out")
+  tween(scene, "fade", to: 0.0, duration: 1.5, ease: "linear")
+  yield wait(2.0)
+  -- 카메라가 월드를 훑음
+  camera_follow(cam, smooth: 0.03)
+  tween(cam.pos, "x", to: 300.0, duration: 2.0, ease: "quad_in_out")
+  yield wait(2.5)
+  tween(cam.pos, "x", to: 600.0, duration: 2.0, ease: "quad_in_out")
+  yield wait(2.5)
+  -- Elder 대화
+  tween(cam.pos, "x", to: 300.0, duration: 1.2, ease: "quad_in_out")
+  yield wait(1.2)
+  elder.talking = true
+  yield say("Elder", "The darkness spreads...", 2.5)
+  yield say("Elder", "You are our last hope.", 2.0)
+  elder.talking = false
+  -- Guard 대화
+  tween(cam.pos, "x", to: 600.0, duration: 1.0, ease: "quad_in_out")
+  yield wait(1.0)
+  guard.talking = true
+  yield say("Guard", "Creatures lurk near the ruins.", 2.5)
+  guard.talking = false
+  -- 플레이어에게 복귀 + 전환
+  tween(cam.pos, "x", to: player.pos.x, duration: 1.0, ease: "quad_in_out")
+  yield wait(1.0)
+  camera_follow(player, smooth: 0.05)
+  yield say("Elder", "Go. Find the source.", 2.5)
+  tween(scene, "letterbox", to: 0.0, duration: 0.6, ease: "quad_in")
+  yield wait(1.0)
+  tween(scene, "fade", to: 1.0, duration: 1.0, ease: "linear")
+  yield wait(1.2)
+  go_scene(PlayScene)
+
+-- 대화 표시 헬퍼
+fn say(speaker: String, text: String, dur: Float)
+  match find_first(Dialog)
+    some(d)
+      d.speaker = speaker
+      d.text = text
+      d.visible = true
+      tween(d, "alpha", to: 1.0, duration: 0.2, ease: "quad_out")
+      yield wait(dur)
+      tween(d, "alpha", to: 0.0, duration: 0.2, ease: "quad_in")
+      yield wait(0.2)
+      d.visible = false
+    none
+      yield wait(dur)
+
+@on("key_pressed", key: "escape")
+fn skip()
+  go_scene(PlayScene)
+
+-- 게임 플레이 씬
+@on("enter")
+fn play_enter(scene: PlayScene)
+  let p = spawn(Player, pos: Vec2(100, 400), can_move: true)
+  camera_follow(p, smooth: 0.05)
+  play_music("explore.ogg", loop: true)
+
+@on("update")
+fn play_move(p: Player, dt: Float)
+  if not p.can_move
+    return
+  p.pos += Vec2(input_axis("left", "right"), input_axis("up", "down")) * 200.0 * dt
+
+@on("draw")
+fn draw_p(p: Player)
+  draw_rect(p.pos - Vec2(12, 20), Vec2(24, 40), fill: Color(0.2, 0.7, 1, 1))
+
+@on("draw")
+fn draw_npc(npc: NPC)
+  draw_rect(npc.pos - Vec2(12, 20), Vec2(24, 40), fill: npc.color)
+  draw_text(npc.name, npc.pos - Vec2(20, 30), color: Color(1, 1, 1, 1), size: 12)
+
+@on("draw")
+fn draw_dlg(d: Dialog)
+  if not d.visible
+    return
+  draw_rect(Vec2(50, H - 120), Vec2(W - 100, 80), fill: Color(0.04, 0.04, 0.12, d.alpha * 0.85))
+  draw_text(d.speaker, Vec2(70, H - 115), color: Color(1, 0.85, 0.4, d.alpha), size: 14)
+  draw_text(d.text, Vec2(70, H - 95), color: Color(0.95, 0.95, 0.95, d.alpha), size: 18)
+
+@on("draw")
+fn draw_bars(scene: CutScene)
+  if scene.letterbox > 0.5
+    draw_rect(Vec2(0, 0), Vec2(W, scene.letterbox), fill: Color(0, 0, 0, 1))
+    draw_rect(Vec2(0, H - scene.letterbox), Vec2(W, scene.letterbox), fill: Color(0, 0, 0, 1))
+  if scene.fade > 0.01
+    draw_rect(Vec2(0, 0), Vec2(W, H), fill: Color(0, 0, 0, scene.fade))
+
+@on("draw")
+fn draw_hud(scene: PlayScene)
+  draw_text(scene.objective, Vec2(10, 10), color: Color(0.8, 0.8, 0.6, 1), size: 16)

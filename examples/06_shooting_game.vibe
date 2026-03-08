@@ -1,0 +1,105 @@
+-- ============================================
+-- Example 6: 슈팅 게임 (총알 + 적 파괴)
+-- 스페이스바로 총알 발사, 적 파괴 시 트윈 폭발 + 점수
+-- Features: spawn/destroy, @on("collide"), List, tween
+-- ============================================
+
+const W = 800
+const H = 600
+
+@entity
+@tag("bullet")
+struct Bullet
+  pos: Vec2
+  speed: Float = 500.0
+
+@entity
+@tag("enemy")
+struct Enemy
+  pos: Vec2
+  speed: Float = 120.0
+
+-- 폭발 이펙트 (트윈으로 확대 + 페이드아웃)
+@entity
+struct Explosion
+  pos: Vec2
+  alpha: Float = 1.0
+  radius: Float = 5.0
+
+@entity
+struct Player
+  pos: Vec2
+  cooldown: Float = 0.0
+
+@scene
+struct ShootScene
+  score: Int = 0
+  bullets: List[Bullet] = []
+
+@on("enter")
+fn setup(scene: ShootScene)
+  spawn(Player, pos: Vec2(W / 2, H - 60))
+  every(1.8, fn()
+    spawn(Enemy, pos: Vec2(rand_float(40.0, W - 40.0), -20.0))
+  )
+
+@on("update")
+fn move_player(p: Player, dt: Float)
+  p.pos.x = clamp(p.pos.x + input_axis("left", "right") * 280.0 * dt, 20.0, W - 20.0)
+  if p.cooldown > 0.0
+    p.cooldown -= dt
+
+-- 스페이스바로 총알 발사
+@on("key_pressed", key: "space")
+fn shoot(p: Player)
+  if p.cooldown <= 0.0
+    let b = spawn(Bullet, pos: Vec2(p.pos.x, p.pos.y - 20.0))
+    get_scene(ShootScene).bullets = get_scene(ShootScene).bullets + [b]
+    p.cooldown = 0.15
+    play_sound("shoot.wav", volume: 0.4)
+
+@on("update")
+fn move_bullet(b: Bullet, dt: Float)
+  b.pos.y -= b.speed * dt
+  if b.pos.y < -10.0
+    destroy(b)
+
+@on("update")
+fn move_enemy(e: Enemy, dt: Float)
+  e.pos.y += e.speed * dt
+  if e.pos.y > H + 30.0
+    destroy(e)
+
+-- 총알-적 충돌 -> 파괴 + 폭발 트윈 + 점수
+@on("collide")
+fn bullet_hit(bullet: Bullet, enemy: Enemy)
+  get_scene(ShootScene).score += 100
+  let fx = spawn(Explosion, pos: Vec2(enemy.pos.x, enemy.pos.y))
+  tween(fx, "radius", to: 36.0, duration: 0.25, ease: "quad_out")
+  tween(fx, "alpha", to: 0.0, duration: 0.3, ease: "linear", on_complete: fn()
+    destroy(fx)
+  )
+  play_sound("boom.wav")
+  destroy(bullet)
+  destroy(enemy)
+
+-- 그리기
+@on("draw")
+fn draw_player(p: Player)
+  draw_rect(p.pos - Vec2(16, 16), Vec2(32, 32), fill: Color(0.3, 0.8, 1, 1))
+
+@on("draw")
+fn draw_bullet(b: Bullet)
+  draw_rect(b.pos - Vec2(3, 8), Vec2(6, 16), fill: Color(1, 1, 0.3, 1))
+
+@on("draw")
+fn draw_enemy(e: Enemy)
+  draw_rect(e.pos - Vec2(14, 14), Vec2(28, 28), fill: Color(1, 0.2, 0.2, 1))
+
+@on("draw")
+fn draw_fx(fx: Explosion)
+  draw_circle(fx.pos, fx.radius, fill: Color(1, 0.8, 0.2, fx.alpha))
+
+@on("draw")
+fn draw_hud(scene: ShootScene)
+  draw_text("SCORE: " + str(scene.score), Vec2(10, 10), color: Color(1, 1, 1, 1), size: 24)

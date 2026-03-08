@@ -1,0 +1,137 @@
+-- ============================================
+-- Example 7: 플랫포머 (물리 + 중력)
+-- 중력 적용, 더블 점프, 바닥 충돌, 이동 플랫폼
+-- Features: @component RigidBody, @system, Vec2 math
+-- ============================================
+
+const W = 800
+const H = 600
+const GRAVITY = 900.0
+
+@component
+struct RigidBody
+  vel: Vec2 = Vec2(0, 0)
+  grounded: Bool = false
+
+@component
+struct Mover
+  start: Vec2
+  dest: Vec2
+  speed: Float = 60.0
+  forward: Bool = true
+
+@entity
+struct Player
+  pos: Vec2
+  body: RigidBody
+  jumps: Int = 0
+
+@entity
+@tag("solid")
+struct Block
+  pos: Vec2
+  w: Float = 64.0
+  h: Float = 16.0
+
+@entity
+@tag("solid")
+struct MovBlock
+  pos: Vec2
+  w: Float = 96.0
+  h: Float = 16.0
+  mover: Mover
+
+@entity
+@tag("coin")
+struct Coin
+  pos: Vec2
+  bob: Float = 0.0
+
+@scene
+struct PlatScene
+  coins: Int = 0
+
+@on("enter")
+fn setup(scene: PlatScene)
+  spawn(Player, pos: Vec2(80, 400), body: RigidBody())
+  for i in range(0, 13)
+    spawn(Block, pos: Vec2(i * 64 + 32, H - 8))
+  spawn(Block, pos: Vec2(200, 440), w: 120.0)
+  spawn(Block, pos: Vec2(500, 360), w: 100.0)
+  spawn(MovBlock, pos: Vec2(350, 280), mover: Mover(start: Vec2(250, 280), dest: Vec2(550, 280), speed: 70.0))
+  for p in [Vec2(200, 410), Vec2(500, 330), Vec2(400, 250)]
+    spawn(Coin, pos: p)
+    scene.coins += 1
+
+-- 중력 시스템 (RigidBody 보유 엔티티 전체 적용)
+@system
+fn gravity(pos: Vec2, body: RigidBody, dt: Float)
+  if not body.grounded
+    body.vel.y += GRAVITY * dt
+  pos += body.vel * dt
+
+@on("update")
+fn input(player: Player, dt: Float)
+  player.body.vel.x = input_axis("left", "right") * 200.0
+
+@on("key_pressed", key: "space")
+fn jump(player: Player)
+  if player.jumps < 2
+    player.body.vel.y = -380.0
+    player.body.grounded = false
+    player.jumps += 1
+
+-- 착지 판정
+@on("collide", tag: "solid")
+fn land(player: Player, block: Entity, col: Collision)
+  if col.normal.y < -0.5
+    player.body.vel.y = 0.0
+    player.body.grounded = true
+    player.jumps = 0
+
+-- 이동 플랫폼 왕복
+@on("update")
+fn move_plat(mb: MovBlock, dt: Float)
+  let tgt = if mb.mover.forward
+    mb.mover.dest
+  else
+    mb.mover.start
+  mb.pos += normalize(tgt - mb.pos) * mb.mover.speed * dt
+  if distance(mb.pos, tgt) < 3.0
+    mb.mover.forward = not mb.mover.forward
+
+@on("collide")
+fn grab(player: Player, coin: Coin)
+  get_scene(PlatScene).coins -= 1
+  destroy(coin)
+
+@on("update")
+fn bob(coin: Coin, dt: Float)
+  coin.bob += dt * 3.0
+  coin.pos.y += sin(coin.bob) * 0.4
+
+@on("update")
+fn fall(player: Player, dt: Float)
+  if player.pos.y > H + 50
+    player.pos = Vec2(80, 400)
+    player.body.vel = Vec2(0, 0)
+
+@on("draw")
+fn draw_p(p: Player)
+  draw_rect(p.pos - Vec2(12, 20), Vec2(24, 40), fill: Color(0.3, 0.7, 1, 1))
+
+@on("draw")
+fn draw_b(b: Block)
+  draw_rect(b.pos - Vec2(b.w / 2, b.h / 2), Vec2(b.w, b.h), fill: Color(0.4, 0.4, 0.5, 1))
+
+@on("draw")
+fn draw_mb(mb: MovBlock)
+  draw_rect(mb.pos - Vec2(mb.w / 2, mb.h / 2), Vec2(mb.w, mb.h), fill: Color(0.3, 0.7, 0.3, 1))
+
+@on("draw")
+fn draw_c(c: Coin)
+  draw_circle(c.pos, 8.0, fill: Color(1, 0.85, 0, 1))
+
+@on("draw")
+fn draw_hud(scene: PlatScene)
+  draw_text("Coins left: " + str(scene.coins), Vec2(10, 10), color: Color(1, 1, 1, 1), size: 20)

@@ -1,0 +1,163 @@
+-- ============================================
+-- Example 5: 씬 전환 (메뉴 -> 게임 -> 게임오버)
+-- 타이틀, 게임, 게임오버 3개 씬 간 전환
+-- ============================================
+
+const W = 800
+const H = 600
+
+-- ============================================
+-- 씬 1: 타이틀 화면
+-- ============================================
+@scene
+struct TitleScene
+    blink: Float
+    show: Bool
+
+@on("enter")
+fn title_enter(scene: TitleScene)
+    scene.blink = 0.0
+    scene.show = true
+
+@on("update")
+fn title_update(scene: TitleScene, dt: Float)
+    scene.blink += dt
+    if scene.blink > 0.5
+        scene.blink = 0.0
+        scene.show = not scene.show
+    if key_pressed("space")
+        go_scene(PlayScene)
+
+@on("draw")
+fn title_draw(scene: TitleScene)
+    draw_rect(Vec2(0, 0), Vec2(W, H), fill: Color(0.05, 0.05, 0.15, 1))
+    draw_text("VIBE SURVIVOR", Vec2(400, 200), color: Color(0.9, 0.2, 0.3, 1), size: 56, align: "center")
+    if scene.show
+        draw_text("Press SPACE to start", Vec2(400, 380), color: Color(1, 1, 1, 1), size: 28, align: "center")
+
+-- ============================================
+-- 씬 2: 게임 플레이
+-- ============================================
+@entity
+@tag("player")
+struct Player
+    pos: Vec2
+
+@entity
+@tag("hazard")
+struct Hazard
+    pos: Vec2
+    vel: Vec2
+
+@scene
+struct PlayScene
+    hp: Int
+    score: Int
+    elapsed: Float
+    inv_timer: Float
+
+@on("enter")
+fn play_enter(scene: PlayScene)
+    scene.hp = 3
+    scene.score = 0
+    scene.elapsed = 0.0
+    scene.inv_timer = 0.0
+    spawn(Player, pos: Vec2(400, 500))
+    for i in range(0, 5)
+        spawn(Hazard, pos: Vec2(rand_float(50, W - 50), rand_float(-150, -30)), vel: Vec2(rand_float(-30, 30), rand_float(80, 140)))
+
+@on("exit")
+fn play_exit(scene: PlayScene)
+    -- 씬을 나갈 때 모든 엔티티 정리
+    for e in find_all("player")
+        destroy(e)
+    for e in find_all("hazard")
+        destroy(e)
+
+@on("update")
+fn move_player(player: Player, dt: Float)
+    let dir = Vec2(0, 0)
+    if key_down("a")
+        dir.x -= 1.0
+    if key_down("d")
+        dir.x += 1.0
+    if key_down("w")
+        dir.y -= 1.0
+    if key_down("s")
+        dir.y += 1.0
+    if length(dir) > 0.0
+        player.pos += normalize(dir) * 200.0 * dt
+    player.pos.x = clamp(player.pos.x, 16.0, W - 16.0)
+    player.pos.y = clamp(player.pos.y, 16.0, H - 16.0)
+
+@on("update")
+fn move_hazards(hazard: Hazard, dt: Float)
+    hazard.pos += hazard.vel * dt
+    if hazard.pos.y > H + 40
+        hazard.pos = Vec2(rand_float(50, W - 50), -40.0)
+
+@on("update")
+fn play_tick(scene: PlayScene, dt: Float)
+    scene.elapsed += dt
+    scene.score = floor(scene.elapsed * 10)
+    if scene.inv_timer > 0.0
+        scene.inv_timer -= dt
+    if scene.hp <= 0
+        go_scene(GameOverScene, score: scene.score)
+
+@on("collide")
+fn hit(player: Player, hazard: Hazard)
+    let scene = get_scene(PlayScene)
+    if scene.inv_timer <= 0.0
+        scene.hp -= 1
+        scene.inv_timer = 1.0
+        hazard.pos.y = -40.0
+
+@on("draw")
+fn draw_play(scene: PlayScene)
+    draw_rect(Vec2(0, 0), Vec2(W, H), fill: Color(0.08, 0.08, 0.12, 1))
+    draw_text("Score: " + str(scene.score), Vec2(W - 10, 10), color: Color(1, 1, 1, 1), size: 20, align: "right")
+    for i in range(0, 3)
+        let c = Color(0.3, 0.3, 0.3, 1)
+        if i < scene.hp
+            c = Color(1, 0.2, 0.3, 1)
+        draw_circle(Vec2(25 + i * 30, 25), 10.0, fill: c)
+
+@on("draw")
+fn draw_player(player: Player)
+    draw_rect(player.pos - Vec2(16, 16), Vec2(32, 32), fill: Color(0.2, 0.8, 1, 1))
+
+@on("draw")
+fn draw_hazard(hazard: Hazard)
+    draw_circle(hazard.pos, 14.0, fill: Color(1, 0.3, 0.2, 1))
+
+-- ============================================
+-- 씬 3: 게임오버 화면 (씬 파라미터로 점수 전달)
+-- ============================================
+@scene
+struct GameOverScene
+    @export score: Int
+    blink: Float
+    show: Bool
+
+@on("enter")
+fn over_enter(scene: GameOverScene)
+    scene.blink = 0.0
+    scene.show = true
+
+@on("update")
+fn over_update(scene: GameOverScene, dt: Float)
+    scene.blink += dt
+    if scene.blink > 0.5
+        scene.blink = 0.0
+        scene.show = not scene.show
+    if key_pressed("r")
+        go_scene(TitleScene)
+
+@on("draw")
+fn over_draw(scene: GameOverScene)
+    draw_rect(Vec2(0, 0), Vec2(W, H), fill: Color(0.1, 0.02, 0.02, 1))
+    draw_text("GAME OVER", Vec2(400, 200), color: Color(0.9, 0.1, 0.1, 1), size: 64, align: "center")
+    draw_text("Score: " + str(scene.score), Vec2(400, 290), color: Color(1, 1, 1, 1), size: 36, align: "center")
+    if scene.show
+        draw_text("Press R to restart", Vec2(400, 400), color: Color(0.8, 0.8, 0.8, 1), size: 24, align: "center")

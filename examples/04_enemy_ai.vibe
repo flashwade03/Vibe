@@ -1,0 +1,132 @@
+-- ============================================
+-- Example 4: 상태 머신 적 AI (enum + match)
+-- 적이 거리 기반으로 상태를 전환하며 행동
+-- ============================================
+
+const DETECT_RANGE = 200.0
+const ATTACK_RANGE = 40.0
+const LOSE_RANGE = 300.0
+
+-- 적 AI 상태 열거형 (데이터 포함 variant)
+enum AIState
+    Idle(timer: Float)
+    Patrol(target: Vec2)
+    Chase(last_seen: Vec2)
+    Attack(cooldown: Float)
+
+-- 이동 가능 트레이트
+trait Movable
+    fn get_pos() -> Vec2
+
+-- 플레이어
+@entity
+@tag("player")
+struct Player
+    pos: Vec2
+    hp: Int
+
+-- 적
+@entity
+struct Enemy
+    pos: Vec2
+    state: AIState
+
+-- 트레이트 구현
+has Movable for Player
+    fn get_pos() -> Vec2
+        return pos
+
+has Movable for Enemy
+    fn get_pos() -> Vec2
+        return pos
+
+@scene
+struct AIScene
+    info: String
+
+@on("enter")
+fn setup(scene: AIScene)
+    scene.info = "WASD to move"
+    spawn(Player, pos: Vec2(400, 300), hp: 100)
+    spawn(Enemy, pos: Vec2(100, 100), state: AIState.Idle(timer: 2.0))
+
+@on("update")
+fn move_player(player: Player, dt: Float)
+    let dir = Vec2(0, 0)
+    if key_down("w")
+        dir.y -= 1.0
+    if key_down("s")
+        dir.y += 1.0
+    if key_down("a")
+        dir.x -= 1.0
+    if key_down("d")
+        dir.x += 1.0
+    if length(dir) > 0.0
+        player.pos += normalize(dir) * 200.0 * dt
+
+-- 적 AI 핵심: match로 상태 전환
+@on("update")
+fn update_ai(enemy: Enemy, dt: Float)
+    let player = find_first("player")
+    if player == none
+        return
+    let dist = distance(enemy.pos, player.pos)
+
+    match enemy.state
+        AIState.Idle(timer)
+            if dist < DETECT_RANGE
+                enemy.state = AIState.Chase(last_seen: player.pos)
+            else if timer - dt <= 0.0
+                let t = Vec2(rand_float(50, 750), rand_float(50, 550))
+                enemy.state = AIState.Patrol(target: t)
+            else
+                enemy.state = AIState.Idle(timer: timer - dt)
+
+        AIState.Patrol(target)
+            enemy.pos += normalize(target - enemy.pos) * 80.0 * dt
+            if dist < DETECT_RANGE
+                enemy.state = AIState.Chase(last_seen: player.pos)
+            else if distance(enemy.pos, target) < 5.0
+                enemy.state = AIState.Idle(timer: 1.5)
+
+        AIState.Chase(last_seen)
+            enemy.pos += normalize(player.pos - enemy.pos) * 160.0 * dt
+            if dist < ATTACK_RANGE
+                enemy.state = AIState.Attack(cooldown: 0.5)
+            else if dist > LOSE_RANGE
+                enemy.state = AIState.Idle(timer: 1.0)
+            else
+                enemy.state = AIState.Chase(last_seen: player.pos)
+
+        AIState.Attack(cooldown)
+            if cooldown - dt <= 0.0
+                player.hp -= 10
+                if dist > ATTACK_RANGE
+                    enemy.state = AIState.Chase(last_seen: player.pos)
+                else
+                    enemy.state = AIState.Attack(cooldown: 0.5)
+            else
+                enemy.state = AIState.Attack(cooldown: cooldown - dt)
+
+-- 상태 이름 헬퍼
+fn state_label(s: AIState) -> String
+    match s
+        AIState.Idle(_)
+            return "Idle"
+        AIState.Patrol(_)
+            return "Patrol"
+        AIState.Chase(_)
+            return "Chase"
+        AIState.Attack(_)
+            return "Attack"
+
+-- 그리기
+@on("draw")
+fn draw_player(player: Player)
+    draw_rect(player.pos - Vec2(16, 16), Vec2(32, 32), fill: Color(0.2, 0.8, 0.3, 1))
+    draw_text("HP:" + str(player.hp), Vec2(10, 10), color: Color(1, 1, 1, 1), size: 20)
+
+@on("draw")
+fn draw_enemy(enemy: Enemy)
+    draw_rect(enemy.pos - Vec2(16, 16), Vec2(32, 32), fill: Color(0.9, 0.2, 0.2, 1))
+    draw_text(state_label(enemy.state), enemy.pos - Vec2(0, 24), color: Color(1, 1, 0, 1), size: 12, align: "center")

@@ -1,0 +1,1069 @@
+# =============================================================================
+# Vibe 언어 -- 타입 시스템 PEG 문법 (Formal Grammar)
+# =============================================================================
+#
+# 이 문법은 Vibe 언어의 타입 시스템 구문만을 다룬다.
+# 제어 흐름(if/for/while 등)과 표현식(산술/비교 등)은 별도 문법에서 정의한다.
+#
+# ---- 확정 설계 결정 요약 ----
+#
+# 블록 구분: 순수 들여쓰기 (INDENT/DEDENT 토큰). colon/do/then/end 없음.
+# 콜론(:): 오직 타입 어노테이션에서만 사용.
+# 제네릭: 내장 타입 전용 대괄호 -- List[T], Map[K,V], Set[T].
+# Optional: T? 접미사, match some(x)/none, ?. 체이닝, ? 전파, or 폴백.
+# 인터페이스: trait 선언 + struct ... has TraitName 구현.
+# impl 블록 없음: 메서드는 struct 내부에 직접 정의.
+# Self 타입: trait 내부에서 구현 타입을 가리킴.
+# 상속 없음, 소유권/라이프타임 없음, 매크로 없음.
+# 타입 추론: 지역 변수에서 허용 (let x = 5). 함수 시그니처에서는 불허.
+# 구조체 필드 기본값: 선택적 (health: Int 또는 health: Int = 100).
+# match 완전성: enum은 모든 variant 또는 _ 필수. Optional은 some/none 필수.
+# 생성자: 이름 지정 필드 필수 -- Player(health: 100, pos: Position(x: 0, y: 0)).
+# 패턴 가드: 허용 -- Walking(speed) if speed > 10.
+#
+# ---- PEG 메타 문법 표기 규칙 ----
+#
+# Rule      <- Expression          규칙 정의
+# 'literal'                        터미널 문자열
+# [a-z]                            문자 클래스
+# .                                임의의 문자
+# e1 e2                            시퀀스 (e1 다음에 e2)
+# e1 / e2                          순서 있는 선택 (e1 시도, 실패 시 e2)
+# e*                               0회 이상 반복
+# e+                               1회 이상 반복
+# e?                               0 또는 1회 (선택적)
+# &e                               긍정 전방 탐색
+# !e                               부정 전방 탐색
+# (e)                              그룹화
+#
+# INDENT, DEDENT, NEWLINE, SAMEDENT는 렉서가 생성하는 가상 토큰이다.
+# Python과 동일한 들여쓰기 기반 토큰화 규칙을 사용한다.
+#
+# =============================================================================
+
+
+# =============================================================================
+# 0. 어휘 규칙 (Lexical Rules)
+# =============================================================================
+# 렉서가 처리하는 기본 토큰들.
+# PEG 파서에 전달되기 전에 렉서가 INDENT/DEDENT/NEWLINE을 삽입한다.
+
+# ---- 공백 및 주석 ----
+# 줄 내부의 공백. 줄 시작 공백은 렉서가 INDENT/DEDENT로 변환한다.
+_               <- [ \t]*
+__              <- [ \t]+
+
+# 주석: '#' 부터 줄 끝까지. '--' 스타일도 허용.
+Comment         <- ('#' / '--') (!'\n' .)*
+
+# 줄 끝 처리
+EOL             <- _ Comment? '\n'
+
+# ---- 키워드 ----
+# 키워드 뒤에 식별자 문자가 오면 안 된다 (예: 'format'에서 'for'를 키워드로 인식 방지).
+KW_LET          <- 'let'      !IdentCont
+KW_MUT          <- 'mut'      !IdentCont
+KW_CONST        <- 'const'    !IdentCont
+KW_FN           <- 'fn'       !IdentCont
+KW_STRUCT       <- 'struct'   !IdentCont
+KW_ENUM         <- 'enum'     !IdentCont
+KW_TRAIT        <- 'trait'    !IdentCont
+KW_HAS          <- 'has'      !IdentCont
+KW_MATCH        <- 'match'    !IdentCont
+KW_RETURN       <- 'return'   !IdentCont
+KW_SELF_LOWER   <- 'self'     !IdentCont
+KW_SELF_UPPER   <- 'Self'     !IdentCont
+KW_NONE         <- 'none'     !IdentCont
+KW_SOME         <- 'some'     !IdentCont
+KW_IF           <- 'if'       !IdentCont
+KW_OR           <- 'or'       !IdentCont
+KW_AND          <- 'and'      !IdentCont
+KW_NOT          <- 'not'      !IdentCont
+KW_TRUE         <- 'true'     !IdentCont
+KW_FALSE        <- 'false'    !IdentCont
+KW_FOR          <- 'for'      !IdentCont
+KW_IN           <- 'in'       !IdentCont
+KW_WHILE        <- 'while'    !IdentCont
+KW_ELIF         <- 'elif'     !IdentCont
+KW_ELSE         <- 'else'     !IdentCont
+KW_BREAK        <- 'break'    !IdentCont
+KW_CONTINUE     <- 'continue' !IdentCont
+
+# 예약어 집합: 식별자로 사용할 수 없는 단어들
+Keyword         <- KW_LET / KW_MUT / KW_CONST / KW_FN / KW_STRUCT / KW_ENUM
+                 / KW_TRAIT / KW_HAS / KW_MATCH / KW_RETURN
+                 / KW_SELF_LOWER / KW_SELF_UPPER / KW_NONE / KW_SOME
+                 / KW_IF / KW_OR / KW_AND / KW_NOT / KW_TRUE / KW_FALSE
+                 / KW_FOR / KW_IN / KW_WHILE / KW_ELIF / KW_ELSE
+                 / KW_BREAK / KW_CONTINUE
+
+# ---- 식별자 ----
+# 소문자 시작: 변수, 필드, 함수 이름
+# 대문자 시작: 타입 이름, enum variant 이름
+IdentStart      <- [a-zA-Z_]
+IdentCont       <- [a-zA-Z0-9_]
+Ident           <- !Keyword IdentStart IdentCont*
+
+# 소문자 식별자: 변수명, 필드명, 함수명
+LowerIdent      <- !Keyword [a-z_] IdentCont*
+
+# 대문자 식별자: 타입명, enum variant명
+UpperIdent      <- [A-Z] IdentCont*
+
+# ---- 리터럴 ----
+IntLiteral      <- '-'? [0-9]+
+FloatLiteral    <- '-'? [0-9]+ '.' [0-9]+
+StringLiteral   <- '"' (!'"' .)* '"'
+BoolLiteral     <- KW_TRUE / KW_FALSE
+
+
+# =============================================================================
+# 1. 타입 표현식 (Type Expressions)
+# =============================================================================
+#
+# Vibe의 타입 시스템에서 사용되는 모든 타입 표현.
+#
+# 기본 타입:          Int, Float, String, Bool, Vec2, Vec3, Color
+# 제네릭 내장 타입:   List[String], Map[String, Int], Set[Entity]
+# Optional:           Enemy?, List[Enemy?], Map[String, Int]?
+# Self 타입:          trait 내부에서만 유효
+# 함수 타입:          (현재 버전에서는 제외 -- 추후 확장 가능)
+#
+# 문법:
+#   Type = BaseType '?'?
+#   BaseType = UpperIdent ('[' TypeArgs ']')? / 'Self'
+#   TypeArgs = Type (',' Type)*
+#
+# '?'는 Optional을 의미한다. T?는 내부적으로 Option[T]와 동일하다.
+# '?'는 가장 바깥 타입에 적용된다: List[Enemy]? = Optional<List<Enemy>>.
+# 중첩 Optional (T??)은 허용하지 않는다 -- T?로 자동 평탄화.
+
+Type            <- BaseType _ '?'?
+
+BaseType        <- SelfType
+                 / GenericType
+                 / SimpleType
+
+# Self 타입: trait 선언 내부에서만 유효. 구현하는 타입을 가리킨다.
+# 예: trait Damageable 내부의 fn take_damage(self: Self, amount: Int)
+SelfType        <- KW_SELF_UPPER
+
+# 제네릭 타입: 내장 컬렉션 타입에만 허용.
+# List[T], Map[K, V], Set[T], Queue[T] 등.
+# 사용자 정의 제네릭은 허용하지 않는다.
+GenericType     <- UpperIdent _ '[' _ TypeArgs _ ']'
+
+# 단순 타입: 파라미터 없는 타입 이름.
+# Int, Float, String, Bool, Vec2, Vec3, Color, Player, Enemy 등.
+SimpleType      <- UpperIdent
+
+# 제네릭 타입 인자 목록: 쉼표로 구분된 1개 이상의 타입.
+# List[String] -> TypeArgs = String
+# Map[String, Int] -> TypeArgs = String, Int
+TypeArgs        <- Type (_ ',' _ Type)*
+
+
+# =============================================================================
+# 2. 타입 어노테이션 (Type Annotations)
+# =============================================================================
+#
+# 콜론(:)은 Vibe에서 오직 타입 어노테이션에서만 사용된다.
+# 블록 구분, 딕셔너리 리터럴 등 다른 용도로는 사용되지 않는다.
+#
+# 사용 위치:
+#   변수 선언:      let x: Int = 5
+#   상수 선언:      const MAX: Int = 100
+#   함수 매개변수:  fn foo(x: Int, y: Float)
+#   함수 반환 타입:  fn foo() -> Int        (-> 연산자 사용, : 아님)
+#   구조체 필드:    health: Int = 100
+#
+# 지역 변수에서는 타입 어노테이션을 생략할 수 있다 (타입 추론).
+# 함수 시그니처(매개변수, 반환 타입)에서는 반드시 명시해야 한다.
+
+TypeAnnotation  <- ':' _ Type
+
+# 반환 타입: -> 연산자 사용. fn foo() -> Int
+ReturnType      <- '->' _ Type
+
+
+# =============================================================================
+# 3. 구조체 선언 (Struct Declarations)
+# =============================================================================
+#
+# struct는 이름 있는 데이터 묶음(레코드)이다.
+# 메서드를 struct 내부에 직접 정의한다 (별도 impl 블록 없음).
+# has 키워드로 trait 구현을 선언한다.
+#
+# 기본 형태:
+#   struct Position
+#     x: Float = 0.0
+#     y: Float = 0.0
+#
+# trait 구현:
+#   struct Player has Damageable, Drawable
+#     health: Int = 100
+#     pos: Position = Position(x: 0.0, y: 0.0)
+#
+#     fn take_damage(self: Self, amount: Int)
+#       self.health = self.health - amount
+#
+# 필드:
+#   - 타입 어노테이션 필수: health: Int
+#   - 기본값 선택적: health: Int = 100
+#
+# 메서드:
+#   - struct 내부에 fn으로 정의
+#   - 첫 번째 매개변수가 self이면 인스턴스 메서드
+#   - self가 없으면 연관 함수 (static method)
+
+StructDecl      <- KW_STRUCT __ UpperIdent (_ HasClause)? _ NEWLINE
+                   INDENT
+                     StructBody
+                   DEDENT
+
+# has 절: trait 구현 선언. 쉼표로 구분된 1개 이상의 trait 이름.
+# struct Player has Damageable, Drawable
+HasClause       <- KW_HAS __ TraitList
+
+TraitList       <- UpperIdent (_ ',' _ UpperIdent)*
+
+# 구조체 본문: 필드와 메서드의 혼합. 순서는 자유롭지만 필드를 먼저 쓰는 것을 권장.
+StructBody      <- (StructMember NEWLINE)*
+
+StructMember    <- MethodDecl
+                 / FieldDecl
+
+# 필드 선언: 이름: 타입 (= 기본값)?
+# 예: health: Int
+# 예: health: Int = 100
+# 예: pos: Position = Position(x: 0.0, y: 0.0)
+FieldDecl       <- LowerIdent _ TypeAnnotation (_ '=' _ Expr)?
+
+
+# =============================================================================
+# 4. Enum 선언 (Enum Declarations)
+# =============================================================================
+#
+# Rust 스타일의 태그드 유니언. 각 variant는 데이터를 가질 수 있다.
+# 게임의 상태 기계(FSM)를 표현하는 핵심 구문.
+#
+# 단순 열거형 (데이터 없음):
+#   enum Direction
+#     Up
+#     Down
+#     Left
+#     Right
+#
+# 데이터를 가진 열거형:
+#   enum State
+#     Idle
+#     Walking(speed: Float)
+#     Attacking(weapon: String, power: Int)
+#     Dead
+#
+# variant 이름은 대문자로 시작한다.
+# 데이터가 있는 variant는 이름 붙은 필드를 소괄호 안에 나열한다.
+
+EnumDecl        <- KW_ENUM __ UpperIdent _ NEWLINE
+                   INDENT
+                     EnumBody
+                   DEDENT
+
+EnumBody        <- (EnumVariant NEWLINE)+
+
+# Enum variant: 대문자 이름 + 선택적 데이터 필드
+# 예: Idle                           -- 데이터 없음
+# 예: Walking(speed: Float)          -- 이름 붙은 필드 1개
+# 예: Attacking(weapon: String, power: Int) -- 이름 붙은 필드 2개
+EnumVariant     <- UpperIdent (_ '(' _ VariantFields _ ')')?
+
+# Variant 필드: 이름: 타입 형태, 쉼표로 구분
+VariantFields   <- VariantField (_ ',' _ VariantField)*
+
+VariantField    <- LowerIdent _ TypeAnnotation
+
+
+# =============================================================================
+# 5. Trait 선언 (Trait Declarations)
+# =============================================================================
+#
+# trait는 타입이 구현해야 하는 메서드 계약을 정의한다.
+# Rust의 trait와 유사하지만 별도 impl 블록 대신 struct ... has Trait 구문을 사용한다.
+#
+# 추상 trait (구현 없음):
+#   trait Damageable
+#     fn take_damage(self: Self, amount: Int)
+#     fn is_alive(self: Self) -> Bool
+#
+# 기본 구현이 있는 trait:
+#   trait Drawable
+#     fn draw(self: Self, renderer: Renderer)
+#     fn layer(self: Self) -> Int
+#       return 0
+#
+# Self 타입:
+#   trait 내부의 메서드 시그니처에서 Self는 "이 trait를 구현하는 타입"을 가리킨다.
+#   struct Player has Drawable이면, Drawable 메서드 내의 Self = Player.
+#
+# trait 합성 (supertrait):
+#   trait GameEntity has Drawable, Updatable
+#     fn on_spawn(self: Self)
+#   GameEntity를 구현하려면 Drawable과 Updatable도 구현해야 한다.
+
+TraitDecl       <- KW_TRAIT __ UpperIdent (_ HasClause)? _ NEWLINE
+                   INDENT
+                     TraitBody
+                   DEDENT
+
+# trait 본문: 메서드 시그니처 또는 기본 구현이 있는 메서드들의 나열
+TraitBody       <- (TraitMember NEWLINE)*
+
+TraitMember     <- MethodDeclWithBody      # 기본 구현이 있는 메서드
+                 / MethodSignature         # 추상 메서드 (시그니처만)
+
+
+# =============================================================================
+# 6. 함수 및 메서드 선언 (Function & Method Declarations)
+# =============================================================================
+#
+# fn 키워드로 함수와 메서드를 모두 선언한다.
+# 메서드와 일반 함수의 구분: 첫 번째 매개변수가 self이면 메서드.
+#
+# 일반 함수:
+#   fn distance(a: Vec2, b: Vec2) -> Float
+#     return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
+#
+# 메서드 (struct 내부):
+#   fn take_damage(self: Self, amount: Int)
+#     self.health = self.health - amount
+#
+# 반환 타입:
+#   -> 연산자로 지정. 생략하면 반환값 없음 (void).
+#   fn foo() -> Int       반환값 있음
+#   fn bar()              반환값 없음
+#
+# 타입 어노테이션:
+#   매개변수: 반드시 타입 명시 (타입 추론 불허)
+#   반환 타입: 있으면 반드시 명시, 없으면 -> 생략
+#
+# self 매개변수:
+#   - trait 내부: self: Self (Self는 구현 타입을 가리킴)
+#   - struct 내부: self: StructName 또는 self (타입 생략 가능 -- 자명)
+#   - Vibe에는 &self / &mut self 구분 없음. 항상 self 하나.
+
+# 메서드/함수 선언 (본문 있음)
+MethodDecl      <- FnSignature _ NEWLINE
+                   INDENT
+                     Block
+                   DEDENT
+
+# 메서드/함수 본문이 있는 선언 (trait의 기본 구현용)
+MethodDeclWithBody <- FnSignature _ NEWLINE
+                      INDENT
+                        Block
+                      DEDENT
+
+# 메서드/함수 시그니처만 (trait의 추상 메서드용)
+# 본문 없이 시그니처로 끝난다.
+MethodSignature <- FnSignature
+
+# 함수 시그니처: fn 이름(매개변수들) (-> 반환타입)?
+FnSignature     <- KW_FN __ LowerIdent _ '(' _ Params? _ ')' (_ ReturnType)?
+
+# 매개변수 목록: 쉼표로 구분
+Params          <- Param (_ ',' _ Param)*
+
+# 개별 매개변수
+# 일반 매개변수: name: Type
+# self 매개변수: self (타입 생략) 또는 self: Self / self: StructName
+Param           <- SelfParam
+                 / NormalParam
+
+# self 매개변수: struct/trait 메서드의 첫 번째 매개변수
+# self                -- 타입 생략 (struct 내부에서 자명한 경우)
+# self: Self          -- trait 내부에서 명시
+# self: Player        -- struct 내부에서 명시 (선택적)
+SelfParam       <- KW_SELF_LOWER (_ TypeAnnotation)?
+
+# 일반 매개변수: 이름: 타입 (타입 필수)
+NormalParam     <- LowerIdent _ TypeAnnotation
+
+# 최상위 함수 선언 (struct/trait 바깥)
+FnDecl          <- FnSignature _ NEWLINE
+                   INDENT
+                     Block
+                   DEDENT
+
+
+# =============================================================================
+# 7. 변수 및 상수 선언 (Variable & Constant Declarations)
+# =============================================================================
+#
+# let (불변 바인딩):
+#   let speed: Float = 200.0        타입 명시
+#   let speed = 200.0               타입 추론 (지역 변수에서만 허용)
+#
+# let mut (가변 바인딩):
+#   let mut health: Int = 100       타입 명시
+#   let mut health = 100            타입 추론
+#
+# const (컴파일 타임 상수):
+#   const MAX_HEALTH: Int = 100     타입 필수
+#   const GRAVITY: Float = 9.8      타입 필수
+
+LetDecl         <- KW_LET __ (KW_MUT __)? LowerIdent (_ TypeAnnotation)? _ '=' _ Expr
+
+ConstDecl       <- KW_CONST __ UpperIdent _ TypeAnnotation _ '=' _ Expr
+                 / KW_CONST __ LowerIdent _ TypeAnnotation _ '=' _ Expr
+
+# 상수 이름 규칙: UPPER_SNAKE_CASE 권장이지만 문법적으로는 강제하지 않음.
+# const MAX_HEALTH: Int = 100    (권장)
+# const gravity: Float = 9.8     (허용되지만 비권장)
+
+
+# =============================================================================
+# 8. Match 표현식과 패턴 (Match Expressions & Patterns)
+# =============================================================================
+#
+# match는 값을 여러 패턴과 비교하여 분기한다.
+# enum에 대한 match는 완전성(exhaustiveness)을 강제한다:
+#   - 모든 variant를 나열하거나
+#   - _ (와일드카드)로 나머지를 처리해야 한다.
+# Optional에 대한 match는 some과 none 둘 다 있어야 한다.
+#
+# 기본 형태:
+#   match state
+#     Idle
+#       play("idle")
+#     Walking(speed)
+#       move(speed * dt)
+#     Attacking(weapon, power)
+#       attack(weapon, power)
+#     Dead
+#       destroy(self)
+#
+# Optional 매칭:
+#   match target
+#     some(enemy)
+#       attack(enemy)
+#     none
+#       idle()
+#
+# 패턴 가드:
+#   match state
+#     Walking(speed) if speed > 10
+#       run_animation()
+#     Walking(speed)
+#       walk_animation()
+#     _
+#       idle_animation()
+#
+# 한 줄 match arm (선택적):
+#   match direction
+#     Up    -> move(0, -1)
+#     Down  -> move(0, 1)
+#     Left  -> move(-1, 0)
+#     Right -> move(1, 0)
+
+MatchExpr       <- KW_MATCH __ Expr _ NEWLINE
+                   INDENT
+                     MatchArm+
+                   DEDENT
+
+# Match arm: 패턴 + 선택적 가드 + 본문
+# 두 가지 형태:
+#   1. 여러 줄: 패턴 다음에 들여쓰기된 블록
+#   2. 한 줄:   패턴 -> 단일 표현식
+MatchArm        <- Pattern (_ Guard)? _ '->' _ Expr _ NEWLINE               # 한 줄 arm
+                 / Pattern (_ Guard)? _ NEWLINE INDENT Block DEDENT         # 여러 줄 arm
+
+# 패턴 가드: if 뒤에 불리언 표현식
+# 예: Walking(speed) if speed > 10
+Guard           <- KW_IF __ Expr
+
+
+# ---- 패턴 (Patterns) ----
+#
+# 패턴은 match arm의 왼쪽에 위치하며, 값의 구조를 분해한다.
+#
+# 종류:
+#   1. 와일드카드:           _                         아무 값이나 매칭 (바인딩 없음)
+#   2. 리터럴:               42, "hello", true         특정 값 매칭
+#   3. 변수 바인딩:          speed, name               아무 값이나 매칭 + 이름 바인딩
+#   4. 단순 variant:         Idle, Dead                데이터 없는 enum variant
+#   5. 데이터 variant:       Walking(speed)            데이터 있는 enum variant + 바인딩
+#   6. 한정 variant:         State.Idle                타입명.variant (모호성 해소용)
+#   7. Optional some:        some(enemy)               값이 있는 Optional
+#   8. Optional none:        none                      값이 없는 Optional
+#
+# some(x)에서 some은 키워드가 아니라 매치 패턴이다.
+# enum variant 패턴과 동일한 문법 구조를 가진다.
+# none은 키워드이다 (match 밖에서도 let x: T? = none 으로 사용).
+
+Pattern         <- WildcardPattern
+                 / NonePattern
+                 / SomePattern
+                 / QualifiedVariantPattern
+                 / DataVariantPattern
+                 / SimpleVariantPattern
+                 / LiteralPattern
+                 / BindingPattern
+
+# _ : 와일드카드. 아무 값이나 매칭하되 바인딩하지 않음.
+# enum의 나머지 모든 variant를 포괄한다.
+WildcardPattern <- '_'
+
+# none : Optional의 "값 없음" 매칭
+NonePattern     <- KW_NONE
+
+# some(name) : Optional의 "값 있음" 매칭 + 내부 값 바인딩
+# some(enemy)   -> enemy에 값이 바인딩됨
+SomePattern     <- KW_SOME _ '(' _ LowerIdent _ ')'
+
+# Type.Variant : 타입명으로 한정된 variant 패턴 (모호성이 있을 때 사용)
+# State.Idle, Direction.Up
+# Type.Variant(bindings) : 데이터가 있는 한정 variant
+QualifiedVariantPattern <- UpperIdent '.' UpperIdent (_ '(' _ PatternFields _ ')')?
+
+# Variant(field1, field2) : 데이터가 있는 variant + 바인딩
+# Walking(speed)
+# Attacking(weapon, power)
+DataVariantPattern <- UpperIdent _ '(' _ PatternFields _ ')'
+
+# 패턴 내부 바인딩: 쉼표로 구분된 바인딩 이름들
+# 각 바인딩은 소문자 식별자 (variant 정의 순서대로 대응)
+PatternFields   <- PatternField (_ ',' _ PatternField)*
+
+PatternField    <- LowerIdent
+
+# Idle, Dead : 데이터 없는 단순 variant
+# 대문자로 시작하는 식별자
+SimpleVariantPattern <- UpperIdent
+
+# 42, "hello", true, false : 리터럴 값 매칭
+LiteralPattern  <- FloatLiteral
+                 / IntLiteral
+                 / StringLiteral
+                 / BoolLiteral
+
+# speed, name : 변수 바인딩 (소문자 식별자)
+# 아무 값이나 매칭 + 해당 이름으로 바인딩
+BindingPattern  <- LowerIdent
+
+
+# =============================================================================
+# 9. 생성자 구문 (Constructor Syntax)
+# =============================================================================
+#
+# 구조체 인스턴스 생성: 이름 지정 필드 필수.
+# LLM의 정확도를 위해 위치 기반(positional) 인자가 아닌 이름 기반(named)을 강제한다.
+#
+# 예:
+#   Position(x: 0.0, y: 0.0)
+#   Player(health: 100, pos: Position(x: 0.0, y: 0.0))
+#
+# Enum variant 생성: 위치 기반.
+# variant 데이터는 함수 인자처럼 위치로 전달한다.
+#
+# 예:
+#   State.Walking(200.0)
+#   State.Attacking("sword", 25)
+
+StructConstructor <- UpperIdent _ '(' _ NamedArgs _ ')'
+
+# 이름 지정 인자 목록
+NamedArgs       <- NamedArg (_ ',' _ NamedArg)*
+
+NamedArg        <- LowerIdent _ ':' _ Expr
+
+# Enum variant 생성
+EnumConstructor <- (UpperIdent '.')? UpperIdent (_ '(' _ Args _ ')')?
+
+# 위치 기반 인자 목록 (함수 호출과 동일)
+Args            <- Expr (_ ',' _ Expr)*
+
+
+# =============================================================================
+# 10. 표현식 (Expressions) -- 타입 시스템 관련 부분만
+# =============================================================================
+#
+# 전체 표현식 문법은 별도 문서에서 정의한다.
+# 여기서는 타입 시스템과 직접 관련된 표현식만 다룬다:
+#   - Optional 관련: ?. 체이닝, ? 전파, or 폴백
+#   - 생성자 호출
+#   - self/필드 접근
+#   - match 표현식
+
+# 표현식: or를 최하위 우선순위 연산자로 처리
+# T? or T -> T (Optional 폴백)
+# bool or bool -> bool (논리합)
+# 타입 검사기가 좌측 타입으로 의미를 결정한다.
+Expr            <- OrExpr
+
+OrExpr          <- AndExpr (_ KW_OR __ AndExpr)*
+
+AndExpr         <- NotExpr (_ KW_AND __ NotExpr)*
+
+NotExpr         <- KW_NOT __ NotExpr
+                 / CompareExpr
+
+CompareExpr     <- AddExpr (_ CompareOp _ AddExpr)?
+
+CompareOp       <- '==' / '!=' / '>=' / '<=' / '>' / '<'
+
+AddExpr         <- MulExpr (_ AddOp _ MulExpr)*
+
+AddOp           <- '+' / '-'
+
+MulExpr         <- UnaryExpr (_ MulOp _ UnaryExpr)*
+
+MulOp           <- '*' / '/' / '%'
+
+UnaryExpr       <- '-' UnaryExpr
+                 / PostfixExpr
+
+# 후위 표현식: 필드 접근, Optional 체이닝, 함수 호출, 인덱싱, 전파 연산자
+PostfixExpr     <- PrimaryExpr PostfixOp*
+
+PostfixOp       <- OptionalChain      # expr?.field
+                 / FieldAccess         # expr.field
+                 / MethodCall          # expr.method(args)
+                 / FnCall              # expr(args)
+                 / IndexAccess         # expr[index]
+                 / PropagateOp         # expr?
+
+# ?. (옵셔널 체이닝): a?.b
+# a가 none이면 전체 체인이 none. some(val)이면 val.b 계속.
+# JavaScript/TypeScript/Kotlin/Swift의 optional chaining과 동일.
+OptionalChain   <- '?.' LowerIdent (_ '(' _ Args? _ ')')?
+
+# . (필드/메서드 접근)
+FieldAccess     <- '.' LowerIdent !(_ '(')
+
+MethodCall      <- '.' LowerIdent _ '(' _ Args? _ ')'
+
+# 함수 호출
+FnCall          <- '(' _ Args? _ ')'
+
+# 인덱싱
+IndexAccess     <- '[' _ Expr _ ']'
+
+# ? (전파 연산자): expr?
+# expr가 T? 타입일 때, none이면 현재 함수에서 즉시 none 반환.
+# some(val)이면 val (타입 T)로 언래핑.
+# 반환 타입이 T?인 함수 안에서만 사용 가능.
+PropagateOp     <- '?' !('.' / IdentStart)
+
+# 기본 표현식
+PrimaryExpr     <- '(' _ Expr _ ')'                    # 괄호 그룹
+                 / MatchExpr                            # match 표현식
+                 / StructConstructor                    # 구조체 생성
+                 / EnumConstructor                      # enum variant 생성
+                 / KW_SELF_LOWER                        # self
+                 / KW_NONE                              # none 리터럴
+                 / FloatLiteral                         # 3.14
+                 / IntLiteral                           # 42
+                 / StringLiteral                        # "hello"
+                 / BoolLiteral                          # true, false
+                 / LowerIdent                           # 변수 참조
+                 / UpperIdent                           # 타입/variant 참조
+                 / ListLiteral                          # [1, 2, 3]
+                 / MapLiteral                           # {"key": value}
+
+# 리스트 리터럴
+ListLiteral     <- '[' _ (Expr (_ ',' _ Expr)* _ ','?)? _ ']'
+
+# 맵 리터럴 -- 맵 리터럴에서의 : 는 키-값 구분자로, 타입 어노테이션의 : 와
+# 문맥이 완전히 다르므로 모호성이 없다 (항상 { } 내부).
+MapLiteral      <- '{' _ (MapEntry (_ ',' _ MapEntry)* _ ','?)? _ '}'
+
+MapEntry        <- Expr _ ':' _ Expr
+
+
+# =============================================================================
+# 11. 문장 (Statements) -- 타입 관련 부분
+# =============================================================================
+#
+# 블록은 동일 들여쓰기의 문장들로 구성된다.
+
+Block           <- (Statement NEWLINE)+
+
+Statement       <- LetDecl                             # let x: Int = 5
+                 / ConstDecl                            # const MAX: Int = 100
+                 / ReturnStmt                           # return expr
+                 / AssignStmt                           # x = expr, self.field = expr
+                 / IfStmt                               # if/elif/else
+                 / ForStmt                              # for x in collection
+                 / WhileStmt                            # while condition
+                 / BreakStmt                            # break
+                 / ContinueStmt                         # continue
+                 / MatchExpr                            # match expr ...
+                 / ExprStmt                             # 표현식 문장 (함수 호출 등)
+
+ReturnStmt      <- KW_RETURN (__ Expr)?
+
+AssignStmt      <- PostfixExpr _ '=' _ Expr
+
+IfStmt          <- KW_IF __ Expr _ NEWLINE
+                   INDENT Block DEDENT
+                   (KW_ELIF __ Expr _ NEWLINE
+                     INDENT Block DEDENT)*
+                   (KW_ELSE _ NEWLINE
+                     INDENT Block DEDENT)?
+
+ForStmt         <- KW_FOR __ LowerIdent __ KW_IN __ Expr _ NEWLINE
+                   INDENT Block DEDENT
+
+WhileStmt       <- KW_WHILE __ Expr _ NEWLINE
+                   INDENT Block DEDENT
+
+BreakStmt       <- KW_BREAK
+
+ContinueStmt    <- KW_CONTINUE
+
+ExprStmt        <- Expr
+
+
+# =============================================================================
+# 12. 최상위 선언 (Top-Level Declarations)
+# =============================================================================
+#
+# 프로그램은 최상위 선언들의 나열이다.
+# 순서는 자유롭지만, 관례적으로:
+#   1. const 선언
+#   2. enum/struct/trait 선언
+#   3. fn 선언
+
+Program         <- (NEWLINE / TopLevelDecl)*
+
+TopLevelDecl    <- StructDecl                          # struct Position ...
+                 / EnumDecl                             # enum Direction ...
+                 / TraitDecl                            # trait Damageable ...
+                 / FnDecl                               # fn distance(...) ...
+                 / ConstDecl                            # const MAX: Int = 100
+                 / LetDecl                              # let (최상위 -- 모듈 수준 변수)
+
+
+# =============================================================================
+# 13. 설계 결정 답변 (Critical Questions -- 문법에 반영된 결정)
+# =============================================================================
+#
+# Q1: 타입 추론을 허용하는가?
+# A1: YES -- 지역 변수에서만. 함수 시그니처(매개변수, 반환 타입)에서는 불허.
+#     let x = 5           -- OK, 타입 추론
+#     let x: Int = 5      -- OK, 명시적
+#     fn foo(x: Int)      -- 매개변수 타입 필수
+#     fn foo() -> Int      -- 반환 타입은 있으면 필수, 없으면 생략(void)
+#     문법: LetDecl에서 TypeAnnotation이 '?' (선택적)으로 정의됨.
+#
+# Q2: 구조체 필드에 기본값이 필수인가?
+# A2: NO -- 기본값은 선택적.
+#     health: Int          -- 기본값 없음 (생성 시 반드시 제공해야 함)
+#     health: Int = 100    -- 기본값 있음 (생성 시 생략 가능)
+#     문법: FieldDecl에서 '=' Expr 부분이 '?' (선택적).
+#
+# Q3: has는 구문적으로 어떻게 동작하는가?
+# A3: struct/trait 이름 뒤, 같은 줄에 위치.
+#     struct Player has Damageable           -- 단일 trait
+#     struct Player has Damageable, Drawable -- 복수 trait
+#     trait GameEntity has Drawable, Updatable -- trait의 supertrait
+#     문법: HasClause <- 'has' TraitList.
+#
+# Q4: match가 완전성(exhaustiveness)을 요구하는가?
+# A4: YES -- enum은 모든 variant를 나열하거나 _ (와일드카드) 필수.
+#     Optional은 some/none 모두 필수.
+#     이것은 의미 검사(semantic check)이며 문법 규칙이 아니다.
+#     파서는 arm이 1개 이상이면 허용하고, 완전성은 타입 검사 단계에서 강제한다.
+#
+# Q5: 생성자 구문은?
+# A5: 이름 지정 필드 (named fields) 필수. LLM 정확도를 위한 설계.
+#     Player(health: 100, pos: Position(x: 0.0, y: 0.0))    -- OK
+#     Player(100, Position(0.0, 0.0))                         -- 불허
+#     enum variant는 위치 기반: State.Walking(200.0)
+#     문법: StructConstructor는 NamedArgs, EnumConstructor는 Args.
+#
+# Q6: 패턴 가드를 지원하는가?
+# A6: YES -- match arm에서 패턴 뒤에 if 조건을 붙일 수 있다.
+#     Walking(speed) if speed > 10
+#       run_animation()
+#     문법: Guard <- 'if' Expr.
+#
+# Q7: Self 타입은?
+# A7: trait 선언 내부에서만 유효한 특수 타입.
+#     구현하는 struct의 실제 타입으로 대체된다.
+#     trait Damageable 내의 Self -> struct Player has Damageable이면 Player.
+#     문법: SelfType <- 'Self' (대문자 S).
+#     self (소문자 s)는 인스턴스 참조 키워드이고,
+#     Self (대문자 S)는 타입을 가리키는 타입 표현식이다.
+
+
+# =============================================================================
+# 14. 완전한 예시 파싱 트레이스 (Parse Traces)
+# =============================================================================
+#
+# ---- 예시 1: 타입 표현식 ----
+#
+#   Int                        -> SimpleType("Int")
+#   Float                      -> SimpleType("Float")
+#   List[String]               -> GenericType("List", [SimpleType("String")])
+#   Map[String, Int]           -> GenericType("Map", [SimpleType("String"), SimpleType("Int")])
+#   Enemy?                     -> Type(SimpleType("Enemy"), optional=true)
+#   List[Enemy?]               -> GenericType("List", [Type(SimpleType("Enemy"), optional=true)])
+#   Map[String, List[Int]]?    -> Type(GenericType("Map", [SimpleType("String"),
+#                                      GenericType("List", [SimpleType("Int")])]),
+#                                      optional=true)
+#   Self                       -> SelfType
+#
+#
+# ---- 예시 2: struct 선언 ----
+#
+#   struct Position
+#     x: Float = 0.0
+#     y: Float = 0.0
+#
+#   파싱 결과:
+#     StructDecl(
+#       name="Position",
+#       has=[],
+#       body=[
+#         FieldDecl("x", Type("Float"), default=FloatLiteral(0.0)),
+#         FieldDecl("y", Type("Float"), default=FloatLiteral(0.0))
+#       ]
+#     )
+#
+#
+# ---- 예시 3: struct with has + 메서드 ----
+#
+#   struct Player has Damageable, Drawable
+#     health: Int = 100
+#     pos: Position = Position(x: 0.0, y: 0.0)
+#
+#     fn take_damage(self: Self, amount: Int)
+#       self.health = self.health - amount
+#
+#   파싱 결과:
+#     StructDecl(
+#       name="Player",
+#       has=["Damageable", "Drawable"],
+#       body=[
+#         FieldDecl("health", Type("Int"), default=IntLiteral(100)),
+#         FieldDecl("pos", Type("Position"),
+#                   default=StructConstructor("Position",
+#                     [NamedArg("x", 0.0), NamedArg("y", 0.0)])),
+#         MethodDecl(
+#           name="take_damage",
+#           params=[SelfParam(Type("Self")), NormalParam("amount", Type("Int"))],
+#           return_type=None,
+#           body=[
+#             AssignStmt(
+#               FieldAccess(Self, "health"),
+#               BinOp(FieldAccess(Self, "health"), "-", Ident("amount"))
+#             )
+#           ]
+#         )
+#       ]
+#     )
+#
+#
+# ---- 예시 4: enum 선언 ----
+#
+#   enum State
+#     Idle
+#     Walking(speed: Float)
+#     Attacking(weapon: String, power: Int)
+#     Dead
+#
+#   파싱 결과:
+#     EnumDecl(
+#       name="State",
+#       variants=[
+#         EnumVariant("Idle", fields=[]),
+#         EnumVariant("Walking", fields=[("speed", Type("Float"))]),
+#         EnumVariant("Attacking", fields=[("weapon", Type("String")),
+#                                          ("power", Type("Int"))]),
+#         EnumVariant("Dead", fields=[])
+#       ]
+#     )
+#
+#
+# ---- 예시 5: trait 선언 ----
+#
+#   trait Damageable
+#     fn take_damage(self: Self, amount: Int)
+#     fn is_alive(self: Self) -> Bool
+#
+#   파싱 결과:
+#     TraitDecl(
+#       name="Damageable",
+#       has=[],
+#       body=[
+#         MethodSignature("take_damage",
+#           params=[SelfParam(Type("Self")), NormalParam("amount", Type("Int"))],
+#           return_type=None),
+#         MethodSignature("is_alive",
+#           params=[SelfParam(Type("Self"))],
+#           return_type=Type("Bool"))
+#       ]
+#     )
+#
+#
+# ---- 예시 6: trait with 기본 구현 ----
+#
+#   trait Drawable
+#     fn draw(self: Self, renderer: Renderer)
+#     fn layer(self: Self) -> Int
+#       return 0
+#
+#   파싱 결과:
+#     TraitDecl(
+#       name="Drawable",
+#       has=[],
+#       body=[
+#         MethodSignature("draw",
+#           params=[SelfParam(Type("Self")), NormalParam("renderer", Type("Renderer"))],
+#           return_type=None),
+#         MethodDeclWithBody("layer",
+#           params=[SelfParam(Type("Self"))],
+#           return_type=Type("Int"),
+#           body=[ReturnStmt(IntLiteral(0))])
+#       ]
+#     )
+#
+#
+# ---- 예시 7: match 표현식 ----
+#
+#   match state
+#     Idle
+#       play("idle")
+#     Walking(speed)
+#       move(speed * dt)
+#     Attacking(weapon, power)
+#       attack(weapon, power)
+#     Dead
+#       destroy(self)
+#
+#   파싱 결과:
+#     MatchExpr(
+#       subject=Ident("state"),
+#       arms=[
+#         MatchArm(SimpleVariantPattern("Idle"), guard=None,
+#                  body=[ExprStmt(FnCall("play", ["idle"]))]),
+#         MatchArm(DataVariantPattern("Walking", ["speed"]), guard=None,
+#                  body=[ExprStmt(FnCall("move", [BinOp("speed", "*", "dt")]))]),
+#         MatchArm(DataVariantPattern("Attacking", ["weapon", "power"]), guard=None,
+#                  body=[ExprStmt(FnCall("attack", ["weapon", "power"]))]),
+#         MatchArm(SimpleVariantPattern("Dead"), guard=None,
+#                  body=[ExprStmt(FnCall("destroy", [Self]))])
+#       ]
+#     )
+#
+#
+# ---- 예시 8: Optional 매칭 ----
+#
+#   match target
+#     some(enemy)
+#       attack(enemy)
+#     none
+#       idle()
+#
+#   파싱 결과:
+#     MatchExpr(
+#       subject=Ident("target"),
+#       arms=[
+#         MatchArm(SomePattern("enemy"), guard=None,
+#                  body=[ExprStmt(FnCall("attack", ["enemy"]))]),
+#         MatchArm(NonePattern, guard=None,
+#                  body=[ExprStmt(FnCall("idle", []))])
+#       ]
+#     )
+#
+#
+# ---- 예시 9: 패턴 가드 ----
+#
+#   match state
+#     Walking(speed) if speed > 10
+#       run_animation()
+#     Walking(speed)
+#       walk_animation()
+#     _
+#       idle_animation()
+#
+#   파싱 결과:
+#     MatchExpr(
+#       subject=Ident("state"),
+#       arms=[
+#         MatchArm(DataVariantPattern("Walking", ["speed"]),
+#                  guard=CompareExpr(Ident("speed"), ">", IntLiteral(10)),
+#                  body=[ExprStmt(FnCall("run_animation", []))]),
+#         MatchArm(DataVariantPattern("Walking", ["speed"]), guard=None,
+#                  body=[ExprStmt(FnCall("walk_animation", []))]),
+#         MatchArm(WildcardPattern, guard=None,
+#                  body=[ExprStmt(FnCall("idle_animation", []))])
+#       ]
+#     )
+#
+#
+# ---- 예시 10: Optional 체이닝과 전파 ----
+#
+#   let damage: Int = player.weapon?.damage?.base_value or 0
+#
+#   파싱 결과:
+#     LetDecl(
+#       name="damage",
+#       type=Type("Int"),
+#       value=OrExpr(
+#         OptionalChain(
+#           OptionalChain(
+#             FieldAccess(Ident("player"), "weapon"),
+#             "damage"
+#           ),
+#           "base_value"
+#         ),
+#         IntLiteral(0)
+#       )
+#     )
+#
+#
+#   fn get_damage() -> Int?
+#     let player: Player = find("Player")?
+#     let weapon: Weapon = player.get_component(Weapon)?
+#     return weapon.damage
+#
+#   파싱 결과:
+#     FnDecl(
+#       name="get_damage",
+#       params=[],
+#       return_type=Type("Int", optional=true),
+#       body=[
+#         LetDecl("player", Type("Player"),
+#                 PropagateOp(FnCall("find", ["Player"]))),
+#         LetDecl("weapon", Type("Weapon"),
+#                 PropagateOp(MethodCall(Ident("player"), "get_component", [Ident("Weapon")]))),
+#         ReturnStmt(FieldAccess(Ident("weapon"), "damage"))
+#       ]
+#     )
+
+
+# =============================================================================
+# 15. 문법 규칙 요약 통계
+# =============================================================================
+#
+# 총 규칙 수: 약 70개
+#
+# 범주별:
+#   어휘 규칙 (토큰):        ~20개
+#   타입 표현식:              6개  (Type, BaseType, SelfType, GenericType, SimpleType, TypeArgs)
+#   타입 어노테이션:          2개  (TypeAnnotation, ReturnType)
+#   구조체:                   6개  (StructDecl, HasClause, TraitList, StructBody, StructMember, FieldDecl)
+#   Enum:                     4개  (EnumDecl, EnumBody, EnumVariant, VariantFields, VariantField)
+#   Trait:                    3개  (TraitDecl, TraitBody, TraitMember)
+#   함수/메서드:              8개  (MethodDecl, MethodDeclWithBody, MethodSignature, FnSignature, ...)
+#   변수/상수:                2개  (LetDecl, ConstDecl)
+#   Match/패턴:              12개  (MatchExpr, MatchArm, Guard, Pattern, 8가지 패턴 종류)
+#   생성자:                   5개  (StructConstructor, NamedArgs, NamedArg, EnumConstructor, Args)
+#   표현식:                  ~15개 (Expr, OrExpr, ..., PrimaryExpr, PostfixOp, ...)
+#   문장:                    ~8개  (Block, Statement, ReturnStmt, ...)
+#   최상위:                   2개  (Program, TopLevelDecl)
+#
+# "50개 미만 규칙" 목표 대비: 표현식/문장의 범용 규칙을 제외하면
+# 타입 시스템 고유 규칙은 약 40개로 목표 범위 내에 있다.

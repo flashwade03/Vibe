@@ -1,0 +1,113 @@
+-- ============================================
+-- Example 9: 파티클 + 트윈 효과 (시각 연출)
+-- 클릭 시 파티클 폭발, 카메라 셰이크, 페이드인/아웃
+-- Features: tween, after, every, camera_shake, Color
+-- ============================================
+
+const W = 800
+const H = 600
+
+@entity
+@tag("particle")
+struct Particle
+  pos: Vec2
+  vel: Vec2
+  alpha: Float = 1.0
+  radius: Float = 4.0
+  color: Color
+  life: Float = 1.0
+
+@entity
+struct PopText
+  pos: Vec2
+  text: String
+  alpha: Float = 0.0
+  scale: Float = 0.5
+
+@entity
+struct Orb
+  pos: Vec2
+  radius: Float = 30.0
+  alpha: Float = 0.0
+  hue: Float = 0.0
+
+@scene
+struct FxScene
+  clicks: Int = 0
+
+@on("enter")
+fn setup(scene: FxScene)
+  let orb = spawn(Orb, pos: Vec2(W / 2, H / 2))
+  tween(orb, "alpha", to: 1.0, duration: 1.5, ease: "cubic_out")
+  tween(orb, "radius", to: 40.0, duration: 1.5, ease: "elastic_out")
+  after(0.5, fn()
+    show_pop(Vec2(W / 2, 80), "Click anywhere!")
+  )
+
+-- 떠오르는 텍스트: 페이드인 -> 체류 -> 페이드아웃 + 소멸
+fn show_pop(pos: Vec2, msg: String)
+  let pt = spawn(PopText, pos: pos, text: msg)
+  tween(pt, "alpha", to: 1.0, duration: 0.3, ease: "quad_out")
+  tween(pt, "scale", to: 1.0, duration: 0.3, ease: "back_out")
+  after(2.0, fn()
+    tween(pt, "alpha", to: 0.0, duration: 0.5, ease: "quad_in", on_complete: fn()
+      destroy(pt)
+    )
+  )
+
+-- 클릭: 파티클 방사 + 카메라 흔들림
+@on("mouse_pressed", button: "left")
+fn on_click(pos: Vec2)
+  let scene = get_scene(FxScene)
+  scene.clicks += 1
+  for i in range(0, 20)
+    let angle = rand_float(0.0, 6.283)
+    let spd = rand_float(80.0, 280.0)
+    let life = rand_float(0.4, 1.2)
+    let c = Color(rand_float(0.8, 1.0), rand_float(0.4, 0.9), rand_float(0.1, 0.3), 1.0)
+    let p = spawn(Particle, pos: pos, vel: Vec2(cos(angle) * spd, sin(angle) * spd), color: c, life: life)
+    tween(p, "alpha", to: 0.0, duration: life, ease: "quad_in")
+    tween(p, "radius", to: 0.0, duration: life, ease: "quad_in")
+  camera_shake(clamp(3.0 + scene.clicks * 0.4, 3.0, 14.0), duration: 0.25)
+  show_pop(Vec2(pos.x, pos.y - 30), str(scene.clicks))
+  play_sound("pop.wav", pitch: rand_float(0.8, 1.3))
+
+-- 파티클 물리: 중력 + 감속
+@on("update")
+fn tick_p(p: Particle, dt: Float)
+  p.pos += p.vel * dt
+  p.vel.y += 200.0 * dt
+  p.vel *= 0.97
+  p.life -= dt
+  if p.life <= 0.0
+    destroy(p)
+
+-- 오브 맥동 + 색상 순환
+@on("update")
+fn tick_orb(orb: Orb, dt: Float)
+  orb.hue += dt * 50.0
+  if orb.hue > 360.0
+    orb.hue -= 360.0
+  orb.radius = 30.0 + sin(orb.hue * 0.08) * 8.0
+  orb.color = hsl(orb.hue, 0.7, 0.6)
+  -- 마우스 근접 반응
+  if distance(orb.pos, mouse_pos()) < 100.0
+    orb.radius += (50.0 - orb.radius) * 3.0 * dt
+
+@on("draw")
+fn draw_bg(scene: FxScene)
+  draw_rect(Vec2(0, 0), Vec2(W, H), fill: Color(0.06, 0.06, 0.1, 1))
+  draw_text("Clicks: " + str(scene.clicks), Vec2(10, 10), color: Color(0.7, 0.7, 0.8, 1), size: 16)
+
+@on("draw")
+fn draw_particle(p: Particle)
+  draw_circle(p.pos, p.radius, fill: Color(p.color.r, p.color.g, p.color.b, p.alpha))
+
+@on("draw")
+fn draw_orb(orb: Orb)
+  draw_circle(orb.pos, orb.radius * 1.6, fill: Color(orb.color.r, orb.color.g, orb.color.b, orb.alpha * 0.15))
+  draw_circle(orb.pos, orb.radius, fill: Color(orb.color.r, orb.color.g, orb.color.b, orb.alpha))
+
+@on("draw")
+fn draw_pop(pt: PopText)
+  draw_text(pt.text, pt.pos, color: Color(1, 1, 1, pt.alpha), size: floor(20.0 * pt.scale), align: "center")

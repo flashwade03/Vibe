@@ -1,0 +1,163 @@
+-- ============================================
+-- Example 8: 인벤토리 시스템 (데이터 구조)
+-- 아이템 줍기/사용, 인벤토리 UI, 체력 회복
+-- Features: enum variants, List[Item], Map, struct method, trait
+-- ============================================
+
+-- 아이템 종류 (Rust-style 데이터 variant)
+enum ItemKind
+  Potion(heal: Int)
+  Weapon(atk: Int)
+  Key(door_id: String)
+
+struct Item
+  kind: ItemKind
+  name: String
+  fn label(item: Item) -> String
+    return match item.kind
+      ItemKind.Potion(h)
+        item.name + " (HP+" + str(h) + ")"
+      ItemKind.Weapon(a)
+        item.name + " (ATK " + str(a) + ")"
+      ItemKind.Key(d)
+        item.name + " [" + d + "]"
+
+-- 사용 가능 인터페이스
+trait Usable
+  fn apply(item: Item, hp: Int, max_hp: Int) -> Int
+
+has Usable for Item
+  fn apply(item: Item, hp: Int, max_hp: Int) -> Int
+    match item.kind
+      ItemKind.Potion(h)
+        return clamp(hp + h, 0, max_hp)
+      _
+        return hp
+
+struct Inventory
+  slots: List[Item] = []
+  cap: Int = 8
+  counts: Map[String, Int] = {}
+  fn add(inv: Inventory, item: Item) -> Bool
+    if len(inv.slots) >= inv.cap
+      return false
+    inv.slots = inv.slots + [item]
+    inv.counts.set(item.name, (inv.counts.get(item.name) or 0) + 1)
+    return true
+  fn pop(inv: Inventory, idx: Int) -> Item?
+    if idx < 0 or idx >= len(inv.slots)
+      return none
+    let item = inv.slots[idx]
+    inv.slots = inv.slots.remove(idx)
+    let n = (inv.counts.get(item.name) or 1) - 1
+    if n <= 0
+      inv.counts.remove(item.name)
+    else
+      inv.counts.set(item.name, n)
+    return item
+
+@entity
+struct Player
+  pos: Vec2
+  hp: Int = 100
+  max_hp: Int = 100
+  atk: Int = 5
+  inv: Inventory = Inventory()
+  show_inv: Bool = false
+
+@entity
+@tag("pickup")
+struct Pickup
+  pos: Vec2
+  item: Item
+
+@scene
+struct InvScene
+  msg: String = ""
+  msg_t: Float = 0.0
+
+@on("enter")
+fn setup(scene: InvScene)
+  spawn(Player, pos: Vec2(400, 300))
+  spawn(Pickup, pos: Vec2(200, 250), item: Item(kind: ItemKind.Potion(heal: 30), name: "Red Potion"))
+  spawn(Pickup, pos: Vec2(500, 350), item: Item(kind: ItemKind.Weapon(atk: 15), name: "Iron Sword"))
+  spawn(Pickup, pos: Vec2(350, 150), item: Item(kind: ItemKind.Key(door_id: "boss"), name: "Gold Key"))
+
+@on("update")
+fn move(player: Player, dt: Float)
+  player.pos += Vec2(input_axis("left", "right"), input_axis("up", "down")) * 180.0 * dt
+
+@on("collide")
+fn grab(player: Player, pk: Pickup)
+  let sc = get_scene(InvScene)
+  if player.inv.add(pk.item)
+    sc.msg = "Got: " + pk.item.label()
+    sc.msg_t = 2.0
+    destroy(pk)
+  else
+    sc.msg = "Full!"
+    sc.msg_t = 1.5
+
+@on("key_pressed", key: "1")
+fn use1(player: Player)
+  use_slot(player, 0)
+
+@on("key_pressed", key: "2")
+fn use2(player: Player)
+  use_slot(player, 1)
+
+fn use_slot(player: Player, idx: Int)
+  let sc = get_scene(InvScene)
+  match player.inv.pop(idx)
+    some(item)
+      match item.kind
+        ItemKind.Potion(_)
+          player.hp = item.apply(player.hp, player.max_hp)
+          sc.msg = "Used " + item.name
+        ItemKind.Weapon(a)
+          player.atk = a
+          sc.msg = "Equipped " + item.name
+        _
+          player.inv.add(item)
+          sc.msg = "Can't use here"
+      sc.msg_t = 1.5
+    none
+      sc.msg = "Empty"
+      sc.msg_t = 1.0
+
+@on("key_pressed", key: "i")
+fn toggle(player: Player)
+  player.show_inv = not player.show_inv
+
+@on("update")
+fn tick_msg(sc: InvScene, dt: Float)
+  if sc.msg_t > 0.0
+    sc.msg_t -= dt
+  if sc.msg_t <= 0.0
+    sc.msg = ""
+
+@on("draw")
+fn draw_p(p: Player)
+  draw_rect(p.pos - Vec2(12, 16), Vec2(24, 32), fill: Color(0.3, 0.8, 0.5, 1))
+
+@on("draw")
+fn draw_pk(pk: Pickup)
+  draw_circle(pk.pos, 10.0, fill: Color(1, 1, 0.4, 1))
+
+@on("draw")
+fn draw_hud(p: Player)
+  draw_text("HP:" + str(p.hp) + " ATK:" + str(p.atk) + "  [I]Inv [1][2]Use", Vec2(10, 10), color: Color(1, 1, 1, 1), size: 14)
+
+@on("draw")
+fn draw_inv(p: Player)
+  if not p.show_inv
+    return
+  draw_rect(Vec2(200, 120), Vec2(400, 260), fill: Color(0.08, 0.08, 0.16, 0.9))
+  draw_text("INVENTORY " + str(len(p.inv.slots)) + "/" + str(p.inv.cap), Vec2(220, 130), color: Color(1, 1, 1, 1), size: 18)
+  for i in range(0, len(p.inv.slots))
+    draw_text("[" + str(i+1) + "] " + p.inv.slots[i].label(), Vec2(230, 160 + i * 26), color: Color(0.9, 0.9, 0.8, 1), size: 16)
+
+@on("draw")
+fn draw_msg(sc: InvScene)
+  if sc.msg != ""
+    draw_text(sc.msg, Vec2(400, 540), color: Color(1, 1, 0.4, 1), size: 18, align: "center")

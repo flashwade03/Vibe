@@ -1,0 +1,48 @@
+-- ============================================
+-- Example 1: Hello Vibe (최소 예제)
+-- 화면에 텍스트를 출력하고 클릭으로 색상 변경
+-- ============================================
+
+-- 색상 상수 정의
+const DEFAULT_COLOR = Color(1.0, 1.0, 1.0, 1.0)
+const COLORS = [
+    Color(1.0, 0.3, 0.3, 1.0),
+    Color(0.3, 1.0, 0.3, 1.0),
+    Color(0.3, 0.3, 1.0, 1.0),
+    Color(1.0, 1.0, 0.3, 1.0),
+    Color(1.0, 0.3, 1.0, 1.0)
+]
+
+-- 메인 씬 정의
+@scene
+struct HelloScene
+    text_color: Color
+    color_index: Int
+    message: String
+
+-- 씬 진입 시 초기화
+@on("enter")
+fn init_hello(scene: HelloScene)
+    scene.text_color = DEFAULT_COLOR
+    scene.color_index = 0
+    scene.message = "Hello, Vibe!"
+
+-- 화면 그리기
+@on("draw")
+fn draw_hello(scene: HelloScene)
+    -- 배경을 어두운 남색으로 칠하기
+    draw_rect(Vec2(0, 0), Vec2(800, 600), fill: Color(0.1, 0.1, 0.2, 1.0))
+
+    -- 메인 텍스트 출력
+    draw_text(scene.message, Vec2(400, 280), color: scene.text_color, size: 48, align: "center")
+
+    -- 안내 텍스트 출력
+    draw_text("Click anywhere to change color!", Vec2(400, 360), color: Color(0.6, 0.6, 0.6, 1.0), size: 20, align: "center")
+
+-- 마우스 클릭 시 색상 변경
+@on("mouse_pressed")
+fn on_click(scene: HelloScene, pos: Vec2, button: Int)
+    -- 왼쪽 클릭만 처리
+    if button == 0
+        scene.color_index = (scene.color_index + 1) % len(COLORS)
+        scene.text_color = COLORS[scene.color_index]

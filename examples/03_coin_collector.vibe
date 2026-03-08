@@ -1,0 +1,86 @@
+-- ============================================
+-- Example 3: 동전 수집 게임 (충돌 + 점수)
+-- 플레이어가 움직여서 동전을 수집하고 점수 획득
+-- ============================================
+
+const SCREEN_W = 800
+const SCREEN_H = 600
+const COIN_COUNT = 8
+
+-- 동전 수집 시그널
+@signal
+struct CoinCollected
+    value: Int
+
+-- 플레이어 엔티티
+@entity
+@tag("player")
+struct Player
+    pos: Vec2
+
+-- 동전 엔티티
+@entity
+@tag("coin")
+struct Coin
+    pos: Vec2
+    value: Int
+
+-- 게임 씬
+@scene
+struct CoinScene
+    score: Int
+    remaining: Int
+
+@on("enter")
+fn setup(scene: CoinScene)
+    scene.score = 0
+    scene.remaining = COIN_COUNT
+    spawn(Player, pos: Vec2(400, 300))
+    -- 동전을 랜덤 위치에 생성
+    for i in range(0, COIN_COUNT)
+        spawn(Coin, pos: Vec2(rand_float(50, SCREEN_W - 50), rand_float(50, SCREEN_H - 50)), value: 10)
+
+-- 플레이어 이동
+@on("update")
+fn move_player(player: Player, dt: Float)
+    let dir = Vec2(0, 0)
+    if key_down("w")
+        dir.y -= 1.0
+    if key_down("s")
+        dir.y += 1.0
+    if key_down("a")
+        dir.x -= 1.0
+    if key_down("d")
+        dir.x += 1.0
+    if length(dir) > 0.0
+        dir = normalize(dir)
+    player.pos += dir * 250.0 * dt
+    player.pos.x = clamp(player.pos.x, 0.0, SCREEN_W)
+    player.pos.y = clamp(player.pos.y, 0.0, SCREEN_H)
+
+-- 플레이어-동전 충돌 시 수집
+@on("collide")
+fn collect(player: Player, coin: Coin)
+    emit(CoinCollected(value: coin.value))
+    destroy(coin)
+
+-- 시그널 수신: 점수 갱신
+@on(CoinCollected)
+fn on_collect(scene: CoinScene, signal: CoinCollected)
+    scene.score += signal.value
+    scene.remaining -= 1
+
+-- 그리기
+@on("draw")
+fn draw_player(player: Player)
+    draw_rect(player.pos - Vec2(16, 16), Vec2(32, 32), fill: Color(0.2, 0.7, 1.0, 1.0))
+
+@on("draw")
+fn draw_coin(coin: Coin)
+    draw_circle(coin.pos, 12.0, fill: Color(1.0, 0.85, 0.0, 1.0))
+
+@on("draw")
+fn draw_hud(scene: CoinScene)
+    draw_text("Score: " + str(scene.score), Vec2(10, 10), color: Color(1, 1, 1, 1), size: 24)
+    if scene.remaining <= 0
+        draw_text("You Win!", Vec2(400, 300), color: Color(1, 0.85, 0, 1), size: 48, align: "center")

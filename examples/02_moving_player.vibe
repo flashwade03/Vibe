@@ -1,0 +1,62 @@
+-- ============================================
+-- Example 2: 움직이는 플레이어 (기본 입력)
+-- WASD로 사각형을 이동하고 화면 경계 충돌 처리
+-- ============================================
+
+const SCREEN_W = 800
+const SCREEN_H = 600
+const PLAYER_SIZE = 40.0
+const PLAYER_SPEED = 200.0
+
+-- 플레이어 엔티티 정의
+@entity
+struct Player
+    pos: Vec2
+    color: Color
+
+-- 게임 씬
+@scene
+struct GameScene
+    bg: Color
+
+-- 씬 시작 시 플레이어 생성
+@on("enter")
+fn setup(scene: GameScene)
+    scene.bg = Color(0.15, 0.15, 0.2, 1.0)
+    spawn(Player, pos: Vec2(400, 300), color: Color(0.2, 0.8, 0.4, 1.0))
+
+-- 매 프레임 입력 처리 및 이동
+@on("update")
+fn update_player(player: Player, dt: Float)
+    let dir = Vec2(0, 0)
+    if key_down("w")
+        dir.y -= 1.0
+    if key_down("s")
+        dir.y += 1.0
+    if key_down("a")
+        dir.x -= 1.0
+    if key_down("d")
+        dir.x += 1.0
+
+    -- 대각선 이동 시 속도 정규화
+    if length(dir) > 0.0
+        dir = normalize(dir)
+
+    -- 위치 갱신
+    player.pos += dir * PLAYER_SPEED * dt
+
+    -- 화면 경계 충돌 처리 (클램핑)
+    let half = PLAYER_SIZE / 2.0
+    player.pos.x = clamp(player.pos.x, half, SCREEN_W - half)
+    player.pos.y = clamp(player.pos.y, half, SCREEN_H - half)
+
+-- 그리기
+@on("draw")
+fn draw_game(scene: GameScene)
+    draw_rect(Vec2(0, 0), Vec2(SCREEN_W, SCREEN_H), fill: scene.bg)
+    draw_text("WASD to move", Vec2(10, 10), color: Color(0.5, 0.5, 0.5, 1.0), size: 16)
+
+@on("draw")
+fn draw_player(player: Player)
+    let half = PLAYER_SIZE / 2.0
+    draw_rect(player.pos - Vec2(half, half), Vec2(PLAYER_SIZE, PLAYER_SIZE), fill: player.color)
