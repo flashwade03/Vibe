@@ -27,6 +27,7 @@ import type {
   FieldAccess,
   IndexAccess,
   GroupExpr,
+  ListLiteral,
 } from "../parser/ast.js";
 
 // ── Constants ───────────────────────────────────────────────
@@ -269,6 +270,8 @@ function emitExpr(expr: Expr): string {
       return `${emitExpr(expr.object)}[${emitExpr(expr.index)}]`;
     case "GroupExpr":
       return `(${emitExpr(expr.expr)})`;
+    case "ListLiteral":
+      return `{${expr.elements.map(emitExpr).join(", ")}}`;
   }
 }
 

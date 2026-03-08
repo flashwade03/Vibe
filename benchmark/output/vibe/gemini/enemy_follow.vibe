@@ -1,0 +1,8 @@
+let px: Float = 400.0
+let py: Float = 300.0
+let ex: Float = 100.0
+let ey: Float = 100.0
+const P_SPEED: Float = 200.0
+const E_SPEED: Float = 100.0
+
+fn update(dt

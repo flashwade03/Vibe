@@ -32,6 +32,7 @@ import {
   FieldAccess,
   IndexAccess,
   GroupExpr,
+  ListLiteral,
 } from "./ast.js";
 
 // ── Public API ──────────────────────────────────────────────
@@ -180,10 +181,29 @@ class Parser {
     let typeAnnotation: string | undefined;
     if (this.at(TokenType.COLON)) {
       this.advance(); // consume :
-      const typeTok = this.expect(TokenType.IDENT);
-      typeAnnotation = typeTok.value;
+      typeAnnotation = this.consumeTypeAnnotation();
     }
     return { name: nameTok.value, typeAnnotation, loc: this.loc(nameTok) };
+  }
+
+  /** Consume a type annotation like `Float`, `List[Float]`, `Map[String, Int]`. */
+  private consumeTypeAnnotation(): string {
+    const typeTok = this.expect(TokenType.IDENT);
+    let annotation = typeTok.value;
+    // Handle generic type: List[Float], Map[String, Int]
+    if (this.at(TokenType.LBRACKET)) {
+      this.advance(); // consume [
+      annotation += "[";
+      annotation += this.consumeTypeAnnotation();
+      while (this.at(TokenType.COMMA)) {
+        this.advance();
+        annotation += ", ";
+        annotation += this.consumeTypeAnnotation();
+      }
+      this.expect(TokenType.RBRACKET);
+      annotation += "]";
+    }
+    return annotation;
   }
 
   // ── LetDecl / ConstDecl ─────────────────────────────────
@@ -194,8 +214,7 @@ class Parser {
     let typeAnnotation: string | undefined;
     if (this.at(TokenType.COLON)) {
       this.advance();
-      const typeTok = this.expect(TokenType.IDENT);
-      typeAnnotation = typeTok.value;
+      typeAnnotation = this.consumeTypeAnnotation();
     }
     this.expect(TokenType.EQ);
     const value = this.parseExpr();
@@ -215,8 +234,7 @@ class Parser {
     let typeAnnotation: string | undefined;
     if (this.at(TokenType.COLON)) {
       this.advance();
-      const typeTok = this.expect(TokenType.IDENT);
-      typeAnnotation = typeTok.value;
+      typeAnnotation = this.consumeTypeAnnotation();
     }
     this.expect(TokenType.EQ);
     const value = this.parseExpr();
@@ -611,6 +629,20 @@ class Parser {
         const expr = this.parseExpr();
         this.expect(TokenType.RPAREN);
         return { kind: "GroupExpr", expr, loc: this.loc(tok) };
+      }
+      case TokenType.LBRACKET: {
+        this.advance(); // consume [
+        const elements: Expr[] = [];
+        if (!this.at(TokenType.RBRACKET)) {
+          elements.push(this.parseExpr());
+          while (this.at(TokenType.COMMA)) {
+            this.advance();
+            if (this.at(TokenType.RBRACKET)) break; // trailing comma
+            elements.push(this.parseExpr());
+          }
+        }
+        this.expect(TokenType.RBRACKET);
+        return { kind: "ListLiteral", elements, loc: this.loc(tok) } as ListLiteral;
       }
       default:
         throw new VibeError(

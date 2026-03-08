@@ -1,0 +1,15 @@
+let bx: Float = 400.0
+let by: Float = 300.0
+let vx: Float = 150.0
+let vy: Float = 150.0
+
+fn update(dt: Float)
+    bx = bx + vx * dt
+    by = by + vy * dt
+    if bx < 0.0 or bx > 784.0
+        vx = -vx
+    if by < 0.0 or by > 584.0
+        vy = -vy
+
+fn draw()
+    draw_circle(bx, by, 16.0)

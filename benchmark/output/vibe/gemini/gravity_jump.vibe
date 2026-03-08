@@ -1,0 +1,9 @@
+let x: Float = 384.0
+let y: Float = 550.0
+let vy: Float = 0.0
+let on_ground: Bool = true
+
+fn update(dt: Float)
+    if key_down("left")
+        x = x - 200.0 * dt
+    if key_down

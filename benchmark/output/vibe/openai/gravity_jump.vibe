@@ -1,0 +1,27 @@
+let x: Float = 384.0
+let y: Float = 550.0
+let vy: Float = 0.0
+let on_ground: Bool = true
+const speed: Float = 200.0
+const gravity: Float = 500.0
+
+fn update(dt: Float)
+    if key_down("right")
+        x = x + speed * dt
+    if key_down("left")
+        x = x - speed * dt
+
+    vy = vy + gravity * dt
+    y = y + vy * dt
+
+    if y >= 550.0
+        y = 550.0
+        vy = 0.0
+        on_ground = true
+
+    if key_down("up") and on_ground
+        vy = -300.0
+        on_ground = false
+
+fn draw()
+    draw_rect(x, y, 32, 32)

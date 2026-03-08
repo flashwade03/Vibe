@@ -1,0 +1,18 @@
+let bx: Float = 400.0
+let by: Float = 300.0
+let vx: Float = 150.0
+let vy: Float = 150.0
+const RADIUS: Float = 16.0
+
+fn update(dt: Float)
+    bx = bx + vx * dt
+    by = by + vy * dt
+
+    if bx - RADIUS < 0.0 or bx + RADIUS > 800.0
+        vx = -vx
+    
+    if by - RADIUS < 0.0 or by + RADIUS > 600.0
+        vy = -vy
+
+fn draw()
+    draw_circle(bx, by, RADIUS)

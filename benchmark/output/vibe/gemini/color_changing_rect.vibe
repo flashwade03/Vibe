@@ -1,0 +1,17 @@
+let x: Float = 368.0
+let y: Float = 268.0
+const SPEED: Float = 100.0
+
+fn update(dt: Float)
+    if key_down("left")
+        x = x - SPEED * dt
+    if key_down("right")
+        x = x + SPEED * dt
+    if key_down("up")
+        y = y - SPEED * dt
+    if key_down("down")
+        y = y + SPEED * dt
+
+fn draw()
+    draw_rect(x, y, 64.0, 64.0)
+    draw_text("x: " + str(x) + " y: " + str(y), 10.0, 10.0)

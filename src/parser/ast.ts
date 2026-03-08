@@ -117,7 +117,8 @@ export type Expr =
   | CallExpr
   | FieldAccess
   | IndexAccess
-  | GroupExpr;
+  | GroupExpr
+  | ListLiteral;
 
 export interface IntLiteral {
   kind: "IntLiteral";
@@ -188,5 +189,11 @@ export interface IndexAccess {
 export interface GroupExpr {
   kind: "GroupExpr";
   expr: Expr;
+  loc: Loc;
+}
+
+export interface ListLiteral {
+  kind: "ListLiteral";
+  elements: Expr[];
   loc: Loc;
 }

@@ -1,0 +1,8 @@
+let particle_xs: List[Float] = []
+let particle_ys: List[Float] = []
+let particle_vxs: List[Float] = []
+let particle_vys: List[Float] = []
+let particle_lifes: List[Float] = []
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    for

@@ -1,0 +1,8 @@
+let player_x: Float = 384.0
+let player_y: Float = 550.0
+let bullet_xs: List[Float] = []
+let bullet_ys: List[Float] = []
+
+fn update(dt: Float)
+    if key_down("left")
+        player_x = player_x - 20
