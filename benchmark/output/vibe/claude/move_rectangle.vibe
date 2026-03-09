@@ -1,6 +1,6 @@
--- Move Rectangle: arrow keys move a rectangle around the screen
-let x: Float = 384.0
-let y: Float = 284.0
+-- Move Rectangle: arrow keys move a 32x32 rectangle at 200 px/s
+let x: Float = 400.0
+let y: Float = 300.0
 let speed: Float = 200.0
 
 fn update(dt: Float)

@@ -14,11 +14,11 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw the sun
+    -- Draw the central sun
     love.graphics.setColor(1, 1, 0)
     love.graphics.circle("fill", 400, 300, 20)
 
-    -- Draw orbiting bodies and their paths
+    -- Draw the orbiting bodies and their paths
     for i = 1, 3 do
         -- Draw orbit path
         love.graphics.setColor(0.5, 0.5, 0.5)
@@ -29,11 +29,9 @@ function love.draw()
             love.graphics.circle("fill", px, py, 1.0)
         end
 
-        -- Calculate position of the orbiting body
+        -- Calculate and draw the orbiting body
         local x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
         local y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
-
-        -- Draw the orbiting body
         love.graphics.setColor(1, 1, 1)
         love.graphics.circle("fill", x, y, 10)
     end

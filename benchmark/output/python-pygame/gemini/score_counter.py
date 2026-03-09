@@ -22,9 +22,8 @@ while running:
 
     screen.fill((0, 0, 0))
     
-    score_text = "Score: " + str(score)
-    text_surface = font.render(score_text, True, (255, 255, 255))
-    screen.blit(text_surface, (10, 10))
+    text = font.render("Score: " + str(score), True, (255, 255, 255))
+    screen.blit(text, (10, 10))
 
     pygame.display.flip()
 

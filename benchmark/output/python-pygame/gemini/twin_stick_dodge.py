@@ -10,4 +10,4 @@ pygame.display.set_caption("Dodge the Bullets")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-player
+player_x

@@ -23,7 +23,8 @@ function stripCodeFences(text: string): string {
 async function callGemini(
   systemPrompt: string,
   userPrompt: string,
-  config: BenchmarkConfig
+  config: BenchmarkConfig,
+  temperature: number = 0.2,
 ): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.geminiModel}:generateContent?key=${config.geminiApiKey}`;
 
@@ -38,7 +39,7 @@ async function callGemini(
       },
     ],
     generationConfig: {
-      temperature: 0.2,
+      temperature,
       maxOutputTokens: 2048,
     },
   };
@@ -66,7 +67,8 @@ async function callGemini(
 async function callOpenAI(
   systemPrompt: string,
   userPrompt: string,
-  config: BenchmarkConfig
+  config: BenchmarkConfig,
+  temperature: number = 0.2,
 ): Promise<string> {
   const url = "https://api.openai.com/v1/chat/completions";
 
@@ -79,7 +81,7 @@ async function callOpenAI(
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
-    temperature: 0.2,
+    temperature,
     max_tokens: 2048,
   };
 
@@ -110,15 +112,16 @@ export async function callLLM(
   provider: LLMProvider,
   systemPrompt: string,
   userPrompt: string,
-  config: BenchmarkConfig
+  config: BenchmarkConfig,
+  temperature: number = 0.2,
 ): Promise<{ code: string; latencyMs: number }> {
   const start = Date.now();
   let code: string;
 
   if (provider === "gemini") {
-    code = await callGemini(systemPrompt, userPrompt, config);
+    code = await callGemini(systemPrompt, userPrompt, config, temperature);
   } else {
-    code = await callOpenAI(systemPrompt, userPrompt, config);
+    code = await callOpenAI(systemPrompt, userPrompt, config, temperature);
   }
 
   return { code, latencyMs: Date.now() - start };

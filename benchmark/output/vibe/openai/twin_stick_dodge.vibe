@@ -49,15 +49,15 @@ fn update(dt: Float)
 
         let dx = player_x - spawn_x
         let dy = player_y - spawn_y
-        let dist = sqrt(dx * dx + dy * dy)
+        let length = sqrt(dx * dx + dy * dy)
+        let norm_dx = dx / length
+        let norm_dy = dy / length
         let bullet_speed = 250.0
-        let vx = (dx / dist) * bullet_speed
-        let vy = (dy / dist) * bullet_speed
 
         bx = bx + [spawn_x]
         by = by + [spawn_y]
-        bvx = bvx + [vx]
-        bvy = bvy + [vy]
+        bvx = bvx + [norm_dx * bullet_speed]
+        bvy = bvy + [norm_dy * bullet_speed]
         blife = blife + [4.0]
 
     -- Update bullets
@@ -67,8 +67,8 @@ fn update(dt: Float)
         blife[i] -= dt
 
         -- Check collision
-        let distance = sqrt((player_x - bx[i]) * (player_x - bx[i]) + (player_y - by[i]) * (player_y - by[i]))
-        if distance < 13.0 and blife[i] > 0.0
+        let dist = sqrt((player_x - bx[i]) * (player_x - bx[i]) + (player_y - by[i]) * (player_y - by[i]))
+        if dist < 13.0 and blife[i] > 0.0
             hit = true
 
     -- Update survived time

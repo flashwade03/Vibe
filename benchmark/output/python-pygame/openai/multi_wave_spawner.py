@@ -15,7 +15,6 @@ player_radius = 12
 
 # Enemy variables
 ex, ey, evx, evy, elife = [], [], [], [], []
-enemy_size = 16
 
 # Game state variables
 wave = 1
@@ -28,6 +27,7 @@ def rand_float(min_val, max_val):
 
 def spawn_enemies():
     global wave, enemies_per_wave, spawn_timer
+    speed = 80 + wave * 20
     for _ in range(enemies_per_wave):
         edge = rand_float(0.0, 4.0)
         if 0 <= edge < 1:
@@ -45,11 +45,10 @@ def spawn_enemies():
         direction_x /= length
         direction_y /= length
 
-        speed = 80 + wave * 20
-        evx.append(direction_x * speed)
-        evy.append(direction_y * speed)
         ex.append(x)
         ey.append(y)
+        evx.append(direction_x * speed)
+        evy.append(direction_y * speed)
         elife.append(1.0)
 
     wave += 1
@@ -85,9 +84,8 @@ while running:
                 ey[i] += evy[i] * dt
                 elife[i] -= dt
 
-                # Check collision with player
                 distance = math.sqrt((player_x - ex[i]) ** 2 + (player_y - ey[i]) ** 2)
-                if distance < player_radius + enemy_size / 2:
+                if distance < player_radius + 8:
                     game_over = True
 
     screen.fill((0, 0, 0))
@@ -95,7 +93,7 @@ while running:
 
     for i in range(len(ex)):
         if elife[i] > 0:
-            pygame.draw.rect(screen, (255, 255, 255), (int(ex[i]), int(ey[i]), enemy_size, enemy_size))
+            pygame.draw.rect(screen, (255, 255, 255), (int(ex[i]) - 8, int(ey[i]) - 8, 16, 16))
 
     font = pygame.font.Font(None, 36)
     wave_text = font.render("Wave: " + str(wave), True, (255, 255, 255))

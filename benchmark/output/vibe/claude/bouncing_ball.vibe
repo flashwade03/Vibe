@@ -1,9 +1,9 @@
--- Bouncing Ball: bounces off edges of 800x600 window
+-- Bouncing Ball: circle bounces off 800x600 window edges
 let bx: Float = 400.0
 let by: Float = 300.0
-let vx: Float = 180.0
-let vy: Float = 130.0
-let radius: Float = 12.0
+let vx: Float = 150.0
+let vy: Float = 150.0
+let radius: Float = 16.0
 
 fn update(dt: Float)
     bx = bx + vx * dt

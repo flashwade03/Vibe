@@ -18,7 +18,7 @@ function love.update(dt)
     if love.keyboard.isDown("right") then
         player_x = player_x + player_speed * dt
     end
-    
+
     for i = 1, #bullet_ys do
         bullet_ys[i] = bullet_ys[i] - bullet_speed * dt
     end
@@ -26,7 +26,6 @@ end
 
 function love.keypressed(key)
     if key == "space" then
-        -- Center the 4x4 bullet relative to the 32x32 player (32/2 - 4/2 = 14)
         table.insert(bullet_xs, player_x + 14)
         table.insert(bullet_ys, player_y)
     end

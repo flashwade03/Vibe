@@ -10,4 +10,4 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
 state = 0
-score
+score =

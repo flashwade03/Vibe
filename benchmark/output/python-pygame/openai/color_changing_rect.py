@@ -6,7 +6,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
 
-x, y = 368.0, 268.0
+x, y = 368.0, 268.0  # Centered position for a 64x64 rectangle
 speed = 100
 font = pygame.font.Font(None, 36)
 

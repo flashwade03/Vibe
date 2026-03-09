@@ -11,20 +11,26 @@ fn load()
         boid_vys = boid_vys + [rand_float(-50.0, 50.0)]
 
 fn update(dt: Float)
-    let center_x: Float = 0.0
-    let center_y: Float = 0.0
+    let num_boids: Float = 15.0
+    let cohesion_strength: Float = 0.5
+    let separation_distance: Float = 30.0
+    let separation_strength: Float = 100.0
+    let max_speed: Float = 150.0
 
     for i in range(15)
-        center_x += boid_xs[i]
-        center_y += boid_ys[i]
+        let center_x: Float = 0.0
+        let center_y: Float = 0.0
 
-    center_x /= 15.0
-    center_y /= 15.0
+        for j in range(15)
+            center_x += boid_xs[j]
+            center_y += boid_ys[j]
 
-    for i in range(15)
+        center_x /= num_boids
+        center_y /= num_boids
+
         -- Cohesion
-        boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
-        boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
+        boid_vxs[i] += (center_x - boid_xs[i]) * cohesion_strength * dt
+        boid_vys[i] += (center_y - boid_ys[i]) * cohesion_strength * dt
 
         -- Separation
         for j in range(15)
@@ -32,15 +38,15 @@ fn update(dt: Float)
                 let dx: Float = boid_xs[i] - boid_xs[j]
                 let dy: Float = boid_ys[i] - boid_ys[j]
                 let distance: Float = sqrt(dx * dx + dy * dy)
-                if distance < 30.0
-                    boid_vxs[i] += dx / distance * 100.0 * dt
-                    boid_vys[i] += dy / distance * 100.0 * dt
+                if distance < separation_distance
+                    boid_vxs[i] += dx / distance * separation_strength * dt
+                    boid_vys[i] += dy / distance * separation_strength * dt
 
-        -- Speed clamping
+        -- Clamp speed
         let speed: Float = sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
-        if speed > 150.0
-            boid_vxs[i] = boid_vxs[i] / speed * 150.0
-            boid_vys[i] = boid_vys[i] / speed * 150.0
+        if speed > max_speed
+            boid_vxs[i] = boid_vxs[i] / speed * max_speed
+            boid_vys[i] = boid_vys[i] / speed * max_speed
 
         -- Update positions
         boid_xs[i] += boid_vxs[i] * dt

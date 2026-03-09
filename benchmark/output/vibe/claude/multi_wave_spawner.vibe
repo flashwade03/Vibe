@@ -1,71 +1,86 @@
--- Multi-Wave Spawner: enemies spawn in waves, each wave has more enemies
-let wave: Int = 0
-let wave_timer: Float = 2.0
-let enemies_this_wave: Int = 3
+-- Multi-Wave Spawner: wave-based enemies with increasing difficulty
+let player_x: Float = 400.0
+let player_y: Float = 300.0
+let player_speed: Float = 250.0
 
 let ex: List[Float] = []
 let ey: List[Float] = []
 let evx: List[Float] = []
 let evy: List[Float] = []
-let alive: List[Float] = []
+let elife: List[Float] = []
 
-let score: Int = 0
+let wave: Int = 1
+let spawn_timer: Float = 2.0
+let enemies_per_wave: Int = 3
+let game_over: Bool = false
 
 fn update(dt: Float)
-    -- Wave spawning timer
-    wave_timer = wave_timer - dt
-    if wave_timer <= 0.0
-        wave = wave + 1
-        enemies_this_wave = 2 + wave
-        wave_timer = 3.0
-        -- Spawn enemies from random edges
-        for s in range(0, enemies_this_wave)
+    if game_over
+        return
+    -- Move player
+    if key_down("left")
+        player_x = player_x - player_speed * dt
+    if key_down("right")
+        player_x = player_x + player_speed * dt
+    if key_down("up")
+        player_y = player_y - player_speed * dt
+    if key_down("down")
+        player_y = player_y + player_speed * dt
+    -- Spawn wave
+    spawn_timer = spawn_timer - dt
+    if spawn_timer <= 0.0
+        let spd: Float = 80.0 + float(wave) * 20.0
+        for s in range(0, enemies_per_wave)
             let edge: Float = rand_float(0.0, 4.0)
             let sx: Float = 0.0
             let sy: Float = 0.0
-            let vx: Float = 0.0
-            let vy: Float = 0.0
-            let spd: Float = 60.0 + float(wave) * 15.0
             if edge < 1.0
                 sx = rand_float(0.0, 800.0)
-                sy = -10.0
-                vx = rand_float(-50.0, 50.0)
-                vy = spd
+                sy = 0.0
             else if edge < 2.0
-                sx = 810.0
+                sx = 800.0
                 sy = rand_float(0.0, 600.0)
-                vx = -spd
-                vy = rand_float(-50.0, 50.0)
             else if edge < 3.0
                 sx = rand_float(0.0, 800.0)
-                sy = 610.0
-                vx = rand_float(-50.0, 50.0)
-                vy = -spd
+                sy = 600.0
             else
-                sx = -10.0
+                sx = 0.0
                 sy = rand_float(0.0, 600.0)
-                vx = spd
-                vy = rand_float(-50.0, 50.0)
+            -- Direction toward player
+            let dx: Float = player_x - sx
+            let dy: Float = player_y - sy
+            let dist: Float = sqrt(dx * dx + dy * dy)
+            if dist > 1.0
+                dx = dx / dist
+                dy = dy / dist
             ex = ex + [sx]
             ey = ey + [sy]
-            evx = evx + [vx]
-            evy = evy + [vy]
-            alive = alive + [1.0]
-
-    -- Move enemies
+            evx = evx + [dx * spd]
+            evy = evy + [dy * spd]
+            elife = elife + [1.0]
+        wave = wave + 1
+        enemies_per_wave = 3 + wave
+        let next_timer: Float = 3.0 - float(wave) * 0.2
+        if next_timer < 0.5
+            next_timer = 0.5
+        spawn_timer = next_timer
+    -- Move enemies and check collision
     for i in range(0, len(ex))
-        if alive[i] > 0.0
+        if elife[i] > 0.0
             ex[i] = ex[i] + evx[i] * dt
             ey[i] = ey[i] + evy[i] * dt
-            -- Deactivate if far off screen
-            if ex[i] < -50.0 or ex[i] > 850.0 or ey[i] < -50.0 or ey[i] > 650.0
-                alive[i] = 0.0
+            elife[i] = elife[i] - dt
+            let cdx: Float = player_x - ex[i]
+            let cdy: Float = player_y - ey[i]
+            let cd: Float = sqrt(cdx * cdx + cdy * cdy)
+            if cd < 12.0 + 8.0
+                game_over = true
 
 fn draw()
-    -- Draw enemies
+    draw_circle(player_x, player_y, 12.0)
     for i in range(0, len(ex))
-        if alive[i] > 0.0
+        if elife[i] > 0.0
             draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)
-    -- HUD
     draw_text("Wave: " + str(wave), 10.0, 10.0)
-    draw_text("Next wave in: " + str(int(wave_timer)), 10.0, 35.0)
+    if game_over
+        draw_text("GAME OVER", 340.0, 280.0)

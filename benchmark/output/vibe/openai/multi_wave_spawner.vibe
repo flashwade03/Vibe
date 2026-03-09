@@ -1,6 +1,6 @@
 let px: Float = 400.0
 let py: Float = 300.0
-let player_speed: Float = 250.0
+let pspeed: Float = 250.0
 let wave: Int = 1
 let spawn_timer: Float = 2.0
 let enemies_per_wave: Int = 3
@@ -17,13 +17,13 @@ fn update(dt: Float)
         return
 
     if key_down("right")
-        px = px + player_speed * dt
+        px = px + pspeed * dt
     if key_down("left")
-        px = px - player_speed * dt
+        px = px - pspeed * dt
     if key_down("down")
-        py = py + player_speed * dt
+        py = py + pspeed * dt
     if key_down("up")
-        py = py - player_speed * dt
+        py = py - pspeed * dt
 
     spawn_timer = spawn_timer - dt
     if spawn_timer <= 0.0
@@ -31,7 +31,6 @@ fn update(dt: Float)
             let edge = rand_float(0.0, 4.0)
             let ex_pos: Float
             let ey_pos: Float
-
             if edge < 1.0
                 ex_pos = rand_float(0.0, 800.0)
                 ey_pos = 0.0
@@ -63,25 +62,24 @@ fn update(dt: Float)
         spawn_timer = max(0.5, 3.0 - wave * 0.2)
 
     for i in range(0, len(ex))
-        ex[i] = ex[i] + evx[i] * dt
-        ey[i] = ey[i] + evy[i] * dt
-        elife[i] = elife[i] - dt
+        if elife[i] > 0.0
+            ex[i] = ex[i] + evx[i] * dt
+            ey[i] = ey[i] + evy[i] * dt
+            elife[i] = elife[i] - dt
 
-        let dx = px - ex[i]
-        let dy = py - ey[i]
-        let dist = sqrt(dx * dx + dy * dy)
-
-        if dist < 20.0 and elife[i] > 0.0
-            game_over = true
+            let dx = px - ex[i]
+            let dy = py - ey[i]
+            let dist = sqrt(dx * dx + dy * dy)
+            if dist < 20.0
+                game_over = true
 
 fn draw()
+    draw_text("Wave: " + str(wave), 10.0, 10.0)
     draw_circle(px, py, 12.0)
 
     for i in range(0, len(ex))
         if elife[i] > 0.0
             draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)
 
-    draw_text("Wave: " + str(wave), 10.0, 10.0)
-
     if game_over
-        draw_text("GAME OVER", 350.0, 280.0)
+        draw_text("GAME OVER", 350.0, 290.0)

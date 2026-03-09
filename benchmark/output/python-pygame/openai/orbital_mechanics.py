@@ -30,21 +30,21 @@ while running:
     pygame.draw.circle(screen, (255, 255, 0), (400, 300), 20)
 
     for i in range(3):
-        # Calculate position
+        # Calculate position of each body
         x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
         y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
-
-        # Draw orbiting body
-        pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 10)
 
         # Draw orbit path
         for j in range(36):
             angle = float(j) * 0.1745
             px = 400.0 + math.cos(angle) * orb_radii[i]
             py = 300.0 + math.sin(angle) * orb_radii[i]
-            pygame.draw.circle(screen, (100, 100, 100), (int(px), int(py)), 1)
+            pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), 1)
 
-    # Display angle of body 0
+        # Draw the orbiting body
+        pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 10)
+
+    # Display the current angle of body 0
     angle_text = font.render("Angle: " + str(orb_angles[0]), True, (255, 255, 255))
     screen.blit(angle_text, (10, 10))
 

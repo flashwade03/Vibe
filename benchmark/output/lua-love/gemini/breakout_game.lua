@@ -5,7 +5,6 @@ local paddle_w = 80
 local paddle_h = 12
 local paddle_speed = 300
 
-local bx = 400
-local by = 400
-local vx = 200
-local vy = -2
+local ball_x = 400
+local ball_y = 400
+local ball_vx = 20

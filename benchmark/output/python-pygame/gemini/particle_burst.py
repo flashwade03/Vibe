@@ -12,4 +12,4 @@ clock = pygame.time.Clock()
 particle_xs = []
 particle_ys = []
 particle_vxs = []
-particle_
+particle

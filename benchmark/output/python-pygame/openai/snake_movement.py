@@ -3,9 +3,10 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Snake Movement")
+pygame.display.set_caption("Snake Game")
 clock = pygame.time.Clock()
 
+# Snake state variables
 snake_xs = [400.0, 380.0, 360.0]
 snake_ys = [300.0, 300.0, 300.0]
 dir_x, dir_y = 1.0, 0.0
@@ -23,11 +24,11 @@ while running:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT] and dir_x != -1.0:
         dir_x, dir_y = 1.0, 0.0
-    if keys[pygame.K_LEFT] and dir_x != 1.0:
+    elif keys[pygame.K_LEFT] and dir_x != 1.0:
         dir_x, dir_y = -1.0, 0.0
-    if keys[pygame.K_UP] and dir_y != 1.0:
+    elif keys[pygame.K_UP] and dir_y != 1.0:
         dir_x, dir_y = 0.0, -1.0
-    if keys[pygame.K_DOWN] and dir_y != -1.0:
+    elif keys[pygame.K_DOWN] and dir_y != -1.0:
         dir_x, dir_y = 0.0, 1.0
 
     if move_timer <= 0:
@@ -55,6 +56,7 @@ while running:
     screen.fill((0, 0, 0))
     for x, y in zip(snake_xs, snake_ys):
         pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 18, 18))
+
     pygame.display.flip()
 
 pygame.quit()

@@ -18,11 +18,6 @@ function love.update(dt)
         x = x + speed * dt
     end
 
-    if love.keyboard.isDown("up") and on_ground then
-        vy = -300.0
-        on_ground = false
-    end
-
     vy = vy + gravity * dt
     y = y + vy * dt
 
@@ -30,6 +25,11 @@ function love.update(dt)
         y = 550
         vy = 0
         on_ground = true
+    end
+
+    if love.keyboard.isDown("up") and on_ground then
+        vy = -300.0
+        on_ground = false
     end
 end
 

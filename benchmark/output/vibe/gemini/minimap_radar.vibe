@@ -7,4 +7,4 @@ let item_ys: List[Float] = []
 let initialized: Bool = false
 
 fn load()
-    for i
+    for i in range

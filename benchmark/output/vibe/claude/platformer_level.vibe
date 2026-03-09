@@ -1,24 +1,23 @@
--- Platformer Level: player with gravity, platforms, left/right movement
+-- Platformer Level: player with gravity, 5 platforms, jump mechanic
 let px: Float = 100.0
 let py: Float = 400.0
 let prev_py: Float = 400.0
 let vy: Float = 0.0
 let speed: Float = 250.0
-let gravity: Float = 700.0
+let gravity: Float = 600.0
 let on_ground: Bool = false
 
--- 6 platforms
-let plat_x: List[Float] = [0.0, 200.0, 400.0, 150.0, 500.0, 300.0]
-let plat_y: List[Float] = [550.0, 450.0, 380.0, 300.0, 230.0, 150.0]
-let plat_w: List[Float] = [800.0, 150.0, 160.0, 130.0, 180.0, 200.0]
-let plat_h: Float = 16.0
-let player_w: Float = 24.0
-let player_h: Float = 24.0
+let plat_xs: List[Float] = [50.0, 300.0, 500.0, 200.0, 450.0]
+let plat_ys: List[Float] = [450.0, 380.0, 300.0, 220.0, 150.0]
+let plat_ws: List[Float] = [200.0, 150.0, 180.0, 120.0, 200.0]
+let plat_h: Float = 12.0
+let pw: Float = 20.0
+let ph: Float = 20.0
 
 fn keypressed(k: String)
-    if k == "space"
+    if k == "up"
         if on_ground
-            vy = -420.0
+            vy = -350.0
             on_ground = false
 
 fn update(dt: Float)
@@ -27,37 +26,44 @@ fn update(dt: Float)
         px = px - speed * dt
     if key_down("right")
         px = px + speed * dt
-    -- Clamp to screen width
     if px < 0.0
         px = 0.0
-    if px > 800.0 - player_w
-        px = 800.0 - player_w
-    -- Save previous y for platform detection
+    if px > 800.0 - pw
+        px = 800.0 - pw
+    -- Save previous y
     prev_py = py
     -- Apply gravity
     vy = vy + gravity * dt
     py = py + vy * dt
-    -- Platform collision (only when falling)
+    -- Platform collision
     on_ground = false
-    for i in range(0, len(plat_x))
+    for i in range(0, len(plat_xs))
         if vy >= 0.0
-            if prev_py + player_h <= plat_y[i]
-                if py + player_h >= plat_y[i]
-                    if px + player_w > plat_x[i]
-                        if px < plat_x[i] + plat_w[i]
-                            py = plat_y[i] - player_h
+            if prev_py + ph <= plat_ys[i]
+                if py + ph >= plat_ys[i]
+                    if px + pw > plat_xs[i]
+                        if px < plat_xs[i] + plat_ws[i]
+                            py = plat_ys[i] - ph
                             vy = 0.0
                             on_ground = true
+    -- Ground at y=580
+    if vy >= 0.0
+        if py + ph >= 580.0
+            py = 580.0 - ph
+            vy = 0.0
+            on_ground = true
     -- Reset if fallen off
-    if py > 650.0
+    if py > 620.0
         px = 100.0
         py = 400.0
         vy = 0.0
 
 fn draw()
     -- Draw platforms
-    for i in range(0, len(plat_x))
-        draw_rect(plat_x[i], plat_y[i], plat_w[i], plat_h)
+    for i in range(0, len(plat_xs))
+        draw_rect(plat_xs[i], plat_ys[i], plat_ws[i], plat_h)
+    -- Draw ground
+    draw_rect(0.0, 580.0, 800.0, 20.0)
     -- Draw player
-    draw_rect(px, py, player_w, player_h)
-    draw_text("Arrows + SPACE to jump", 10.0, 10.0)
+    draw_rect(px, py, pw, ph)
+    draw_text("Use arrows + up to jump", 10.0, 10.0)

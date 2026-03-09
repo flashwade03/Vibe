@@ -1,53 +1,42 @@
--- State Machine Game: rectangle with idle, moving, jumping states
--- state: 0=idle, 1=moving, 2=jumping
-let x: Float = 384.0
-let y: Float = 500.0
-let vy: Float = 0.0
-let speed: Float = 200.0
-let gravity: Float = 600.0
-let ground_y: Float = 500.0
+-- State Machine Game: menu, playing, gameover states
+-- state: 0=menu, 1=playing, 2=gameover
 let state: Int = 0
+let score: Int = 0
+let timer: Float = 10.0
+let target_x: Float = 300.0
+let target_y: Float = 200.0
 
 fn keypressed(k: String)
     if k == "space"
-        if state != 2
-            vy = -350.0
-            state = 2
+        if state == 0
+            state = 1
+            score = 0
+            timer = 10.0
+            target_x = rand_float(0.0, 780.0)
+            target_y = rand_float(0.0, 580.0)
+        else if state == 2
+            state = 0
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    if state == 1
+        if mx >= target_x and mx <= target_x + 20.0 and my >= target_y and my <= target_y + 20.0
+            score = score + 1
+            target_x = rand_float(0.0, 780.0)
+            target_y = rand_float(0.0, 580.0)
 
 fn update(dt: Float)
-    let moving: Bool = false
-    -- Horizontal movement
-    if key_down("left")
-        x = x - speed * dt
-        moving = true
-    if key_down("right")
-        x = x + speed * dt
-        moving = true
-    -- Apply gravity
-    vy = vy + gravity * dt
-    y = y + vy * dt
-    -- Ground collision
-    if y >= ground_y
-        y = ground_y
-        vy = 0.0
-        if state == 2
-            state = 0
-    -- Update state
-    if state != 2
-        if moving
-            state = 1
-        else
-            state = 0
+    if state == 1
+        timer = timer - dt
+        if timer <= 0.0
+            state = 2
 
 fn draw()
-    draw_rect(x, y, 32.0, 32.0)
-    -- Draw ground
-    draw_rect(0.0, 532.0, 800.0, 68.0)
-    -- Display current state
     if state == 0
-        draw_text("State: IDLE", 10.0, 10.0)
+        draw_text("Press SPACE to Start", 250.0, 280.0)
     else if state == 1
-        draw_text("State: MOVING", 10.0, 10.0)
+        draw_rect(target_x, target_y, 20.0, 20.0)
+        draw_text("Score: " + str(score), 10.0, 10.0)
+        draw_text("Time: " + str(int(timer)), 10.0, 35.0)
     else
-        draw_text("State: JUMPING", 10.0, 10.0)
-    draw_text("Arrows to move, SPACE to jump", 10.0, 40.0)
+        draw_text("Game Over! Score: " + str(score), 250.0, 260.0)
+        draw_text("Press SPACE to Restart", 250.0, 300.0)

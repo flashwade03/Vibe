@@ -1,29 +1,18 @@
--- Color Changing Rect: changes color every second
--- color_index cycles through 0..3 representing red, green, blue, yellow
-let color_index: Int = 0
-let timer: Float = 0.0
+-- Position Display: 64x64 rect at center, moves with arrows, shows position
+let x: Float = 400.0
+let y: Float = 300.0
+let speed: Float = 100.0
 
 fn update(dt: Float)
-    timer = timer + dt
-    if timer >= 1.0
-        timer = timer - 1.0
-        color_index = color_index + 1
-        if color_index >= 4
-            color_index = 0
+    if key_down("right")
+        x = x + speed * dt
+    if key_down("left")
+        x = x - speed * dt
+    if key_down("down")
+        y = y + speed * dt
+    if key_down("up")
+        y = y - speed * dt
 
 fn draw()
-    -- Draw colored rectangle at center
-    -- Use index to pick a color via separate draws
-    if color_index == 0
-        draw_rect(350.0, 250.0, 100.0, 100.0)
-        draw_text("Red", 370.0, 360.0)
-    else if color_index == 1
-        draw_rect(350.0, 250.0, 100.0, 100.0)
-        draw_text("Green", 365.0, 360.0)
-    else if color_index == 2
-        draw_rect(350.0, 250.0, 100.0, 100.0)
-        draw_text("Blue", 368.0, 360.0)
-    else
-        draw_rect(350.0, 250.0, 100.0, 100.0)
-        draw_text("Yellow", 362.0, 360.0)
-    draw_text("Timer: " + str(int(timer)), 10.0, 10.0)
+    draw_rect(x, y, 64.0, 64.0)
+    draw_text("x: " + str(x) + " y: " + str(y), 10.0, 10.0)

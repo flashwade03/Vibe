@@ -5,9 +5,9 @@ local particle_vxs = {}
 local particle_vys = {}
 local particle_lifes = {}
 
-function love.load()
-    love.window.setMode(800, 600)
-    love.window.setTitle("Particle Burst")
+local function rand_float(min, max)
+    return min + love.math.random() * (max - min)
 end
 
-function love.mouse
+function love.load()
+    love.window

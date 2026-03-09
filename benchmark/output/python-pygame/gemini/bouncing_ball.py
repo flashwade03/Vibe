@@ -37,7 +37,7 @@ while running:
 
     screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), radius)
-    
+
     pygame.display.flip()
 
 pygame.quit()

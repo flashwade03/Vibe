@@ -8,4 +8,4 @@ pygame.display.set_caption("Breakout")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-paddle_x = 360.
+paddle_x = 360.0

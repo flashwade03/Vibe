@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Game")
+pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
 
 player_x, player_y = 400.0, 300.0
@@ -33,11 +33,13 @@ while running:
     dx = player_x - enemy_x
     dy = player_y - enemy_y
     distance = math.sqrt(dx * dx + dy * dy)
+
     if distance > 1.0:
         dx /= distance
         dy /= distance
-        enemy_x += dx * enemy_speed * dt
-        enemy_y += dy * enemy_speed * dt
+
+    enemy_x += dx * enemy_speed * dt
+    enemy_y += dy * enemy_speed * dt
 
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 0, 0), (int(enemy_x), int(enemy_y), 32, 32))

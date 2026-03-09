@@ -1,25 +1,25 @@
--- Orbital Mechanics: small circle orbiting a larger circle using sin/cos
-let angle: Float = 0.0
-let orbit_speed: Float = 1.5
-let orbit_radius: Float = 150.0
-let center_x: Float = 400.0
-let center_y: Float = 300.0
+-- Orbital Mechanics: 3 bodies orbiting a central point
+let orb_angles: List[Float] = [0.0, 2.094, 4.189]
+let orb_radii: List[Float] = [100.0, 160.0, 220.0]
+let orb_speeds: List[Float] = [1.5, 1.0, 0.6]
 
 fn update(dt: Float)
-    angle = angle + orbit_speed * dt
+    for i in range(0, 3)
+        orb_angles[i] = orb_angles[i] + orb_speeds[i] * dt
 
 fn draw()
-    -- Draw the central body
-    draw_circle(center_x, center_y, 30.0)
-    -- Compute orbiting position
-    let orb_x: Float = center_x + cos(angle) * orbit_radius
-    let orb_y: Float = center_y + sin(angle) * orbit_radius
-    -- Draw orbit path as small dots
-    for i in range(0, 60)
-        let a: Float = float(i) * 0.1047
-        let px: Float = center_x + cos(a) * orbit_radius
-        let py: Float = center_y + sin(a) * orbit_radius
-        draw_circle(px, py, 1.0)
-    -- Draw the orbiting body
-    draw_circle(orb_x, orb_y, 10.0)
-    draw_text("Angle: " + str(int(angle * 57.0)), 10.0, 10.0)
+    -- Draw sun at center
+    draw_circle(400.0, 300.0, 20.0)
+    -- Draw orbits and bodies
+    for i in range(0, 3)
+        -- Draw orbit path
+        for j in range(0, 36)
+            let a: Float = float(j) * 0.1745
+            let px: Float = 400.0 + cos(a) * orb_radii[i]
+            let py: Float = 300.0 + sin(a) * orb_radii[i]
+            draw_circle(px, py, 1.0)
+        -- Draw orbiting body
+        let ox: Float = 400.0 + cos(orb_angles[i]) * orb_radii[i]
+        let oy: Float = 300.0 + sin(orb_angles[i]) * orb_radii[i]
+        draw_circle(ox, oy, 10.0)
+    draw_text("Angle: " + str(orb_angles[0]), 10.0, 10.0)

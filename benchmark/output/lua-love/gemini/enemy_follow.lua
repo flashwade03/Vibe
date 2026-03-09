@@ -1,4 +1,3 @@
-```lua
 local player_x = 400
 local player_y = 300
 local player_speed = 200
@@ -43,4 +42,12 @@ end
 function love.draw()
     -- Draw enemy (red)
     love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("fill", enemy_x
+    love.graphics.rectangle("fill", enemy_x, enemy_y, 32, 32)
+
+    -- Draw player (blue)
+    love.graphics.setColor(0, 0, 1)
+    love.graphics.rectangle("fill", player_x, player_y, 32, 32)
+    
+    -- Reset color to default
+    love.graphics.setColor(1, 1, 1)
+end

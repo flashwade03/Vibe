@@ -1,11 +1,10 @@
--- Snake Movement: list of body segments following a head
-let snake_xs: List[Float] = [400.0, 380.0, 360.0, 340.0, 320.0]
-let snake_ys: List[Float] = [300.0, 300.0, 300.0, 300.0, 300.0]
+-- Snake Movement: grid-based snake with body following head
+let snake_xs: List[Float] = [400.0, 380.0, 360.0]
+let snake_ys: List[Float] = [300.0, 300.0, 300.0]
 let dir_x: Float = 1.0
 let dir_y: Float = 0.0
 let move_timer: Float = 0.0
-let step_time: Float = 0.12
-let cell_size: Float = 20.0
+let step_time: Float = 0.15
 
 fn keypressed(k: String)
     if k == "right"
@@ -29,10 +28,10 @@ fn update(dt: Float)
     move_timer = move_timer + dt
     if move_timer >= step_time
         move_timer = move_timer - step_time
-        -- Compute new head position
-        let new_x: Float = snake_xs[0] + dir_x * cell_size
-        let new_y: Float = snake_ys[0] + dir_y * cell_size
-        -- Wrap around screen
+        -- New head position
+        let new_x: Float = snake_xs[0] + dir_x * 20.0
+        let new_y: Float = snake_ys[0] + dir_y * 20.0
+        -- Wrap around
         if new_x >= 800.0
             new_x = 0.0
         if new_x < 0.0
@@ -41,7 +40,7 @@ fn update(dt: Float)
             new_y = 0.0
         if new_y < 0.0
             new_y = 580.0
-        -- Shift body segments backward
+        -- Shift body backward
         let i: Int = len(snake_xs) - 1
         for i > 0
             snake_xs[i] = snake_xs[i - 1]

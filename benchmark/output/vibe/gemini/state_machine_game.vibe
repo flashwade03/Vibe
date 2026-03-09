@@ -1,6 +1,6 @@
 let state: Int = 0
 let score: Int = 0
-let timer: Float = 10.0
+let timer: Float = 0.0
 let target_x: Float = 400.0
 let target_y: Float = 300.0
 

@@ -1,9 +1,9 @@
 let x: Float = 384.0
 let y: Float = 550.0
 let vy: Float = 0.0
+let speed: Float = 200.0
+let gravity: Float = 500.0
 let on_ground: Bool = true
-const speed: Float = 200.0
-const gravity: Float = 500.0
 
 fn update(dt: Float)
     if key_down("right")
@@ -24,4 +24,4 @@ fn update(dt: Float)
         on_ground = false
 
 fn draw()
-    draw_rect(x, y, 32.0, 32.0)
+    draw_rect(x, y, 32, 32)

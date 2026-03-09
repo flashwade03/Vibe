@@ -16,6 +16,7 @@ const KEYWORDS: Record<string, TokenType> = {
   else: TokenType.KW_ELSE,
   return: TokenType.KW_RETURN,
   for: TokenType.KW_FOR,
+  while: TokenType.KW_FOR, // alias: `while cond` → `for cond`
   and: TokenType.KW_AND,
   or: TokenType.KW_OR,
   not: TokenType.KW_NOT,

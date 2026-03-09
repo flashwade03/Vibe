@@ -8,4 +8,4 @@ pygame.display.set_caption("Platformer")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-player_x = 100.
+player_x, player_y =

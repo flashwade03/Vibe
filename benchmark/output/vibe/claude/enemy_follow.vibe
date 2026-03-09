@@ -1,4 +1,4 @@
--- Enemy Follow: enemy rectangle follows the player
+-- Enemy Follow: enemy chases the player using normalized direction
 let player_x: Float = 400.0
 let player_y: Float = 300.0
 let player_speed: Float = 200.0
@@ -25,7 +25,8 @@ fn update(dt: Float)
         enemy_y = enemy_y + (dy / dist) * enemy_speed * dt
 
 fn draw()
-    draw_rect(player_x, player_y, 32.0, 32.0)
+    -- Draw enemy first, player on top
     draw_rect(enemy_x, enemy_y, 32.0, 32.0)
+    draw_rect(player_x, player_y, 32.0, 32.0)
     draw_text("Player", player_x, player_y - 15.0)
     draw_text("Enemy", enemy_x, enemy_y - 15.0)

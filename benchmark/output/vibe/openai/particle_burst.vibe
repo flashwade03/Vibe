@@ -17,15 +17,15 @@ fn mousepressed(mx: Float, my: Float, button: Int)
         particle_lifes = particle_lifes + [2.0]
 
 fn update(dt: Float)
-    let n: Int = len(particle_xs)
+    let n = len(particle_xs)
     for i in range(0, n)
         if particle_lifes[i] > 0.0
-            particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
-            particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
-            particle_lifes[i] = particle_lifes[i] - dt
+            particle_xs[i] += particle_vxs[i] * dt
+            particle_ys[i] += particle_vys[i] * dt
+            particle_lifes[i] -= dt
 
 fn draw()
-    let n: Int = len(particle_xs)
+    let n = len(particle_xs)
     for i in range(0, n)
         if particle_lifes[i] > 0.0
             draw_rect(particle_xs[i], particle_ys[i], 4.0, 4.0)

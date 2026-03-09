@@ -8,12 +8,12 @@ let bullet_speed: Float = 300.0
 
 fn update(dt: Float)
     if key_down("right")
-        player_x += player_speed * dt
+        player_x = player_x + player_speed * dt
     if key_down("left")
-        player_x -= player_speed * dt
+        player_x = player_x - player_speed * dt
 
     for i in range(0, len(bullet_ys))
-        bullet_ys[i] -= bullet_speed * dt
+        bullet_ys[i] = bullet_ys[i] - bullet_speed * dt
 
 fn draw()
     draw_rect(player_x, player_y, 32, 32)

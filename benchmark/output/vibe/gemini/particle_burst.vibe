@@ -10,7 +10,6 @@ fn mousepressed(mx: Float, my: Float, button: Int)
         let speed: Float = rand_float(50.0, 200.0)
         let vx: Float = cos(angle) * speed
         let vy: Float = sin(angle) * speed
-        
         particle_xs = particle_xs + [mx]
         particle_ys = particle_ys + [my]
         particle_vxs = particle_vxs + [vx]
@@ -19,10 +18,9 @@ fn mousepressed(mx: Float, my: Float, button: Int)
 
 fn update(dt: Float)
     for i in range(0, len(particle_xs))
-        if particle_lifes[i] > 0.0
-            particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
-            particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
-            particle_lifes[i] = particle_lifes[i] - dt
+        particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
+        particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
+        particle_lifes[i] = particle_lifes[i] - dt
 
 fn draw()
     for i in range(0, len(particle_xs))

@@ -26,17 +26,19 @@ fn draw()
         let draw_y = item_ys[i] - (player_y - 300.0)
         if draw_x > -20.0 and draw_x < 820.0 and draw_y > -20.0 and draw_y < 620.0
             draw_rect(draw_x, draw_y, 10.0, 10.0)
-    draw_rect(400.0, 300.0, 16.0, 16.0)
+
+    draw_rect(400.0, 300.0, 16.0, 16.0) -- Draw player
 
     -- Draw minimap
-    draw_rect(630.0, 10.0, 160.0, 120.0)  -- Minimap background
+    draw_rect(630.0, 10.0, 160.0, 120.0) -- Minimap background
     for i in range(0, len(item_xs))
         let minimap_x = 630.0 + (item_xs[i] / 2000.0) * 160.0
         let minimap_y = 10.0 + (item_ys[i] / 2000.0) * 120.0
         draw_rect(minimap_x, minimap_y, 2.0, 2.0)
+
     let player_minimap_x = 630.0 + (player_x / 2000.0) * 160.0
     let player_minimap_y = 10.0 + (player_y / 2000.0) * 120.0
-    draw_rect(player_minimap_x, player_minimap_y, 2.0, 2.0)
+    draw_rect(player_minimap_x, player_minimap_y, 2.0, 2.0) -- Player on minimap
 
     -- Draw player position
     draw_text("Pos: " + str(int(player_x)) + ", " + str(int(player_y)), 10.0, 10.0)

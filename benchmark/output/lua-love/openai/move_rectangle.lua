@@ -1,10 +1,10 @@
-local x = 400
-local y = 300
+local x = 384
+local y = 284
 local speed = 200
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Move Rectangle")
+    love.window.setTitle("Moving Rectangle")
 end
 
 function love.update(dt)

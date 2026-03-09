@@ -22,3 +22,14 @@ while running:
     dt = clock.tick(60) / 1000.0
 
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        x -= speed * dt
+    if keys[pygame.K_RIGHT]:
+        x += speed * dt
+    if keys[pygame.K_UP]:
+        y -= speed * dt
+    if keys[pygame.K_DOWN

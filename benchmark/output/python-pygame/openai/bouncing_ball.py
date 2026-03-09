@@ -7,8 +7,8 @@ pygame.display.set_caption("Bouncing Ball")
 clock = pygame.time.Clock()
 
 ball_pos = [400.0, 300.0]
-ball_radius = 16
 ball_velocity = [150.0, 150.0]
+ball_radius = 16
 
 running = True
 while running:

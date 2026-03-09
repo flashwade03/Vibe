@@ -13,7 +13,7 @@ end
 function love.update(dt)
     if state == 1 then
         timer = timer - dt
-        if timer <= 0 then
+        if timer <= 0.0 then
             state = 2
         end
     end
@@ -21,30 +21,32 @@ end
 
 function love.draw()
     if state == 0 then
-        love.graphics.print("Press SPACE to Start", 250, 280)
+        love.graphics.print("Press SPACE to Start", 250.0, 280.0)
     elseif state == 1 then
         love.graphics.rectangle("fill", target_x, target_y, 20, 20)
         love.graphics.print("Score: " .. score, 10, 10)
         love.graphics.print("Time: " .. string.format("%.1f", timer), 10, 30)
     elseif state == 2 then
-        love.graphics.print("Game Over! Score: " .. score, 250, 260)
-        love.graphics.print("Press SPACE to Restart", 250, 300)
+        love.graphics.print("Game Over! Score: " .. score, 250.0, 260.0)
+        love.graphics.print("Press SPACE to Restart", 250.0, 300.0)
     end
 end
 
 function love.keypressed(key)
     if key == "space" then
-        if state == 0 or state == 2 then
+        if state == 0 then
             state = 1
             score = 0
             timer = 10.0
             resetTarget()
+        elseif state == 2 then
+            state = 0
         end
     end
 end
 
 function love.mousepressed(mx, my, button)
-    if state == 1 and button == 1 then
+    if button == 1 and state == 1 then
         if mx >= target_x and mx <= target_x + 20 and my >= target_y and my <= target_y + 20 then
             score = score + 1
             resetTarget()

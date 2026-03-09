@@ -11,4 +11,4 @@ local bvy = {}
 local blife = {}
 
 local spawn_timer = 0.3
-local bullet
+local

@@ -1,18 +1,18 @@
--- Breakout Game: paddle, bouncing ball, row of bricks at top
-let paddle_x: Float = 350.0
-let paddle_w: Float = 100.0
-let paddle_speed: Float = 350.0
+-- Breakout Game: paddle, bouncing ball, row of bricks
+let paddle_x: Float = 360.0
+let paddle_w: Float = 80.0
+let paddle_speed: Float = 300.0
 
 let ball_x: Float = 400.0
 let ball_y: Float = 400.0
-let ball_vx: Float = 180.0
-let ball_vy: Float = -220.0
+let ball_vx: Float = 200.0
+let ball_vy: Float = -200.0
 let ball_r: Float = 6.0
 
--- 10 bricks in a row
-let brick_xs: List[Float] = [5.0, 85.0, 165.0, 245.0, 325.0, 405.0, 485.0, 565.0, 645.0, 725.0]
-let brick_alive: List[Float] = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-let brick_w: Float = 70.0
+-- 8 bricks in a row
+let brick_xs: List[Float] = [5.0, 105.0, 205.0, 305.0, 405.0, 505.0, 605.0, 705.0]
+let brick_alive: List[Float] = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+let brick_w: Float = 90.0
 let brick_h: Float = 20.0
 let brick_y: Float = 50.0
 
@@ -34,18 +34,19 @@ fn update(dt: Float)
     -- Move ball
     ball_x = ball_x + ball_vx * dt
     ball_y = ball_y + ball_vy * dt
-    -- Wall collisions
-    if ball_x - ball_r < 0.0 or ball_x + ball_r > 800.0
+    -- Side wall bounce
+    if ball_x < ball_r or ball_x > 794.0
         ball_vx = -ball_vx
-    if ball_y - ball_r < 0.0
+    -- Top wall bounce
+    if ball_y < ball_r
         ball_vy = -ball_vy
     -- Paddle collision
     if ball_vy > 0.0
         if ball_y + ball_r >= 570.0 and ball_y + ball_r <= 585.0
             if ball_x >= paddle_x and ball_x <= paddle_x + paddle_w
                 ball_vy = -ball_vy
-    -- Ball falls below
-    if ball_y > 610.0
+    -- Ball falls below screen
+    if ball_y > 600.0
         game_over = true
     -- Brick collisions
     for i in range(0, len(brick_xs))

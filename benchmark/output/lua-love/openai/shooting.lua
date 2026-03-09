@@ -1,10 +1,9 @@
 local player_x = 384
 local player_y = 550
 local player_speed = 200
-
+local bullet_speed = 300
 local bullet_xs = {}
 local bullet_ys = {}
-local bullet_speed = 300
 
 function love.load()
     love.window.setMode(800, 600)
@@ -33,7 +32,6 @@ end
 
 function love.draw()
     love.graphics.rectangle("fill", player_x, player_y, 32, 32)
-    
     for i = 1, #bullet_xs do
         love.graphics.rectangle("fill", bullet_xs[i], bullet_ys[i], 4, 4)
     end

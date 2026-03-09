@@ -5,4 +5,4 @@ let p_radius: Float = 10.0
 
 let bx: List[Float] = []
 let by: List[Float] = []
-let bvx: List[Float]
+let bvx: List[Float] = []

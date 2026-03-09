@@ -1,7 +1,7 @@
 let player_x: Float = 400.0
 let player_y: Float = 300.0
+let player_speed: Float = 200.0
+
 let enemy_x: Float = 100.0
 let enemy_y: Float = 100.0
-
-const PLAYER_SPEED: Float = 200.0
-const ENEMY_SPEED: Float =
+let enemy_speed: Float = 100

@@ -1,30 +1,29 @@
--- Particle Burst: click mouse to spawn particles that spread and fade
-let px: List[Float] = []
-let py: List[Float] = []
-let pvx: List[Float] = []
-let pvy: List[Float] = []
-let plife: List[Float] = []
+-- Particle Burst: click to spawn 10 particles that spread outward
+let particle_xs: List[Float] = []
+let particle_ys: List[Float] = []
+let particle_vxs: List[Float] = []
+let particle_vys: List[Float] = []
+let particle_lifes: List[Float] = []
 
 fn mousepressed(mx: Float, my: Float, button: Int)
-    for i in range(0, 20)
-        let angle: Float = rand_float(0.0, 6.2832)
-        let spd: Float = rand_float(50.0, 250.0)
-        px = px + [mx]
-        py = py + [my]
-        pvx = pvx + [cos(angle) * spd]
-        pvy = pvy + [sin(angle) * spd]
-        plife = plife + [1.5]
+    for i in range(0, 10)
+        let angle: Float = rand_float(0.0, 6.283)
+        let spd: Float = rand_float(50.0, 200.0)
+        particle_xs = particle_xs + [mx]
+        particle_ys = particle_ys + [my]
+        particle_vxs = particle_vxs + [cos(angle) * spd]
+        particle_vys = particle_vys + [sin(angle) * spd]
+        particle_lifes = particle_lifes + [2.0]
 
 fn update(dt: Float)
-    for i in range(0, len(px))
-        if plife[i] > 0.0
-            px[i] = px[i] + pvx[i] * dt
-            py[i] = py[i] + pvy[i] * dt
-            plife[i] = plife[i] - dt
+    for i in range(0, len(particle_xs))
+        if particle_lifes[i] > 0.0
+            particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
+            particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
+            particle_lifes[i] = particle_lifes[i] - dt
 
 fn draw()
-    for i in range(0, len(px))
-        if plife[i] > 0.0
-            let size: Float = plife[i] * 4.0
-            draw_rect(px[i], py[i], size, size)
+    for i in range(0, len(particle_xs))
+        if particle_lifes[i] > 0.0
+            draw_rect(particle_xs[i], particle_ys[i], 4.0, 4.0)
     draw_text("Click to spawn particles", 10.0, 10.0)
