@@ -1,40 +1,35 @@
-local ballX = 400
-local ballY = 300
-local ballRadius = 16
-local velX = 150
-local velY = 150
-local windowWidth = 800
-local windowHeight = 600
+local x = 400
+local y = 300
+local radius = 16
+local vx = 150
+local vy = 150
 
 function love.load()
-    love.window.setMode(windowWidth, windowHeight)
+    love.window.setMode(800, 600)
     love.window.setTitle("Bouncing Ball")
 end
 
 function love.update(dt)
-    -- Move the ball
-    ballX = ballX + velX * dt
-    ballY = ballY + velY * dt
+    x = x + vx * dt
+    y = y + vy * dt
 
-    -- Bounce off left and right edges
-    if ballX - ballRadius < 0 then
-        ballX = ballRadius
-        velX = -velX
-    elseif ballX + ballRadius > windowWidth then
-        ballX = windowWidth - ballRadius
-        velX = -velX
+    if x - radius < 0 then
+        x = radius
+        vx = -vx
+    elseif x + radius > 800 then
+        x = 800 - radius
+        vx = -vx
     end
 
-    -- Bounce off top and bottom edges
-    if ballY - ballRadius < 0 then
-        ballY = ballRadius
-        velY = -velY
-    elseif ballY + ballRadius > windowHeight then
-        ballY = windowHeight - ballRadius
-        velY = -velY
+    if y - radius < 0 then
+        y = radius
+        vy = -vy
+    elseif y + radius > 600 then
+        y = 600 - radius
+        vy = -vy
     end
 end
 
 function love.draw()
-    love.graphics.circle("fill", ballX, ballY, ballRadius)
+    love.graphics.circle("fill", x, y, radius)
 end

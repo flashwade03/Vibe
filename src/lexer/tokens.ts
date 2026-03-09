@@ -42,6 +42,11 @@ export enum TokenType {
   PERCENT = "PERCENT", // %
 
   EQ = "EQ",           // =
+  PLUSEQ = "PLUSEQ",   // +=
+  MINUSEQ = "MINUSEQ", // -=
+  STAREQ = "STAREQ",   // *=
+  SLASHEQ = "SLASHEQ", // /=
+  PERCENTEQ = "PERCENTEQ", // %=
   EQEQ = "EQEQ",      // ==
   NEQ = "NEQ",         // !=
   LT = "LT",           // <

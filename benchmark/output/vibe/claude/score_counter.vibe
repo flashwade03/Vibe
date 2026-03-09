@@ -1,0 +1,9 @@
+-- Score Counter: press spacebar to increment score
+let score: Int = 0
+
+fn keypressed(k: String)
+    if k == "space"
+        score = score + 1
+
+fn draw()
+    draw_text("Score: " + str(score), 10.0, 10.0)

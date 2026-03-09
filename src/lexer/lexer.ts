@@ -326,20 +326,44 @@ class Lexer {
 
     switch (ch) {
       case "+":
-        this.advance();
-        this.emit(TokenType.PLUS, "+", this.line, startCol);
+        if (next === "=") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.PLUSEQ, "+=", this.line, startCol);
+        } else {
+          this.advance();
+          this.emit(TokenType.PLUS, "+", this.line, startCol);
+        }
         return;
       case "*":
-        this.advance();
-        this.emit(TokenType.STAR, "*", this.line, startCol);
+        if (next === "=") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.STAREQ, "*=", this.line, startCol);
+        } else {
+          this.advance();
+          this.emit(TokenType.STAR, "*", this.line, startCol);
+        }
         return;
       case "/":
-        this.advance();
-        this.emit(TokenType.SLASH, "/", this.line, startCol);
+        if (next === "=") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.SLASHEQ, "/=", this.line, startCol);
+        } else {
+          this.advance();
+          this.emit(TokenType.SLASH, "/", this.line, startCol);
+        }
         return;
       case "%":
-        this.advance();
-        this.emit(TokenType.PERCENT, "%", this.line, startCol);
+        if (next === "=") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.PERCENTEQ, "%=", this.line, startCol);
+        } else {
+          this.advance();
+          this.emit(TokenType.PERCENT, "%", this.line, startCol);
+        }
         return;
       case ".":
         this.advance();
@@ -378,6 +402,10 @@ class Lexer {
           this.advance();
           this.advance();
           this.emit(TokenType.ARROW, "->", this.line, startCol);
+        } else if (next === "=") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.MINUSEQ, "-=", this.line, startCol);
         } else {
           this.advance();
           this.emit(TokenType.MINUS, "-", this.line, startCol);

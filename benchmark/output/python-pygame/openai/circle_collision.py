@@ -20,6 +20,8 @@ enemy_ys = [100.0, 100.0, 400.0, 400.0, 500.0]
 # Collision state
 hit = False
 
+font = pygame.font.Font(None, 36)
+
 def update(dt):
     global player_x, player_y, hit
     hit = False
@@ -34,7 +36,6 @@ def update(dt):
     if keys[pygame.K_DOWN]:
         player_y += player_speed * dt
 
-    # Check collision
     for ex, ey in zip(enemy_xs, enemy_ys):
         if math.sqrt((player_x - ex) ** 2 + (player_y - ey) ** 2) < player_radius + enemy_radius:
             hit = True
@@ -45,7 +46,6 @@ def draw():
     for ex, ey in zip(enemy_xs, enemy_ys):
         pygame.draw.circle(screen, (255, 255, 255), (int(ex), int(ey)), enemy_radius)
     if hit:
-        font = pygame.font.Font(None, 36)
         text = font.render("Hit!", True, (255, 255, 255))
         screen.blit(text, (10, 10))
 

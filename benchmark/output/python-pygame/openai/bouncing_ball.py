@@ -7,8 +7,8 @@ pygame.display.set_caption("Bouncing Ball")
 clock = pygame.time.Clock()
 
 ball_pos = [400.0, 300.0]
-ball_velocity = [150.0, 150.0]
 ball_radius = 16
+ball_velocity = [150.0, 150.0]
 
 running = True
 while running:
@@ -22,7 +22,7 @@ while running:
     ball_pos[0] += ball_velocity[0] * dt
     ball_pos[1] += ball_velocity[1] * dt
 
-    # Bounce off the edges
+    # Check for collision with window edges and bounce
     if ball_pos[0] - ball_radius < 0 or ball_pos[0] + ball_radius > 800:
         ball_velocity[0] = -ball_velocity[0]
     if ball_pos[1] - ball_radius < 0 or ball_pos[1] + ball_radius > 600:

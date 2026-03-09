@@ -29,9 +29,11 @@ while running:
         vy = -300.0
         on_ground = False
 
+    # Apply gravity
     vy += gravity * dt
     y += vy * dt
 
+    # Check ground collision
     if y >= 550:
         y = 550
         vy = 0

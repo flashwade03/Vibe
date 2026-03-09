@@ -1,192 +1,264 @@
-# LLM Code Generation Benchmark: Is Vibe More LLM-Friendly?
+# LLM Code Generation Benchmark Results
 
-**Date**: 2026-03-08
-**Benchmark version**: v1
+**Generated**: 2026-03-09T14:13:48.773Z
 
-## Purpose
-
-Validate the hypothesis that Vibe, a language designed for LLM code generation accuracy, can achieve competitive compilation pass rates despite having **zero training data** — relying solely on grammar + examples provided in a system prompt.
-
-## Methodology
-
-### Setup
-- **10 game programming tasks** of increasing difficulty (4 easy, 5 medium, 1 hard)
-- **3 languages**: Vibe (0 training data), Python+Pygame (massive training data), Lua+LOVE 2D (moderate training data)
-- **2 LLMs**: Gemini 3 Flash Preview, GPT-4o
-- **60 total runs** (10 tasks × 3 languages × 2 LLMs)
-
-### Conditions
-- **Vibe**: System prompt contains language grammar summary, built-in functions, and 3 complete examples. The LLM has never seen Vibe code in training.
-- **Python+Pygame**: System prompt contains Pygame boilerplate and 1 example. LLM has extensive Python training data.
-- **Lua+LOVE**: System prompt contains LOVE 2D callbacks and 1 example. LLM has moderate Lua training data.
-- Temperature: 0.2 for all runs
-- Max tokens: 2048
-
-### Validation
-- **Vibe**: Full transpiler pipeline (Lexer → Parser → CodeGen). Strict — any syntax error fails.
-- **Python**: `py_compile.compile()` syntax check.
-- **Lua**: `luac -p` syntax check (not available on test machine — Lua results are unverified).
-
-### Fairness Notes
-- Lua+LOVE results are **not syntax-verified** (luac unavailable). Actual pass rates may be lower.
-- Vibe validation is the **strictest** — it runs through a full 3-stage compiler.
-- Python and Lua benefit from massive pre-training data; Vibe has zero.
-
----
-
-## Results
-
-### Summary Table
+## Summary
 
 | Language | LLM | Pass Rate | Avg Tokens | Avg Latency |
 |----------|-----|-----------|------------|-------------|
-| **Vibe** | **GPT-4o** | **90% (9/10)** | **88** | **1,740ms** |
-| **Vibe** | **Gemini** | **60% (6/10)** | **54** | **10,425ms** |
-| Lua+LOVE | GPT-4o | 100% (10/10)* | 109 | 2,210ms |
-| Lua+LOVE | Gemini | 100% (10/10)* | 98 | 10,040ms |
-| Python+Pygame | GPT-4o | 100% (10/10) | 123 | 2,491ms |
-| Python+Pygame | Gemini | 70% (7/10) | 130 | 9,032ms |
+| lua-love | gemini | 100% (20/20) | 62 | 20347ms |
+| lua-love | openai | 100% (20/20) | 190 | 5501ms |
+| python-pygame | gemini | 20% (4/20) | 60 | 19436ms |
+| python-pygame | openai | 100% (20/20) | 190 | 6362ms |
+| vibe | claude | **100% (20/20)** | 187 | - |
+| vibe | gemini | 55% (11/20) | 57 | 18443ms |
+| vibe | openai | 95% (19/20) | 154 | 4993ms |
 
-\* Lua results are unverified (luac not available on test machine)
+### Claude Vibe Benchmark (Sub-agent)
 
-### Aggregated by Language (across both LLMs)
+Claude Opus 4.6 서브에이전트로 실행. Vibe 시스템 프롬프트만 제공, API 레이턴시 미측정.
 
-| Language | Combined Pass Rate | Avg Tokens | Training Data |
-|----------|--------------------|------------|---------------|
-| Lua+LOVE | 100% (20/20)* | 104 | Moderate |
-| Python+Pygame | 85% (17/20) | 127 | Massive |
-| **Vibe** | **75% (15/20)** | **71** | **Zero** |
+| Task | Pass | Tokens |
+|------|------|--------|
+| move_rectangle | YES | 71 |
+| bouncing_ball | YES | 86 |
+| score_counter | YES | 33 |
+| color_changing_rect | YES | 124 |
+| enemy_follow | YES | 158 |
+| shooting | YES | 111 |
+| circle_collision | YES | 148 |
+| gravity_jump | YES | 142 |
+| countdown_timer | YES | 52 |
+| particle_burst | YES | 149 |
+| state_machine_game | YES | 202 |
+| snake_movement | YES | 245 |
+| multi_wave_spawner | YES | 317 |
+| orbital_mechanics | YES | 134 |
+| breakout_game | YES | 327 |
+| twin_stick_dodge | YES | 384 |
+| flocking_simulation | YES | 302 |
+| platformer_level | YES | 280 |
+| minimap_radar | YES | 319 |
+| chain_reaction | YES | 284 |
 
-### Token Efficiency
+## Detailed Results
 
-| Language | Avg Tokens | vs Vibe |
-|----------|------------|---------|
-| **Vibe** | **71** | baseline |
-| Lua+LOVE | 104 | +46% |
-| Python+Pygame | 127 | +79% |
+### Task: move_rectangle
 
-Vibe expresses the same game logic in **44% fewer tokens** than Python+Pygame and **32% fewer tokens** than Lua+LOVE.
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 60 | 16497ms | - |
+| vibe | openai | YES | 60 | 1706ms | - |
+| python-pygame | gemini | YES | 88 | 22127ms | - |
+| python-pygame | openai | YES | 95 | 2032ms | - |
+| lua-love | gemini | YES | 76 | 13351ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 74 | 1178ms | Warning: luac/luajit not found, syntax not verified |
 
----
+### Task: bouncing_ball
 
-## Detailed Results by Task
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 64 | 11091ms | - |
+| vibe | openai | YES | 64 | 3095ms | - |
+| python-pygame | gemini | YES | 123 | 17294ms | - |
+| python-pygame | openai | YES | 112 | 3325ms | - |
+| lua-love | gemini | YES | 109 | 12669ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 109 | 1639ms | Warning: luac/luajit not found, syntax not verified |
 
-### Easy Tasks (4)
+### Task: score_counter
 
-| Task | Vibe (Gemini) | Vibe (GPT-4o) | Python (Gemini) | Python (GPT-4o) | Lua (Gemini) | Lua (GPT-4o) |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| move_rectangle | PASS | PASS | PASS | PASS | PASS* | PASS* |
-| bouncing_ball | PASS | PASS | PASS | PASS | PASS* | PASS* |
-| score_counter | PASS | PASS | PASS | PASS | PASS* | PASS* |
-| position_display | PASS | PASS | PASS | PASS | PASS* | PASS* |
-| **Subtotal** | **4/4** | **4/4** | **4/4** | **4/4** | **4/4*** | **4/4*** |
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 25 | 6557ms | - |
+| vibe | openai | YES | 25 | 828ms | - |
+| python-pygame | gemini | YES | 75 | 16222ms | - |
+| python-pygame | openai | YES | 81 | 1933ms | - |
+| lua-love | gemini | YES | 46 | 11811ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 40 | 2281ms | Warning: luac/luajit not found, syntax not verified |
 
-All languages pass easy tasks at 100%.
+### Task: color_changing_rect
 
-### Medium Tasks (5)
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 72 | 17074ms | - |
+| vibe | openai | YES | 72 | 1429ms | - |
+| python-pygame | gemini | NO | 64 | 19365ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 111 | 2298ms | - |
+| lua-love | gemini | YES | 91 | 18440ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 86 | 1761ms | Warning: luac/luajit not found, syntax not verified |
 
-| Task | Vibe (Gemini) | Vibe (GPT-4o) | Python (Gemini) | Python (GPT-4o) | Lua (Gemini) | Lua (GPT-4o) |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| enemy_follow | FAIL | PASS | FAIL | PASS | PASS* | PASS* |
-| shooting | PASS | PASS | FAIL | PASS | PASS* | PASS* |
-| circle_collision | PASS | PASS | PASS | PASS | PASS* | PASS* |
-| gravity_jump | FAIL | PASS | PASS | PASS | PASS* | PASS* |
-| countdown_timer | FAIL | FAIL | PASS | PASS | PASS* | PASS* |
-| **Subtotal** | **2/5** | **4/5** | **3/5** | **5/5** | **5/5*** | **5/5*** |
+### Task: enemy_follow
 
-### Hard Tasks (1)
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 29 | 18637ms | unexpected token NEWLINE ("") |
+| vibe | openai | YES | 120 | 2452ms | - |
+| python-pygame | gemini | NO | 114 | 19088ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 149 | 5267ms | - |
+| lua-love | gemini | YES | 155 | 47944ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 178 | 3918ms | Warning: luac/luajit not found, syntax not verified |
 
-| Task | Vibe (Gemini) | Vibe (GPT-4o) | Python (Gemini) | Python (GPT-4o) | Lua (Gemini) | Lua (GPT-4o) |
-|------|:---:|:---:|:---:|:---:|:---:|:---:|
-| particle_burst | FAIL | PASS | FAIL | PASS | PASS* | PASS* |
-| **Subtotal** | **0/1** | **1/1** | **0/1** | **1/1** | **1/1*** | **1/1*** |
+### Task: shooting
 
----
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 92 | 19736ms | - |
+| vibe | openai | YES | 91 | 3106ms | - |
+| python-pygame | gemini | NO | 23 | 21003ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 137 | 4180ms | - |
+| lua-love | gemini | YES | 119 | 19113ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 105 | 2601ms | Warning: luac/luajit not found, syntax not verified |
 
-## Failure Analysis
+### Task: circle_collision
 
-### Vibe Failures (5 total)
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 28 | 24307ms | unexpected token EOF ("") |
+| vibe | openai | YES | 128 | 3805ms | - |
+| python-pygame | gemini | NO | 98 | 20090ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 188 | 4214ms | - |
+| lua-love | gemini | YES | 30 | 25558ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 170 | 3453ms | Warning: luac/luajit not found, syntax not verified |
 
-| Task | LLM | Error | Root Cause |
-|------|-----|-------|------------|
-| enemy_follow | Gemini | `expected RPAREN, got EOF` | **Truncated response** — Gemini cut off mid-function. Not a language issue. |
-| gravity_jump | Gemini | `expected INDENT, got DEDENT` | **Empty function body** — Gemini generated `fn keypressed(key: String)` with no body. Vibe doesn't support empty blocks. |
-| countdown_timer | Gemini | `expected INDENT, got DEDENT` | Same empty body issue. |
-| countdown_timer | GPT-4o | `expected RPAREN, got IDENT ("as")` | **Invented syntax** — GPT-4o used `str(timer as Int)`, a cast syntax that doesn't exist in Vibe. |
-| particle_burst | Gemini | `unexpected token NEWLINE` | **Truncated response** — Gemini cut off before completing the program. |
+### Task: gravity_jump
 
-### Failure Categories
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 84 | 17064ms | - |
+| vibe | openai | YES | 86 | 2028ms | - |
+| python-pygame | gemini | NO | 24 | 19057ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 123 | 2839ms | - |
+| lua-love | gemini | YES | 104 | 15030ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 105 | 3056ms | Warning: luac/luajit not found, syntax not verified |
 
-| Category | Count | Fixable? |
-|----------|-------|----------|
-| Truncated LLM response | 2 | No (LLM/API limitation) |
-| Empty function body | 2 | Yes — add `pass` or allow empty blocks in parser |
-| Invented non-existent syntax | 1 | Partially — improve system prompt to be more explicit about what does NOT exist |
+### Task: countdown_timer
 
-### Python Failures (3 total)
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 0 | 0ms | API error: fetch failed |
+| vibe | openai | YES | 41 | 1897ms | - |
+| python-pygame | gemini | YES | 84 | 14553ms | - |
+| python-pygame | openai | YES | 94 | 3991ms | - |
+| lua-love | gemini | YES | 45 | 14205ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 54 | 1846ms | Warning: luac/luajit not found, syntax not verified |
 
-| Task | LLM | Root Cause |
-|------|-----|------------|
-| enemy_follow | Gemini | Syntax error in generated Python |
-| shooting | Gemini | Syntax error in generated Python |
-| particle_burst | Gemini | Truncated response |
+### Task: particle_burst
 
-### Key Observation
-Gemini 3 Flash Preview struggles with **all** languages on medium/hard tasks — this is an LLM quality issue, not language-specific. GPT-4o is significantly more capable across the board.
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 134 | 13307ms | - |
+| vibe | openai | YES | 144 | 3437ms | - |
+| python-pygame | gemini | NO | 29 | 18390ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 147 | 5402ms | - |
+| lua-love | gemini | YES | 30 | 19435ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 146 | 3822ms | Warning: luac/luajit not found, syntax not verified |
 
----
+### Task: state_machine_game
 
-## Key Findings
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 180 | 18908ms | - |
+| vibe | openai | YES | 172 | 5455ms | - |
+| python-pygame | gemini | NO | 25 | 19471ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 227 | 16030ms | - |
+| lua-love | gemini | YES | 30 | 28441ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 191 | 4064ms | Warning: luac/luajit not found, syntax not verified |
 
-### 1. Zero Training Data, 90% Pass Rate (GPT-4o)
+### Task: snake_movement
 
-Vibe achieved **90% compilation pass rate with GPT-4o** despite having zero training data. The LLM learned Vibe syntax entirely from the system prompt (grammar + 3 examples). This validates the core hypothesis: **LLM-friendly language design can compensate for the absence of training data.**
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 21 | 27497ms | expected EQ, got NEWLINE ("") |
+| vibe | openai | YES | 187 | 6435ms | - |
+| python-pygame | gemini | NO | 21 | 20445ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 196 | 4974ms | - |
+| lua-love | gemini | YES | 23 | 20318ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 203 | 4713ms | Warning: luac/luajit not found, syntax not verified |
 
-For comparison, Python+Pygame (with massive training data) achieved 100% with GPT-4o but only 70% with Gemini.
+### Task: multi_wave_spawner
 
-### 2. Token Efficiency is Real
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 35 | 19867ms | - |
+| vibe | openai | NO | 350 | 14958ms | expected EQ, got NEWLINE ("") |
+| python-pygame | gemini | NO | 27 | 21007ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 365 | 11585ms | - |
+| lua-love | gemini | YES | 45 | 20795ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 406 | 7512ms | Warning: luac/luajit not found, syntax not verified |
 
-Vibe generates the same game logic in **44% fewer tokens** than Python. This has direct implications:
-- Less context window consumed → more room for complex prompts
-- Fewer tokens to generate → lower latency and cost
-- Less surface area for syntax errors
+### Task: orbital_mechanics
 
-### 3. Failures are "Language Immaturity" Not "LLM Confusion"
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 106 | 16162ms | - |
+| vibe | openai | YES | 98 | 3266ms | - |
+| python-pygame | gemini | NO | 136 | 19527ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 167 | 7390ms | - |
+| lua-love | gemini | YES | 145 | 16983ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 163 | 5211ms | Warning: luac/luajit not found, syntax not verified |
 
-The Vibe failures were:
-- 2× truncated responses (API/LLM issue)
-- 2× empty function body (missing language feature)
-- 1× invented syntax (LLM hallucinated a cast operator)
+### Task: breakout_game
 
-None of the failures indicate that LLMs "can't understand" Vibe syntax. The LLMs understood the grammar correctly — they failed on edge cases the v0 language doesn't handle yet.
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 32 | 39856ms | expected EQ, got NEWLINE ("") |
+| vibe | openai | YES | 207 | 8573ms | - |
+| python-pygame | gemini | NO | 21 | 20191ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 295 | 6851ms | - |
+| lua-love | gemini | YES | 37 | 19868ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 325 | 6743ms | Warning: luac/luajit not found, syntax not verified |
 
-### 4. Gemini is Unreliable Across All Languages
+### Task: twin_stick_dodge
 
-Gemini 3 Flash Preview produced truncated or broken code in 30-40% of medium/hard tasks regardless of language. This benchmark primarily measures GPT-4o's performance, with Gemini as a weaker secondary data point.
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 33 | 20633ms | expected EQ, got NEWLINE ("") |
+| vibe | openai | YES | 332 | 8943ms | - |
+| python-pygame | gemini | NO | 25 | 20590ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 315 | 10656ms | - |
+| lua-love | gemini | YES | 43 | 20616ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 386 | 11243ms | Warning: luac/luajit not found, syntax not verified |
 
----
+### Task: flocking_simulation
 
-## Limitations
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 33 | 20126ms | unexpected character: '`' |
+| vibe | openai | YES | 248 | 6009ms | - |
+| python-pygame | gemini | NO | 130 | 20398ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 248 | 7342ms | - |
+| lua-love | gemini | YES | 16 | 20217ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 298 | 21188ms | Warning: luac/luajit not found, syntax not verified |
 
-1. **Small sample size** — 10 tasks, 2 LLMs. Need 50+ tasks and 3+ LLMs for statistical significance.
-2. **Syntax-only validation** — Pass rate measures compilation, not semantic correctness. A program that compiles may still have logic bugs.
-3. **Lua results unverified** — No `luac` on test machine. Lua's 100% pass rate may be inflated.
-4. **Single run** — No repeated trials. LLM outputs are stochastic; averaging over 5+ runs would be more robust.
-5. **Context prompt bias** — Vibe's system prompt includes 3 examples while Python/Lua include 1. However, Vibe needs more examples precisely because it has zero training data.
+### Task: platformer_level
 
-## Next Steps
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 32 | 20384ms | expected IDENT, got EOF ("") |
+| vibe | openai | YES | 221 | 9307ms | - |
+| python-pygame | gemini | NO | 21 | 19204ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 266 | 7313ms | - |
+| lua-love | gemini | YES | 34 | 20820ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 269 | 7775ms | Warning: luac/luajit not found, syntax not verified |
 
-1. **Add `pass` keyword or empty block support** — Would fix 2 of 5 Vibe failures
-2. **Run with Claude Sonnet/Opus** — Add a third high-quality LLM for stronger signal
-3. **Increase to 50 tasks** — Cover more game patterns (animation, state machines, UI, networking)
-4. **Add semantic validation** — Actually run generated code and check behavior
-5. **Repeat trials** — Run each combination 5 times and report mean ± std
-6. **Install luac** — Verify Lua results fairly
+### Task: minimap_radar
 
----
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | YES | 34 | 20168ms | - |
+| vibe | openai | YES | 212 | 6561ms | - |
+| python-pygame | gemini | NO | 24 | 20418ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 257 | 12028ms | - |
+| lua-love | gemini | YES | 26 | 20661ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 256 | 10849ms | Warning: luac/luajit not found, syntax not verified |
 
-## Raw Data
+### Task: chain_reaction
 
-Full generated code is saved in `benchmark/output/{language}/{llm}/{taskId}.{ext}`.
-
-Benchmark runner: `npx tsx benchmark/runner.ts`
+| Language | LLM | Pass | Tokens | Latency | Errors |
+|----------|-----|------|--------|---------|--------|
+| vibe | gemini | NO | 43 | 20988ms | unexpected character: '`' |
+| vibe | openai | YES | 213 | 6562ms | - |
+| python-pygame | gemini | NO | 46 | 20288ms | Traceback (most recent call last):   File "/opt/anaconda3/lib/python3.12/py_comp |
+| python-pygame | openai | YES | 231 | 7586ms | - |
+| lua-love | gemini | YES | 44 | 20664ms | Warning: luac/luajit not found, syntax not verified |
+| lua-love | openai | YES | 237 | 5174ms | Warning: luac/luajit not found, syntax not verified |

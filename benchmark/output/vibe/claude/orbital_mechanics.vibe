@@ -1,0 +1,25 @@
+-- Orbital Mechanics: small circle orbiting a larger circle using sin/cos
+let angle: Float = 0.0
+let orbit_speed: Float = 1.5
+let orbit_radius: Float = 150.0
+let center_x: Float = 400.0
+let center_y: Float = 300.0
+
+fn update(dt: Float)
+    angle = angle + orbit_speed * dt
+
+fn draw()
+    -- Draw the central body
+    draw_circle(center_x, center_y, 30.0)
+    -- Compute orbiting position
+    let orb_x: Float = center_x + cos(angle) * orbit_radius
+    let orb_y: Float = center_y + sin(angle) * orbit_radius
+    -- Draw orbit path as small dots
+    for i in range(0, 60)
+        let a: Float = float(i) * 0.1047
+        let px: Float = center_x + cos(a) * orbit_radius
+        let py: Float = center_y + sin(a) * orbit_radius
+        draw_circle(px, py, 1.0)
+    -- Draw the orbiting body
+    draw_circle(orb_x, orb_y, 10.0)
+    draw_text("Angle: " + str(int(angle * 57.0)), 10.0, 10.0)

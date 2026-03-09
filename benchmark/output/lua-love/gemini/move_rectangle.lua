@@ -1,11 +1,10 @@
 local x = 384
 local y = 284
 local speed = 200
-local size = 32
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Vibe")
 end
 
 function love.update(dt)
@@ -25,5 +24,5 @@ end
 
 function love.draw()
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("fill", x, y, size, size)
+    love.graphics.rectangle("fill", x, y, 32, 32)
 end

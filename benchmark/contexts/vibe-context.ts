@@ -61,11 +61,15 @@ Use \`and\`, \`or\`, \`not\` (not &&, ||, !).
 ## Operators
 Arithmetic: + - * / %
 Comparison: == != < > <= >=
-Assignment: = += -= *= /=
+Assignment: = += -= *= /= %=
 String concatenation: +
 
 ## Type Conversion
 str(value) — converts Int or Float to String
+int(value) — converts Float to Int (truncates toward zero)
+float(value) — converts Int or String to Float
+
+There is NO cast syntax. Do NOT use "as" keyword. Use conversion functions instead.
 
 ## Game Loop (Special Functions)
 \`\`\`
@@ -93,6 +97,9 @@ These are top-level functions that the engine calls automatically.
 | draw_rect | draw_rect(x: Float, y: Float, w: Float, h: Float) | Draws a filled rectangle |
 | draw_circle | draw_circle(x: Float, y: Float, radius: Float) | Draws a filled circle |
 | draw_text | draw_text(text: String, x: Float, y: Float) | Draws text at position |
+| str | str(value) -> String | Convert any value to String |
+| int | int(value: Float) -> Int | Convert Float to Int (truncates) |
+| float | float(value) -> Float | Convert to Float |
 | sqrt | sqrt(x: Float) -> Float | Square root |
 | cos | cos(x: Float) -> Float | Cosine (radians) |
 | sin | sin(x: Float) -> Float | Sine (radians) |
@@ -157,6 +164,41 @@ fn keypressed(k: String)
 fn draw()
     draw_text("Score: " + str(score), 10.0, 10.0)
 \`\`\`
+
+## Complete Example 4: Condition Loop (Timer)
+\`\`\`
+let timer: Float = 5.0
+
+fn update(dt: Float)
+    for timer > 0.0
+        timer = timer - dt
+        break
+
+fn draw()
+    draw_text("Time: " + str(int(timer)), 350.0, 280.0)
+\`\`\`
+
+## Complete Example 5: List with Indexing
+\`\`\`
+let xs: List[Float] = [100.0, 300.0, 500.0]
+let ys: List[Float] = [200.0, 400.0, 100.0]
+
+fn draw()
+    for i in range(0, len(xs))
+        draw_circle(xs[i], ys[i], 20.0)
+\`\`\`
+
+## CRITICAL: DO NOT USE
+- Do NOT use \`while\`. Use \`for condition\` instead: \`for x > 0\`
+- \`+=\`, \`-=\`, \`*=\`, \`/=\`, \`%=\` are supported. \`x += 1\` is equivalent to \`x = x + 1\`
+- Do NOT use \`++\` or \`--\`. Write \`x = x + 1\`
+- Do NOT declare variables without initial values. Always: \`let x: Float = 0.0\`, never: \`let x: Float\`
+- Do NOT use markdown code fences (\`\`\`) in output. Output raw code only
+- Do NOT use \`do\`, \`then\`, \`end\`, or \`:\` before blocks. Blocks start with indentation only
+- Do NOT use \`var\`, \`def\`, \`function\`, \`local\`. Use \`let\`, \`fn\`
+- Do NOT use \`null\`, \`nil\`, \`None\`, \`undefined\`. Use \`none\`
+- Do NOT use \`&&\`, \`||\`, \`!\`. Use \`and\`, \`or\`, \`not\`
+- Do NOT use \`#\` or \`//\` for comments. Use \`--\`
 
 ## Rules
 - Output ONLY the Vibe code, no explanations or markdown

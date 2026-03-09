@@ -3,13 +3,11 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Program")
+pygame.display.set_caption("Move Rectangle")
 clock = pygame.time.Clock()
 
-# Initial position: center of 800x600 minus half of 32x32 size
-x = 400.0 - 16
-y = 300.0 - 16
-speed = 200
+x, y = 384.0, 284.0
+speed = 200.0
 
 running = True
 while running:
@@ -31,6 +29,7 @@ while running:
 
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
+    
     pygame.display.flip()
 
 pygame.quit()

@@ -345,4 +345,32 @@ fn draw()
     expect((callExpr.callee as Identifier).name).toBe("draw_rect");
     expect(callExpr.args).toHaveLength(4);
   });
+
+  // ── Empty body support ──────────────────────────────────
+
+  it("should parse empty function body", () => {
+    const src = `fn keypressed(key: String)\n\nfn load()\n  let x = 1\n`;
+    const tokens = lex(src);
+    const ast = parse(tokens);
+    expect(ast.body).toHaveLength(2);
+
+    const fn1 = ast.body[0] as FnDecl;
+    expect(fn1.name).toBe("keypressed");
+    expect(fn1.body).toHaveLength(0);
+
+    const fn2 = ast.body[1] as FnDecl;
+    expect(fn2.name).toBe("load");
+    expect(fn2.body).toHaveLength(1);
+  });
+
+  it("should parse empty function body at end of file", () => {
+    const src = `fn update(dt: Float)\n  let x = 1\n\nfn draw()\n`;
+    const tokens = lex(src);
+    const ast = parse(tokens);
+    expect(ast.body).toHaveLength(2);
+
+    const fn2 = ast.body[1] as FnDecl;
+    expect(fn2.name).toBe("draw");
+    expect(fn2.body).toHaveLength(0);
+  });
 });

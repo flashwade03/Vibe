@@ -1,0 +1,7 @@
+let px: Float = 100.0
+let py: Float = 400.0
+let vx: Float = 0.0
+let vy: Float = 0.0
+let on_ground: Bool = false
+
+let plat_xs: List[Float] = [50.0, 300.0, 500.

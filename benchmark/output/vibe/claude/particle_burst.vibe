@@ -1,0 +1,30 @@
+-- Particle Burst: click mouse to spawn particles that spread and fade
+let px: List[Float] = []
+let py: List[Float] = []
+let pvx: List[Float] = []
+let pvy: List[Float] = []
+let plife: List[Float] = []
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    for i in range(0, 20)
+        let angle: Float = rand_float(0.0, 6.2832)
+        let spd: Float = rand_float(50.0, 250.0)
+        px = px + [mx]
+        py = py + [my]
+        pvx = pvx + [cos(angle) * spd]
+        pvy = pvy + [sin(angle) * spd]
+        plife = plife + [1.5]
+
+fn update(dt: Float)
+    for i in range(0, len(px))
+        if plife[i] > 0.0
+            px[i] = px[i] + pvx[i] * dt
+            py[i] = py[i] + pvy[i] * dt
+            plife[i] = plife[i] - dt
+
+fn draw()
+    for i in range(0, len(px))
+        if plife[i] > 0.0
+            let size: Float = plife[i] * 4.0
+            draw_rect(px[i], py[i], size, size)
+    draw_text("Click to spawn particles", 10.0, 10.0)

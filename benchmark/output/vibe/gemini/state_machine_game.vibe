@@ -1,0 +1,41 @@
+let state: Int = 0
+let score: Int = 0
+let timer: Float = 10.0
+let target_x: Float = 400.0
+let target_y: Float = 300.0
+
+fn update(dt: Float)
+    if state == 1
+        timer = timer - dt
+        if timer <= 0.0
+            state = 2
+
+fn draw()
+    if state == 0
+        draw_text("Press SPACE to Start", 250.0, 280.0)
+    else if state == 1
+        draw_rect(target_x, target_y, 20.0, 20.0)
+        draw_text("Score: " + str(score), 10.0, 10.0)
+        draw_text("Time: " + str(int(timer)), 10.0, 30.0)
+    else if state == 2
+        draw_text("Game Over! Score: " + str(score), 250.0, 260.0)
+        draw_text("Press SPACE to Restart", 250.0, 300.0)
+
+fn keypressed(k: String)
+    if state == 0
+        if k == "space"
+            state = 1
+            score = 0
+            timer = 10.0
+            target_x = rand_float(0.0, 780.0)
+            target_y = rand_float(0.0, 580.0)
+    else if state == 2
+        if k == "space"
+            state = 0
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    if state == 1
+        if mx >= target_x and mx <= target_x + 20.0 and my >= target_y and my <= target_y + 20.0
+            score = score + 1
+            target_x = rand_float(0.0, 780.0)
+            target_y = rand_float(0.0, 580.0)

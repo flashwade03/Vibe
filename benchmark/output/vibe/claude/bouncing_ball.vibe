@@ -1,0 +1,17 @@
+-- Bouncing Ball: bounces off edges of 800x600 window
+let bx: Float = 400.0
+let by: Float = 300.0
+let vx: Float = 180.0
+let vy: Float = 130.0
+let radius: Float = 12.0
+
+fn update(dt: Float)
+    bx = bx + vx * dt
+    by = by + vy * dt
+    if bx - radius < 0.0 or bx + radius > 800.0
+        vx = -vx
+    if by - radius < 0.0 or by + radius > 600.0
+        vy = -vy
+
+fn draw()
+    draw_circle(bx, by, radius)

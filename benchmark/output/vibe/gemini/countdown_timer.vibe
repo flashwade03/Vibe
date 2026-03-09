@@ -7,5 +7,6 @@ fn update(dt: Float)
 
 fn draw()
     if timer > 0.0
-        draw_text(str(timer), 350.0, 280.0)
+        draw_text(str(int(timer)), 350.0, 280.0)
     else
+        draw_text("Time Up!", 330.0, 280.0)

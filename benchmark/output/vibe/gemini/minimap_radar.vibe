@@ -1,0 +1,10 @@
+let player_x: Float = 1000.0
+let player_y: Float = 1000.0
+let speed: Float = 300.0
+
+let item_xs: List[Float] = []
+let item_ys: List[Float] = []
+let initialized: Bool = false
+
+fn load()
+    for i

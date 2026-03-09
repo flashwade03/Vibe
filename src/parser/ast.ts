@@ -93,6 +93,7 @@ export interface ReturnStmt {
 
 export interface Assignment {
   kind: "Assignment";
+  op: "=" | "+=" | "-=" | "*=" | "/=" | "%=";
   target: Expr; // must be Identifier or FieldAccess
   value: Expr;
   loc: Loc;

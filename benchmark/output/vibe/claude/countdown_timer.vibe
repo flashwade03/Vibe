@@ -1,0 +1,14 @@
+-- Countdown Timer: display countdown from 10 to 0
+let timer: Float = 10.0
+
+fn update(dt: Float)
+    if timer > 0.0
+        timer = timer - dt
+    if timer < 0.0
+        timer = 0.0
+
+fn draw()
+    if timer > 0.0
+        draw_text("Time: " + str(int(timer) + 1), 350.0, 280.0)
+    else
+        draw_text("Time's Up!", 340.0, 280.0)

@@ -1,0 +1,63 @@
+-- Flocking Simulation: simplified boids
+let bx: List[Float] = []
+let by: List[Float] = []
+let bvx: List[Float] = []
+let bvy: List[Float] = []
+let count: Int = 20
+
+fn load()
+    for i in range(0, count)
+        bx = bx + [rand_float(100.0, 700.0)]
+        by = by + [rand_float(100.0, 500.0)]
+        bvx = bvx + [rand_float(-60.0, 60.0)]
+        bvy = bvy + [rand_float(-60.0, 60.0)]
+
+fn update(dt: Float)
+    -- Compute center of mass
+    let cx: Float = 0.0
+    let cy: Float = 0.0
+    for i in range(0, count)
+        cx = cx + bx[i]
+        cy = cy + by[i]
+    cx = cx / float(count)
+    cy = cy / float(count)
+
+    for i in range(0, count)
+        -- Cohesion: steer toward center
+        bvx[i] = bvx[i] + (cx - bx[i]) * 0.4 * dt
+        bvy[i] = bvy[i] + (cy - by[i]) * 0.4 * dt
+
+        -- Separation: push away from nearby boids
+        for j in range(0, count)
+            if i != j
+                let dx: Float = bx[i] - bx[j]
+                let dy: Float = by[i] - by[j]
+                let dist: Float = sqrt(dx * dx + dy * dy)
+                if dist < 30.0 and dist > 0.1
+                    bvx[i] = bvx[i] + (dx / dist) * 80.0 * dt
+                    bvy[i] = bvy[i] + (dy / dist) * 80.0 * dt
+
+        -- Clamp speed
+        let spd: Float = sqrt(bvx[i] * bvx[i] + bvy[i] * bvy[i])
+        if spd > 120.0
+            bvx[i] = bvx[i] / spd * 120.0
+            bvy[i] = bvy[i] / spd * 120.0
+
+        -- Move
+        bx[i] = bx[i] + bvx[i] * dt
+        by[i] = by[i] + bvy[i] * dt
+
+        -- Wrap edges
+        if bx[i] > 800.0
+            bx[i] = 0.0
+        if bx[i] < 0.0
+            bx[i] = 800.0
+        if by[i] > 600.0
+            by[i] = 0.0
+        if by[i] < 0.0
+            by[i] = 600.0
+
+fn draw()
+    for i in range(0, count)
+        draw_circle(bx[i], by[i], 4.0)
+    draw_text("Boids: " + str(count), 10.0, 10.0)

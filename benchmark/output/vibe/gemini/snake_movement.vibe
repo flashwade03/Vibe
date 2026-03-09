@@ -1,0 +1,4 @@
+let snake_xs: List[Float] = [400.0, 380.0, 360.0]
+let snake_ys: List[Float] = [300.0, 300.0, 300.0]
+let dir_x: Float = 1.0
+let dir_

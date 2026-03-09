@@ -34,7 +34,6 @@ function love.update(dt)
     if distance > 1.0 then
         dx = dx / distance
         dy = dy / distance
-
         enemy_x = enemy_x + dx * enemy_speed * dt
         enemy_y = enemy_y + dy * enemy_speed * dt
     end

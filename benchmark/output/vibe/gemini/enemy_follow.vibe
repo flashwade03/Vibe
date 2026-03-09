@@ -1,8 +1,7 @@
-let px: Float = 400.0
-let py: Float = 300.0
-let ex: Float = 100.0
-let ey: Float = 100.0
-const P_SPEED: Float = 200.0
-const E_SPEED: Float = 100.0
+let player_x: Float = 400.0
+let player_y: Float = 300.0
+let enemy_x: Float = 100.0
+let enemy_y: Float = 100.0
 
-fn update(dt
+const PLAYER_SPEED: Float = 200.0
+const ENEMY_SPEED: Float =

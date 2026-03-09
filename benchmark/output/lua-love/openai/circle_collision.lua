@@ -36,6 +36,7 @@ function love.update(dt)
         local distance = math.sqrt((player_x - ex) * (player_x - ex) + (player_y - ey) * (player_y - ey))
         if distance < player_radius + enemy_radius then
             hit = true
+            break
         end
     end
 end

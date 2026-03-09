@@ -7,12 +7,12 @@ const gravity: Float = 500.0
 
 fn update(dt: Float)
     if key_down("right")
-        x = x + speed * dt
+        x += speed * dt
     if key_down("left")
-        x = x - speed * dt
+        x -= speed * dt
 
-    vy = vy + gravity * dt
-    y = y + vy * dt
+    vy += gravity * dt
+    y += vy * dt
 
     if y >= 550.0
         y = 550.0
@@ -24,4 +24,4 @@ fn update(dt: Float)
         on_ground = false
 
 fn draw()
-    draw_rect(x, y, 32, 32)
+    draw_rect(x, y, 32.0, 32.0)

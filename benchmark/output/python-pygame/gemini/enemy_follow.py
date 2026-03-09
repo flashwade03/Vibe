@@ -5,12 +5,13 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Program")
+pygame.display.set_caption("Player and Enemy")
 clock = pygame.time.Clock()
 
 player_x, player_y = 400.0, 300.0
-enemy_x, enemy_y = 100.0, 100.0
 player_speed = 200.0
+
+enemy_x, enemy_y = 100.0, 100.0
 enemy_speed = 100.0
 
 running = True
@@ -31,26 +32,9 @@ while running:
     if keys[pygame.K_DOWN]:
         player_y += player_speed * dt
 
-    # Enemy update logic
     dx = player_x - enemy_x
     dy = player_y - enemy_y
     distance = math.sqrt(dx * dx + dy * dy)
     
     if distance > 1.0:
-        norm_dx = dx / distance
-        norm_dy = dy / distance
-        enemy_x += norm_dx * enemy_speed * dt
-        enemy_y += norm_dy * enemy_speed * dt
-
-    screen.fill((0, 0, 0))
-
-    # Draw enemy (Red)
-    # Using standard pygame.draw.rect to represent the requested draw_rect call
-    pygame.draw.rect(screen, (255, 0, 0), (int(enemy_x), int(enemy_y), 32, 32))
-
-    # Draw player (Blue)
-    pygame.draw.rect(screen, (0, 0, 255), (int(player_x), int(player_y), 32, 32))
-
-    pygame.display.flip()
-
-pygame.quit()
+        enemy_x += (dx / distance

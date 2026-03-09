@@ -1,11 +1,14 @@
 local x = 368
 local y = 268
 local speed = 100
-local size = 64
+
+local function str(value)
+    return tostring(value)
+end
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Game")
 end
 
 function love.update(dt)
@@ -24,10 +27,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw the 64x64 rectangle
-    love.graphics.rectangle("fill", x, y, size, size)
-    
-    -- Display the current x and y position as text
-    -- Lua uses .. for concatenation and tostring() for str()
-    love.graphics.print("x: " .. tostring(x) .. " y: " .. tostring(y), 10, 10)
+    love.graphics.rectangle("fill", x, y, 64, 64)
+    love.graphics.print("x: " .. str(x) .. " y: " .. str(y), 10, 10)
 end

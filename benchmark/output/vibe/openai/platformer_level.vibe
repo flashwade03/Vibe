@@ -1,0 +1,53 @@
+let player_x: Float = 100.0
+let player_y: Float = 400.0
+let prev_y: Float = player_y
+let vx: Float = 0.0
+let vy: Float = 0.0
+const GRAVITY: Float = 600.0
+const JUMP_VELOCITY: Float = -350.0
+const MOVE_SPEED: Float = 250.0
+let on_ground: Bool = false
+
+let plat_xs: List[Float] = [50.0, 300.0, 500.0, 200.0, 450.0]
+let plat_ys: List[Float] = [450.0, 380.0, 300.0, 220.0, 150.0]
+let plat_ws: List[Float] = [200.0, 150.0, 180.0, 120.0, 200.0]
+
+fn update(dt: Float)
+    prev_y = player_y
+    vy = vy + GRAVITY * dt
+    on_ground = false
+
+    if key_down("right")
+        vx = MOVE_SPEED
+    else if key_down("left")
+        vx = -MOVE_SPEED
+    else
+        vx = 0.0
+
+    if key_down("up") and on_ground
+        vy = JUMP_VELOCITY
+
+    player_x = player_x + vx * dt
+    player_y = player_y + vy * dt
+
+    if player_y + 20 >= 580.0
+        player_y = 580.0 - 20.0
+        vy = 0.0
+        on_ground = true
+
+    for i in range(0, len(plat_xs))
+        if vy >= 0 and prev_y + 20 <= plat_ys[i] and player_y + 20 >= plat_ys[i] and player_x + 20 > plat_xs[i] and player_x < plat_xs[i] + plat_ws[i]
+            player_y = plat_ys[i] - 20.0
+            vy = 0.0
+            on_ground = true
+
+    if player_y > 620.0
+        player_x = 100.0
+        player_y = 400.0
+        vy = 0.0
+
+fn draw()
+    draw_rect(player_x, player_y, 20.0, 20.0)
+    for i in range(0, len(plat_xs))
+        draw_rect(plat_xs[i], plat_ys[i], plat_ws[i], 12.0)
+    draw_text("Use arrows + up to jump", 10.0, 10.0)

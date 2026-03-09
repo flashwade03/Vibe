@@ -1,0 +1,33 @@
+-- Circle Collision: two circles, detect overlap, display text
+let c1_x: Float = 200.0
+let c1_y: Float = 300.0
+let c2_x: Float = 500.0
+let c2_y: Float = 300.0
+let speed: Float = 150.0
+let colliding: Bool = false
+let r1: Float = 30.0
+let r2: Float = 40.0
+
+fn update(dt: Float)
+    -- Move first circle with arrow keys
+    if key_down("right")
+        c1_x = c1_x + speed * dt
+    if key_down("left")
+        c1_x = c1_x - speed * dt
+    if key_down("down")
+        c1_y = c1_y + speed * dt
+    if key_down("up")
+        c1_y = c1_y - speed * dt
+    -- Check collision
+    let dx: Float = c1_x - c2_x
+    let dy: Float = c1_y - c2_y
+    let dist: Float = sqrt(dx * dx + dy * dy)
+    colliding = dist < r1 + r2
+
+fn draw()
+    draw_circle(c1_x, c1_y, r1)
+    draw_circle(c2_x, c2_y, r2)
+    if colliding
+        draw_text("Colliding!", 350.0, 50.0)
+    else
+        draw_text("No collision", 340.0, 50.0)

@@ -35,7 +35,11 @@ import type {
 const INDENT = "  "; // 2-space indentation
 
 /** LOVE2D game-loop function names that get `love.` prefix. */
-const LOVE_FUNCTIONS = new Set(["update", "draw", "load", "keypressed", "keyreleased"]);
+const LOVE_FUNCTIONS = new Set([
+  "update", "draw", "load",
+  "keypressed", "keyreleased",
+  "mousepressed", "mousereleased", "mousemoved",
+]);
 
 /** Lua reserved words that are NOT Vibe keywords — must be escaped. */
 const LUA_RESERVED = new Set([
@@ -49,6 +53,13 @@ const BUILTIN_MAP: Record<string, { lua: string; prependArgs?: string[] }> = {
   draw_rect:   { lua: "love.graphics.rectangle", prependArgs: ['"fill"'] },
   draw_text:   { lua: "love.graphics.print" },
   draw_circle: { lua: "love.graphics.circle", prependArgs: ['"fill"'] },
+  str:         { lua: "tostring" },
+  int:         { lua: "math.floor" },
+  float:       { lua: "tonumber" },
+  sqrt:        { lua: "math.sqrt" },
+  cos:         { lua: "math.cos" },
+  sin:         { lua: "math.sin" },
+  rand_float:  { lua: "love.math.random" },
 };
 
 // ── Public API ──────────────────────────────────────────────
@@ -234,7 +245,13 @@ function emitReturnStmt(node: ReturnStmt, depth: number): string {
 
 function emitAssignment(node: Assignment, depth: number): string {
   const prefix = indent(depth);
-  return `${prefix}${emitExpr(node.target)} = ${emitExpr(node.value)}`;
+  const target = emitExpr(node.target);
+  if (node.op && node.op !== "=") {
+    // Desugar compound assignment: x += 5 → x = x + 5
+    const arithmeticOp = node.op.slice(0, -1); // "+=" → "+"
+    return `${prefix}${target} = ${target} ${arithmeticOp} ${emitExpr(node.value)}`;
+  }
+  return `${prefix}${target} = ${emitExpr(node.value)}`;
 }
 
 function emitExprStmt(node: ExprStmt, depth: number): string {
@@ -278,8 +295,27 @@ function emitExpr(expr: Expr): string {
 function emitBinaryExpr(node: BinaryExpr): string {
   const left = emitExpr(node.left);
   const right = emitExpr(node.right);
-  const op = node.op === "!=" ? "~=" : node.op;
+  let op = node.op === "!=" ? "~=" : node.op;
+  // Vibe uses + for string concatenation; Lua uses ..
+  if (op === "+" && (isStringy(node.left) || isStringy(node.right))) {
+    op = "..";
+  }
   return `${left} ${op} ${right}`;
+}
+
+/** Check if an expression is likely a string (StringLiteral or str() call). */
+function isStringy(expr: Expr): boolean {
+  if (expr.kind === "StringLiteral") return true;
+  if (
+    expr.kind === "CallExpr" &&
+    expr.callee.kind === "Identifier" &&
+    expr.callee.name === "str"
+  ) return true;
+  // Recursive: "a" + "b" + "c" — the left side is a BinaryExpr with +
+  if (expr.kind === "BinaryExpr" && expr.op === "+") {
+    return isStringy(expr.left) || isStringy(expr.right);
+  }
+  return false;
 }
 
 function emitUnaryExpr(node: UnaryExpr): string {

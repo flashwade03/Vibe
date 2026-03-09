@@ -33,7 +33,7 @@ end
 
 function love.draw()
     love.graphics.rectangle("fill", player_x, player_y, 32, 32)
-
+    
     for i = 1, #bullet_xs do
         love.graphics.rectangle("fill", bullet_xs[i], bullet_ys[i], 4, 4)
     end

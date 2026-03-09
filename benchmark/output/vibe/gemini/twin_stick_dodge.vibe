@@ -1,0 +1,8 @@
+let px: Float = 400.0
+let py: Float = 300.0
+let p_speed: Float = 300.0
+let p_radius: Float = 10.0
+
+let bx: List[Float] = []
+let by: List[Float] = []
+let bvx: List[Float]

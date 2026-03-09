@@ -1,8 +1,8 @@
 local x = 400
 local y = 300
 local radius = 16
-local vx = 150
-local vy = 150
+local velocityX = 150
+local velocityY = 150
 
 function love.load()
     love.window.setMode(800, 600)
@@ -10,25 +10,23 @@ function love.load()
 end
 
 function love.update(dt)
-    x = x + vx * dt
-    y = y + vy * dt
+    x = x + velocityX * dt
+    y = y + velocityY * dt
 
-    -- Bounce off the left and right edges
     if x - radius < 0 then
         x = radius
-        vx = -vx
+        velocityX = -velocityX
     elseif x + radius > love.graphics.getWidth() then
         x = love.graphics.getWidth() - radius
-        vx = -vx
+        velocityX = -velocityX
     end
 
-    -- Bounce off the top and bottom edges
     if y - radius < 0 then
         y = radius
-        vy = -vy
+        velocityY = -velocityY
     elseif y + radius > love.graphics.getHeight() then
         y = love.graphics.getHeight() - radius
-        vy = -vy
+        velocityY = -velocityY
     end
 end
 

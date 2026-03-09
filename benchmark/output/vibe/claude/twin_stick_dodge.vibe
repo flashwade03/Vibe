@@ -1,0 +1,84 @@
+-- Twin Stick Dodge: player dodges enemies spawning from edges
+let player_x: Float = 400.0
+let player_y: Float = 300.0
+let player_speed: Float = 280.0
+
+let ex: List[Float] = []
+let ey: List[Float] = []
+let evx: List[Float] = []
+let evy: List[Float] = []
+
+let spawn_timer: Float = 0.5
+let survived: Float = 0.0
+let dead: Bool = false
+
+fn update(dt: Float)
+    if dead
+        return
+    survived = survived + dt
+    -- Move player
+    if key_down("left")
+        player_x = player_x - player_speed * dt
+    if key_down("right")
+        player_x = player_x + player_speed * dt
+    if key_down("up")
+        player_y = player_y - player_speed * dt
+    if key_down("down")
+        player_y = player_y + player_speed * dt
+    -- Clamp to screen
+    if player_x < 10.0
+        player_x = 10.0
+    if player_x > 790.0
+        player_x = 790.0
+    if player_y < 10.0
+        player_y = 10.0
+    if player_y > 590.0
+        player_y = 590.0
+    -- Spawn enemies
+    spawn_timer = spawn_timer - dt
+    if spawn_timer <= 0.0
+        spawn_timer = 0.4
+        let edge: Float = rand_float(0.0, 4.0)
+        let sx: Float = 0.0
+        let sy: Float = 0.0
+        if edge < 1.0
+            sx = rand_float(0.0, 800.0)
+            sy = -10.0
+        else if edge < 2.0
+            sx = 810.0
+            sy = rand_float(0.0, 600.0)
+        else if edge < 3.0
+            sx = rand_float(0.0, 800.0)
+            sy = 610.0
+        else
+            sx = -10.0
+            sy = rand_float(0.0, 600.0)
+        -- Aim toward player
+        let dx: Float = player_x - sx
+        let dy: Float = player_y - sy
+        let dist: Float = sqrt(dx * dx + dy * dy)
+        if dist > 1.0
+            dx = dx / dist
+            dy = dy / dist
+        let espd: Float = 150.0 + survived * 3.0
+        ex = ex + [sx]
+        ey = ey + [sy]
+        evx = evx + [dx * espd]
+        evy = evy + [dy * espd]
+    -- Move enemies and check collision
+    for i in range(0, len(ex))
+        ex[i] = ex[i] + evx[i] * dt
+        ey[i] = ey[i] + evy[i] * dt
+        let cdx: Float = player_x - ex[i]
+        let cdy: Float = player_y - ey[i]
+        let cd: Float = sqrt(cdx * cdx + cdy * cdy)
+        if cd < 15.0
+            dead = true
+
+fn draw()
+    draw_circle(player_x, player_y, 10.0)
+    for i in range(0, len(ex))
+        draw_rect(ex[i] - 5.0, ey[i] - 5.0, 10.0, 10.0)
+    draw_text("Time: " + str(int(survived)), 10.0, 10.0)
+    if dead
+        draw_text("DEAD! Survived: " + str(int(survived)) + "s", 300.0, 280.0)

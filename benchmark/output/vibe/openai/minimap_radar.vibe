@@ -1,0 +1,42 @@
+let player_x: Float = 1000.0
+let player_y: Float = 1000.0
+let speed: Float = 300.0
+let item_xs: List[Float] = []
+let item_ys: List[Float] = []
+
+fn load()
+    for i in range(0, 20)
+        item_xs = item_xs + [rand_float(0.0, 2000.0)]
+        item_ys = item_ys + [rand_float(0.0, 2000.0)]
+
+fn update(dt: Float)
+    if key_down("right")
+        player_x = player_x + speed * dt
+    if key_down("left")
+        player_x = player_x - speed * dt
+    if key_down("down")
+        player_y = player_y + speed * dt
+    if key_down("up")
+        player_y = player_y - speed * dt
+
+fn draw()
+    -- Draw main view
+    for i in range(0, len(item_xs))
+        let draw_x = item_xs[i] - (player_x - 400.0)
+        let draw_y = item_ys[i] - (player_y - 300.0)
+        if draw_x > -20.0 and draw_x < 820.0 and draw_y > -20.0 and draw_y < 620.0
+            draw_rect(draw_x, draw_y, 10.0, 10.0)
+    draw_rect(400.0, 300.0, 16.0, 16.0)
+
+    -- Draw minimap
+    draw_rect(630.0, 10.0, 160.0, 120.0)  -- Minimap background
+    for i in range(0, len(item_xs))
+        let minimap_x = 630.0 + (item_xs[i] / 2000.0) * 160.0
+        let minimap_y = 10.0 + (item_ys[i] / 2000.0) * 120.0
+        draw_rect(minimap_x, minimap_y, 2.0, 2.0)
+    let player_minimap_x = 630.0 + (player_x / 2000.0) * 160.0
+    let player_minimap_y = 10.0 + (player_y / 2000.0) * 120.0
+    draw_rect(player_minimap_x, player_minimap_y, 2.0, 2.0)
+
+    -- Draw player position
+    draw_text("Pos: " + str(int(player_x)) + ", " + str(int(player_y)), 10.0, 10.0)

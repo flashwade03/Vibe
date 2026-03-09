@@ -6,10 +6,10 @@ let particle_lifes: List[Float] = []
 
 fn mousepressed(mx: Float, my: Float, button: Int)
     for i in range(0, 10)
-        let angle = rand_float(0.0, 6.283)
-        let speed = rand_float(50.0, 200.0)
-        let vx = cos(angle) * speed
-        let vy = sin(angle) * speed
+        let angle: Float = rand_float(0.0, 6.283)
+        let speed: Float = rand_float(50.0, 200.0)
+        let vx: Float = cos(angle) * speed
+        let vy: Float = sin(angle) * speed
         particle_xs = particle_xs + [mx]
         particle_ys = particle_ys + [my]
         particle_vxs = particle_vxs + [vx]
@@ -17,7 +17,7 @@ fn mousepressed(mx: Float, my: Float, button: Int)
         particle_lifes = particle_lifes + [2.0]
 
 fn update(dt: Float)
-    let n = len(particle_xs)
+    let n: Int = len(particle_xs)
     for i in range(0, n)
         if particle_lifes[i] > 0.0
             particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
@@ -25,7 +25,7 @@ fn update(dt: Float)
             particle_lifes[i] = particle_lifes[i] - dt
 
 fn draw()
-    let n = len(particle_xs)
+    let n: Int = len(particle_xs)
     for i in range(0, n)
         if particle_lifes[i] > 0.0
             draw_rect(particle_xs[i], particle_ys[i], 4.0, 4.0)

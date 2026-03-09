@@ -148,9 +148,7 @@ class Parser {
     }
 
     this.expect(TokenType.NEWLINE);
-    this.expect(TokenType.INDENT);
-    const body = this.parseBlock();
-    this.expect(TokenType.DEDENT);
+    const body = this.parseIndentedBlock();
 
     return {
       kind: "FnDecl",
@@ -256,6 +254,18 @@ class Parser {
 
   // ── Block (INDENT...DEDENT) ─────────────────────────────
 
+  /** Parse an indented block, allowing empty bodies (INDENT immediately followed by DEDENT). */
+  private parseIndentedBlock(): Stmt[] {
+    if (this.at(TokenType.INDENT)) {
+      this.advance();
+      const stmts = this.parseBlock();
+      this.expect(TokenType.DEDENT);
+      return stmts;
+    }
+    // No INDENT → empty body (e.g., fn foo()\n followed by next top-level decl)
+    return [];
+  }
+
   private parseBlock(): Stmt[] {
     const stmts: Stmt[] = [];
     this.skipNewlines();
@@ -293,9 +303,7 @@ class Parser {
     const kwTok = this.expect(TokenType.KW_IF);
     const condition = this.parseExpr();
     this.expect(TokenType.NEWLINE);
-    this.expect(TokenType.INDENT);
-    const body = this.parseBlock();
-    this.expect(TokenType.DEDENT);
+    const body = this.parseIndentedBlock();
 
     let elseBody: Stmt[] | undefined;
 
@@ -308,9 +316,7 @@ class Parser {
       } else {
         // else block
         this.expect(TokenType.NEWLINE);
-        this.expect(TokenType.INDENT);
-        elseBody = this.parseBlock();
-        this.expect(TokenType.DEDENT);
+        elseBody = this.parseIndentedBlock();
       }
     }
 
@@ -348,9 +354,7 @@ class Parser {
     }
 
     this.expect(TokenType.NEWLINE);
-    this.expect(TokenType.INDENT);
-    const body = this.parseBlock();
-    this.expect(TokenType.DEDENT);
+    const body = this.parseIndentedBlock();
 
     return { kind: "ForStmt", variant, body, loc: this.loc(kwTok) };
   }
@@ -376,13 +380,24 @@ class Parser {
     const startTok = this.peek();
     const expr = this.parseExpr();
 
-    if (this.at(TokenType.EQ)) {
-      // Assignment
-      this.advance(); // consume =
+    // Check for simple or compound assignment
+    const assignOps: Record<string, Assignment["op"]> = {
+      [TokenType.EQ]: "=",
+      [TokenType.PLUSEQ]: "+=",
+      [TokenType.MINUSEQ]: "-=",
+      [TokenType.STAREQ]: "*=",
+      [TokenType.SLASHEQ]: "/=",
+      [TokenType.PERCENTEQ]: "%=",
+    };
+
+    const op = assignOps[this.peek().type];
+    if (op) {
+      this.advance(); // consume assignment operator
       const value = this.parseExpr();
       this.expectNewlineOrEOF();
       return {
         kind: "Assignment",
+        op,
         target: expr,
         value,
         loc: this.loc(startTok),

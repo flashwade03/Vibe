@@ -1,0 +1,8 @@
+let paddle_x: Float = 360.0
+let paddle_y: Float = 570.0
+let paddle_w: Float = 80.0
+let paddle_h: Float = 12.0
+let paddle_speed: Float = 300.0
+
+let bx: Float = 400.0
+let by

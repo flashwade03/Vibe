@@ -1,0 +1,8 @@
+`.
+  - Done circles as small dots (radius 3).
+  - Show count of exploded circles as text. Use a for loop to count circles with state > 0.0.
+  ```vibe
+  fn draw()
+      let exploded_count: Int = 0
+      for i in range(0, len(cx))
+          if cstate[i]

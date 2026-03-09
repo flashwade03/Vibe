@@ -1,0 +1,65 @@
+-- Minimap Radar: main view with objects, small corner minimap
+let cam_x: Float = 1000.0
+let cam_y: Float = 1000.0
+let player_speed: Float = 300.0
+let world_w: Float = 2000.0
+let world_h: Float = 2000.0
+
+-- 15 objects scattered in the world
+let obj_x: List[Float] = []
+let obj_y: List[Float] = []
+
+-- Minimap dimensions
+let map_x: Float = 620.0
+let map_y: Float = 10.0
+let map_w: Float = 170.0
+let map_h: Float = 128.0
+
+fn load()
+    for i in range(0, 15)
+        obj_x = obj_x + [rand_float(50.0, 1950.0)]
+        obj_y = obj_y + [rand_float(50.0, 1950.0)]
+
+fn update(dt: Float)
+    if key_down("left")
+        cam_x = cam_x - player_speed * dt
+    if key_down("right")
+        cam_x = cam_x + player_speed * dt
+    if key_down("up")
+        cam_y = cam_y - player_speed * dt
+    if key_down("down")
+        cam_y = cam_y + player_speed * dt
+    -- Clamp to world
+    if cam_x < 0.0
+        cam_x = 0.0
+    if cam_x > world_w
+        cam_x = world_w
+    if cam_y < 0.0
+        cam_y = 0.0
+    if cam_y > world_h
+        cam_y = world_h
+
+fn draw()
+    -- Draw objects relative to camera
+    let offset_x: Float = cam_x - 400.0
+    let offset_y: Float = cam_y - 300.0
+    for i in range(0, len(obj_x))
+        let sx: Float = obj_x[i] - offset_x
+        let sy: Float = obj_y[i] - offset_y
+        if sx > -20.0 and sx < 820.0 and sy > -20.0 and sy < 620.0
+            draw_rect(sx, sy, 12.0, 12.0)
+    -- Draw player at screen center
+    draw_rect(394.0, 294.0, 12.0, 12.0)
+    -- Minimap background
+    draw_rect(map_x, map_y, map_w, map_h)
+    -- Minimap objects
+    for i in range(0, len(obj_x))
+        let mx: Float = map_x + (obj_x[i] / world_w) * map_w
+        let my: Float = map_y + (obj_y[i] / world_h) * map_h
+        draw_rect(mx, my, 3.0, 3.0)
+    -- Minimap player
+    let mpx: Float = map_x + (cam_x / world_w) * map_w
+    let mpy: Float = map_y + (cam_y / world_h) * map_h
+    draw_circle(mpx, mpy, 3.0)
+    -- Position text
+    draw_text("Pos: " + str(int(cam_x)) + ", " + str(int(cam_y)), 10.0, 10.0)

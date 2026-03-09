@@ -1,8 +1,8 @@
 ```python
 import pygame
 import sys
-import random
 import math
+import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))

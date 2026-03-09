@@ -1,0 +1,7 @@
+if dist > 0.0`.
+    *   Let's write the separation loop carefully:
+        ```vibe
+        for j in range(0, 15)
+            if i != j
+                let dx: Float = boid_xs[i] - boid_xs[j]
+                let dy: Float = boid_ys[i

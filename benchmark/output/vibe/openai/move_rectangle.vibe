@@ -13,4 +13,4 @@ fn update(dt: Float)
         y = y - SPEED * dt
 
 fn draw()
-    draw_rect(x, y, 32, 32)
+    draw_rect(x, y, 32.0, 32.0)

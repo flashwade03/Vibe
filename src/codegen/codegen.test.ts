@@ -218,6 +218,7 @@ describe("codegen", () => {
       body: [
         {
           kind: "Assignment",
+          op: "=",
           target: mkId("x"),
           value: mkInt(5),
           loc,
@@ -422,6 +423,7 @@ describe("codegen", () => {
               body: [
                 {
                   kind: "Assignment",
+                  op: "=",
                   target: mkId("x"),
                   value: mkBinary(
                     "+",
@@ -439,6 +441,7 @@ describe("codegen", () => {
               body: [
                 {
                   kind: "Assignment",
+                  op: "=",
                   target: mkId("x"),
                   value: mkBinary(
                     "-",
@@ -487,5 +490,110 @@ describe("codegen", () => {
     ].join("\n");
 
     expect(generate(ast)).toBe(expected);
+  });
+
+  // 21. Empty function body
+  it("21. empty function body → function name() end", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "keypressed",
+      params: [mkParam("key")],
+      body: [],
+      loc,
+    });
+    expect(generate(ast)).toBe("function love.keypressed(key)\nend");
+  });
+
+  // 22. str() → tostring()
+  it("22. str() → tostring()", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("str", [mkId("x")]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  tostring(x)\nend");
+  });
+
+  // 23. int() → math.floor()
+  it("23. int() → math.floor()", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("int", [mkId("timer")]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  math.floor(timer)\nend");
+  });
+
+  // 24. sqrt() → math.sqrt()
+  it("24. sqrt() → math.sqrt()", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("sqrt", [mkId("x")]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  math.sqrt(x)\nend");
+  });
+
+  // 25. String + String → Lua ..
+  it("25. string concatenation: \"a\" + \"b\" → .. ", () => {
+    const expr: BinaryExpr = {
+      kind: "BinaryExpr",
+      op: "+",
+      left: mkStr("hello "),
+      right: mkStr("world"),
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(expr)],
+      loc,
+    });
+    expect(generate(ast)).toBe('function test()\n  "hello " .. "world"\nend');
+  });
+
+  // 26. str(x) + " text" → tostring(x) .. " text"
+  it("26. str() + string → .. ", () => {
+    const expr: BinaryExpr = {
+      kind: "BinaryExpr",
+      op: "+",
+      left: mkStr("Score: "),
+      right: mkCall("str", [mkId("score")]),
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(expr)],
+      loc,
+    });
+    expect(generate(ast)).toBe('function test()\n  "Score: " .. tostring(score)\nend');
+  });
+
+  // 27. Numeric + stays as +
+  it("27. numeric addition stays as +", () => {
+    const expr: BinaryExpr = {
+      kind: "BinaryExpr",
+      op: "+",
+      left: mkId("x"),
+      right: mkId("speed"),
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(expr)],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  x + speed\nend");
   });
 });

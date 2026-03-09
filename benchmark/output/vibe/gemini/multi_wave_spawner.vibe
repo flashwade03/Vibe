@@ -1,0 +1,8 @@
+let px: Float = 400.0
+let py: Float = 300.0
+let p_speed: Float = 250.0
+
+let ex: List[Float] = []
+let ey: List[Float] = []
+let evx: List[Float] = []
+let evy: List[Float] = []
