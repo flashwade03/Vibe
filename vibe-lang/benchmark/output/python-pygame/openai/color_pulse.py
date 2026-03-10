@@ -30,7 +30,7 @@ while running:
 
     font = pygame.font.Font(None, 36)
     text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(text, (10.0, 10.0))
+    screen.blit(text, (10, 10))
 
     pygame.display.flip()
 

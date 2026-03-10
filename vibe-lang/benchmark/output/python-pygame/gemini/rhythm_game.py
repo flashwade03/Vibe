@@ -8,7 +8,6 @@ pygame.display.set_caption("Rhythm Game")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
 note_xs = []
 note_ys = []
 note_lanes = []
@@ -45,7 +44,6 @@ while running:
                         flash_lane = press_lane
                         break
 
-    # Update logic
     spawn_timer += dt
     if spawn_timer >= 0.6:
         spawn_timer = 0.0
@@ -62,21 +60,20 @@ while running:
                 note_hit[i] = 2.0
                 misses += 1
                 combo = 0
-    
+
     flash_timer -= dt
 
-    # Draw logic
     screen.fill((0, 0, 0))
     
     for lane in range(4):
-        pygame.draw.rect(screen, (255, 255, 255), (220 + lane * 100, 495, 60, 10))
-        
+        pygame.draw.rect(screen, (255, 255, 255), (220.0 + float(lane) * 100.0, 495.0, 60.0, 10.0))
+    
     for i in range(len(note_xs)):
         if note_hit[i] == 0.0:
-            pygame.draw.rect(screen, (255, 255, 255), (int(note_xs[i] - 30), int(note_ys[i] - 10), 60, 20))
+            pygame.draw.rect(screen, (255, 255, 255), (note_xs[i] - 30.0, note_ys[i] - 10.0, 60.0, 20.0))
             
-    if flash_timer > 0.0 and flash_lane != -1:
-        pygame.draw.rect(screen, (200, 200, 200), (220 + flash_lane * 100, 488, 60, 24))
+    if flash_timer > 0.0:
+        pygame.draw.rect(screen, (200, 200, 200), (220.0 + float(flash_lane) * 100.0, 488.0, 60.0, 24.0))
 
     screen.blit(font.render(f"Score: {score}", True, (255, 255, 255)), (10, 10))
     screen.blit(font.render(f"Combo: {combo}", True, (255, 255, 255)), (10, 30))

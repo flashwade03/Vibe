@@ -78,7 +78,7 @@ function love.draw()
         for col = 0, 15 do
             local idx = row * 16 + col + 1
             local x, y = col * 50.0, row * 50.0
-            love.graphics.setColor(0.3, 0.3, 0.3)
+            love.graphics.setColor(0.2, 0.2, 0.2)
             love.graphics.rectangle("line", x, y, 50, 50)
             love.graphics.setColor(1, 1, 1)
             if grid[idx] == 1.0 then love.graphics.rectangle("fill", x, y, 50, 50)
@@ -89,6 +89,6 @@ function love.draw()
         end
     end
     love.graphics.print("Click: walls | Space: BFS", 10, 580)
-    if found then love.graphics.print("Path found!", 300, 580)
-    elseif not bfs_running and q_ptr > 1 and not found then love.graphics.print("No path", 300, 580) end
+    if found then love.graphics.print("Path found!", 300, 10)
+    elseif not bfs_running and q_ptr > 1 and not found then love.graphics.print("No path", 300, 10) end
 end

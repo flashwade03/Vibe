@@ -12,19 +12,30 @@ path_xs = [0.0, 200.0, 200.0, 600.0, 600.0, 800.0]
 path_ys = [300.0, 300.0, 100.0, 100.0, 500.0, 500.0]
 
 # Enemies
-en_xs, en_ys, en_wp, en_hp = [], [], [], []
+en_xs = []
+en_ys = []
+en_wp = []
+en_hp = []
 
 # Towers
-tow_xs, tow_ys, tow_timers = [], [], []
+tow_xs = []
+tow_ys = []
+tow_timers = []
 
 # Projectiles
-proj_xs, proj_ys, proj_txs, proj_tys, proj_alive = [], [], [], [], []
+proj_xs = []
+proj_ys = []
+proj_txs = []
+proj_tys = []
+proj_alive = []
 
 # Game state variables
 spawn_timer = 2.0
 enemy_speed = 80.0
 score = 0
 lives = 10
+
+font = pygame.font.Font(None, 36)
 
 def update(dt):
     global spawn_timer, lives, score
@@ -94,12 +105,6 @@ def update(dt):
                             if en_hp[i] <= 0.0:
                                 score += 1
 
-def mousepressed(pos):
-    if len(tow_xs) < 5:
-        tow_xs.append(pos[0])
-        tow_ys.append(pos[1])
-        tow_timers.append(0.0)
-
 def draw():
     screen.fill((0, 0, 0))
 
@@ -121,12 +126,17 @@ def draw():
         if proj_alive[i] > 0.0:
             pygame.draw.rect(screen, (255, 255, 0), (int(proj_xs[i]) - 2, int(proj_ys[i]) - 2, 4, 4))
 
-    # Draw text
-    font = pygame.font.Font(None, 36)
-    text = font.render(f"Lives: {lives} Score: {score}", True, (255, 255, 255))
-    screen.blit(text, (10, 10))
-    text = font.render(f"Click to place tower ({len(tow_xs)}/5)", True, (255, 255, 255))
-    screen.blit(text, (10, 30))
+    # Draw UI
+    lives_text = font.render(f"Lives: {lives} Score: {score}", True, (255, 255, 255))
+    screen.blit(lives_text, (10, 10))
+    tower_text = font.render(f"Click to place tower ({len(tow_xs)}/5)", True, (255, 255, 255))
+    screen.blit(tower_text, (10, 30))
+
+def mousepressed(pos):
+    if len(tow_xs) < 5:
+        tow_xs.append(pos[0])
+        tow_ys.append(pos[1])
+        tow_timers.append(0.0)
 
 running = True
 while running:

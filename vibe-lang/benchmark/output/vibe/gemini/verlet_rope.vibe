@@ -5,6 +5,7 @@ let prev_ys: List[Float] = []
 let pin_x: Float = 200.0
 let pin_y: Float = 200.0
 let rest_len: Float = 40.0
+let initialized: Bool = false
 
 fn load()
     for i in range(0, 10)
@@ -15,6 +16,10 @@ fn load()
         prev_ys = prev_ys + [200.0]
 
 fn update(dt: Float)
+    if not initialized
+        load()
+        initialized = true
+
     if key_down("right")
         pin_x += 200.0 * dt
     if key_down("left")

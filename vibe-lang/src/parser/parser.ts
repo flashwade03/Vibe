@@ -122,13 +122,8 @@ class Parser {
       case TokenType.KW_CONST:
         return this.parseConstDecl();
       default:
-        throw new VibeError(
-          this.filename,
-          tok.line,
-          tok.col,
-          "parser",
-          `expected top-level declaration (fn, let, const), got ${tok.type} ("${tok.value}")`,
-        );
+        // Allow top-level expression statements (e.g. function calls like load())
+        return this.parseAssignOrExprStmt() as ExprStmt | Assignment;
     }
   }
 
@@ -214,8 +209,11 @@ class Parser {
       this.advance();
       typeAnnotation = this.consumeTypeAnnotation();
     }
-    this.expect(TokenType.EQ);
-    const value = this.parseExpr();
+    let value: Expr | undefined;
+    if (this.at(TokenType.EQ)) {
+      this.advance();
+      value = this.parseExpr();
+    }
     this.expectNewlineOrEOF();
     return {
       kind: "LetDecl",

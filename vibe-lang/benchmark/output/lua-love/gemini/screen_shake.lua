@@ -20,7 +20,7 @@ function love.update(dt)
         shake_timer = shake_timer - dt
         shake_x = love.math.random(-shake_intensity, shake_intensity)
         shake_y = love.math.random(-shake_intensity, shake_intensity)
-        shake_intensity = shake_intensity - (20.0 * dt)
+        shake_intensity = shake_intensity - 20.0 * dt
     else
         shake_x = 0.0
         shake_y = 0.0

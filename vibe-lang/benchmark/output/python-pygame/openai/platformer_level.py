@@ -6,7 +6,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Simple Platformer")
 clock = pygame.time.Clock()
 
-# Player variables
+# Player properties
 player_x, player_y = 100.0, 400.0
 player_vx, player_vy = 0.0, 0.0
 gravity = 600.0
@@ -15,16 +15,15 @@ move_speed = 250.0
 on_ground = False
 
 # Platform data
-plat_xs = [50.0, 300.0, 500.0, 200.0, 450.0]
-plat_ys = [450.0, 380.0, 300.0, 220.0, 150.0]
-plat_ws = [200.0, 150.0, 180.0, 120.0, 200.0]
+plat_xs = [50, 300, 500, 200, 450]
+plat_ys = [450, 380, 300, 220, 150]
+plat_ws = [200, 150, 180, 120, 200]
 
 font = pygame.font.Font(None, 36)
 
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
-    prev_y = player_y
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -41,6 +40,7 @@ while running:
         on_ground = False
 
     # Physics update
+    prev_y = player_y
     player_x += player_vx * dt
     player_y += player_vy * dt
     player_vy += gravity * dt
@@ -55,7 +55,7 @@ while running:
             player_vy = 0
             on_ground = True
 
-    # Ground collision
+    # Check ground level
     if player_y + 20 >= 580:
         player_y = 580 - 20
         player_vy = 0
@@ -64,15 +64,16 @@ while running:
     # Reset if player falls below screen
     if player_y > 620:
         player_x, player_y = 100.0, 400.0
-        player_vy = 0.0
+        player_vy = 0
 
     # Drawing
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(player_x), int(player_y), 20, 20))
     for i in range(len(plat_xs)):
-        pygame.draw.rect(screen, (255, 255, 255), (int(plat_xs[i]), int(plat_ys[i]), int(plat_ws[i]), 12))
+        pygame.draw.rect(screen, (255, 255, 255), (plat_xs[i], plat_ys[i], plat_ws[i], 12))
     text = font.render("Use arrows + up to jump", True, (255, 255, 255))
     screen.blit(text, (10, 10))
+
     pygame.display.flip()
 
 pygame.quit()

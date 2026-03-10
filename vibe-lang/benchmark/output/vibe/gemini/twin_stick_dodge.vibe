@@ -32,27 +32,24 @@ fn update(dt: Float)
             let sy: Float = 0.0
             if side < 1.0
                 sx = rand_float(0.0, 800.0)
-                sy = -10.0
+                sy = 0.0
             else if side < 2.0
-                sx = 810.0
+                sx = 800.0
                 sy = rand_float(0.0, 600.0)
             else if side < 3.0
                 sx = rand_float(0.0, 800.0)
-                sy = 610.0
+                sy = 600.0
             else
-                sx = -10.0
+                sx = 0.0
                 sy = rand_float(0.0, 600.0)
 
             let dx = px - sx
             let dy = py - sy
             let dist = sqrt(dx * dx + dy * dy)
-            let vx = (dx / dist) * 250.0
-            let vy = (dy / dist) * 250.0
-
             bx += [sx]
             by += [sy]
-            bvx += [vx]
-            bvy += [vy]
+            bvx += [dx / dist * 250.0]
+            bvy += [dy / dist * 250.0]
             blife += [4.0]
 
         for i in range(0, len(bx))
@@ -60,7 +57,6 @@ fn update(dt: Float)
                 bx[i] += bvx[i] * dt
                 by[i] += bvy[i] * dt
                 blife[i] -= dt
-
                 let dist = sqrt((px - bx[i]) * (px - bx[i]) + (py - by[i]) * (py - by[i]))
                 if dist < 13.0
                     hit = true

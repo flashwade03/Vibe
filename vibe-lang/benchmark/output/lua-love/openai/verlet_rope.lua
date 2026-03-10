@@ -2,7 +2,6 @@ local node_xs = {}
 local node_ys = {}
 local prev_xs = {}
 local prev_ys = {}
-
 local pin_x = 200.0
 local pin_y = 200.0
 local speed = 200.0
@@ -11,7 +10,6 @@ local rest_len = 40.0
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Verlet Rope Simulation")
-
     for i = 0, 9 do
         local xv = 200.0 + i * 40.0
         table.insert(node_xs, xv)
@@ -74,13 +72,11 @@ function love.draw()
     for i = 0, 9 do
         love.graphics.circle("fill", node_xs[i], node_ys[i], 5.0)
     end
-
     for i = 0, 8 do
         for j = 0, 4 do
             local lt = j / 5.0
             love.graphics.circle("fill", node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt, node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt, 2.0)
         end
     end
-
     love.graphics.print("Arrows move anchor", 10.0, 10.0)
 end

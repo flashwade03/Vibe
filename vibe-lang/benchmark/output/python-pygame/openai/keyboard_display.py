@@ -6,14 +6,10 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Key Press Tracker")
 clock = pygame.time.Clock()
 
-last_key = "none"
-key_count = 0
 font = pygame.font.Font(None, 36)
 
-def keypressed(k):
-    global last_key, key_count
-    last_key = k
-    key_count += 1
+last_key = "none"
+key_count = 0
 
 running = True
 while running:
@@ -23,17 +19,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            keypressed(pygame.key.name(event.key))
+            last_key = pygame.key.name(event.key)
+            key_count += 1
 
     screen.fill((0, 0, 0))
-    text_last_key = font.render("Last Key: " + last_key, True, (255, 255, 255))
-    text_key_count = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
-    text_in_box = font.render(last_key, True, (255, 255, 255))
 
-    screen.blit(text_last_key, (250, 250))
-    screen.blit(text_key_count, (250, 290))
-    pygame.draw.rect(screen, (255, 255, 255), (300, 350, 200, 80), 2)
-    screen.blit(text_in_box, (370, 380))
+    last_key_text = font.render("Last Key: " + last_key, True, (255, 255, 255))
+    screen.blit(last_key_text, (250.0, 250.0))
+
+    key_count_text = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
+    screen.blit(key_count_text, (250.0, 290.0))
+
+    pygame.draw.rect(screen, (255, 255, 255), (300.0, 350.0, 200.0, 80.0), 2)
+    last_key_in_rect_text = font.render(last_key, True, (255, 255, 255))
+    screen.blit(last_key_in_rect_text, (370.0, 380.0))
 
     pygame.display.flip()
 

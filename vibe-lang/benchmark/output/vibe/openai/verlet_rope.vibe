@@ -18,13 +18,13 @@ fn load()
 
 fn update(dt: Float)
     if key_down("right")
-        pin_x += speed * dt
+        pin_x = pin_x + speed * dt
     if key_down("left")
-        pin_x -= speed * dt
+        pin_x = pin_x - speed * dt
     if key_down("down")
-        pin_y += speed * dt
+        pin_y = pin_y + speed * dt
     if key_down("up")
-        pin_y -= speed * dt
+        pin_y = pin_y - speed * dt
 
     node_xs[0] = pin_x
     node_ys[0] = pin_y
@@ -58,10 +58,8 @@ fn update(dt: Float)
 fn draw()
     for i in range(0, 10)
         draw_circle(node_xs[i], node_ys[i], 5.0)
-
     for i in range(0, 9)
         for j in range(0, 5)
             let lt: Float = float(j) / 5.0
-            draw_circle(node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt, node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt, 2.0)
-
+            draw_circle(node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt, node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt, 2.0)
     draw_text("Arrows move anchor", 10.0, 10.0)

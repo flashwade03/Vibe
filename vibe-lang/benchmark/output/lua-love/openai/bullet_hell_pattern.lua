@@ -3,11 +3,9 @@ local bul_ys = {}
 local bul_vxs = {}
 local bul_vys = {}
 local bul_lifes = {}
-
 local emit_angle = 0.0
 local emit_timer = 0.0
 local game_over = false
-
 local px = 400.0
 local py = 500.0
 local player_speed = 300.0
@@ -21,7 +19,6 @@ function love.update(dt)
     if not game_over then
         emit_angle = emit_angle + 2.5 * dt
         emit_timer = emit_timer + dt
-
         if emit_timer >= 0.05 then
             emit_timer = 0.0
             for k = 0, 2 do

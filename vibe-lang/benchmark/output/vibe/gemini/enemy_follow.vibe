@@ -1,30 +1,30 @@
-let player_x: Float = 400.0
-let player_y: Float = 300.0
-let enemy_x: Float = 100.0
-let enemy_y: Float = 100.0
-const player_speed: Float = 200.0
-const enemy_speed: Float = 100.0
+let px: Float = 400.0
+let py: Float = 300.0
+let ex: Float = 100.0
+let ey: Float = 100.0
+let p_speed: Float = 200.0
+let e_speed: Float = 100.0
 
 fn update(dt: Float)
     if key_down("right")
-        player_x += player_speed * dt
+        px += p_speed * dt
     if key_down("left")
-        player_x -= player_speed * dt
+        px -= p_speed * dt
     if key_down("down")
-        player_y += player_speed * dt
+        py += p_speed * dt
     if key_down("up")
-        player_y -= player_speed * dt
+        py -= p_speed * dt
 
-    let dx: Float = player_x - enemy_x
-    let dy: Float = player_y - enemy_y
+    let dx: Float = px - ex
+    let dy: Float = py - ey
     let dist: Float = sqrt(dx * dx + dy * dy)
 
     if dist > 1.0
-        enemy_x += (dx / dist) * enemy_speed * dt
-        enemy_y += (dy / dist) * enemy_speed * dt
+        ex += (dx / dist) * e_speed * dt
+        ey += (dy / dist) * e_speed * dt
 
 fn draw()
     -- Enemy (Red)
-    draw_rect(enemy_x, enemy_y, 32, 32, 0, 0)
+    draw_rect(ex, ey, 32, 32, 255, 0)
     -- Player (Blue)
-    draw_rect(player_x, player_y, 32, 32, 0, 0)
+    draw_rect(px, py, 32, 32, 0, 255)

@@ -24,7 +24,6 @@ function love.draw()
     love.graphics.print(full_text, 100, 280)
 
     -- Draw covering rectangle to hide unrevealed characters
-    -- Assuming a fixed width font character size of 10 pixels
     local cover_x = 100.0 + (char_index * 10.0)
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill", cover_x, 270, 700, 30)
@@ -35,7 +34,7 @@ function love.draw()
         love.graphics.rectangle("fill", cover_x, 275, 2, 20)
     end
 
-    -- Display progress
+    -- Display status
     love.graphics.print("Chars: " .. char_index .. "/" .. text_len, 10, 10)
 
     -- Display completion message

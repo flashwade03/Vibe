@@ -14,7 +14,6 @@ fn update(dt: Float)
             player_y -= 250.0 * dt
         if key_down("down")
             player_y += 250.0 * dt
-
         player_y = max(0.0, min(player_y, 576.0))
 
         spawn_timer += dt

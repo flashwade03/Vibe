@@ -68,7 +68,6 @@ function love.draw()
             end
         end
     end
-    love.graphics.setColor(1, 1, 1)
     love.graphics.print("Click to add heat", 10, 10)
     love.graphics.print("Max: " .. math.floor(max_t), 10, 30)
 end

@@ -50,7 +50,7 @@ def update(dt):
         ship_x += ship_vx * dt
         ship_y += ship_vy * dt
 
-        # Wrap ship around screen
+        # Wrap ship
         if ship_x > 800.0:
             ship_x = 0.0
         if ship_x < 0.0:
@@ -62,19 +62,18 @@ def update(dt):
 
         # Move asteroids
         for i in range(len(ax)):
-            if aalive[i] == 1.0:
-                ax[i] += avx[i] * dt
-                ay[i] += avy[i] * dt
+            ax[i] += avx[i] * dt
+            ay[i] += avy[i] * dt
 
-                # Wrap asteroids around screen
-                if ax[i] > 800.0:
-                    ax[i] = 0.0
-                if ax[i] < 0.0:
-                    ax[i] = 800.0
-                if ay[i] > 600.0:
-                    ay[i] = 0.0
-                if ay[i] < 0.0:
-                    ay[i] = 600.0
+            # Wrap asteroids
+            if ax[i] > 800.0:
+                ax[i] = 0.0
+            if ax[i] < 0.0:
+                ax[i] = 800.0
+            if ay[i] > 600.0:
+                ay[i] = 0.0
+            if ay[i] < 0.0:
+                ay[i] = 600.0
 
         # Move bullets
         for j in range(len(bx)):
@@ -105,7 +104,6 @@ def update(dt):
 
 def keypressed(k):
     global bx, by, bvx, bvy, blife
-
     if k == pygame.K_SPACE and not game_over:
         nx = ship_x + math.cos(ship_angle) * 15.0
         ny = ship_y + math.sin(ship_angle) * 15.0
@@ -129,15 +127,16 @@ def draw():
             pygame.draw.circle(screen, (255, 255, 255), (int(bx[j]), int(by[j])), 2)
 
     font = pygame.font.Font(None, 36)
-    text = font.render("Score: " + str(score), True, (255, 255, 255))
+    text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(text, (10, 10))
 
     if game_over:
         game_over_text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(game_over_text, (340, 280))
 
-load()
+    pygame.display.flip()
 
+load()
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -145,12 +144,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             keypressed(event.key)
 
     update(dt)
     draw()
-    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

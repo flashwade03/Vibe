@@ -44,26 +44,26 @@ function love.update(dt)
                 spawn_x = love.math.random(0, 800)
                 spawn_y = 0
             elseif edge == 1 then
-                spawn_x = 800
-                spawn_y = love.math.random(0, 600)
-            elseif edge == 2 then
                 spawn_x = love.math.random(0, 800)
                 spawn_y = 600
-            else
+            elseif edge == 2 then
                 spawn_x = 0
+                spawn_y = love.math.random(0, 600)
+            else
+                spawn_x = 800
                 spawn_y = love.math.random(0, 600)
             end
 
             local dx = player_x - spawn_x
             local dy = player_y - spawn_y
             local length = math.sqrt(dx * dx + dy * dy)
-            dx = dx / length
-            dy = dy / length
+            dx = dx / length * 250
+            dy = dy / length * 250
 
             table.insert(bx, spawn_x)
             table.insert(by, spawn_y)
-            table.insert(bvx, dx * 250)
-            table.insert(bvy, dy * 250)
+            table.insert(bvx, dx)
+            table.insert(bvy, dy)
             table.insert(blife, 4.0)
         end
 

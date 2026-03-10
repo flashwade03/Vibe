@@ -7,7 +7,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Verlet Rope Simulation")
 clock = pygame.time.Clock()
 
-# Initialize node positions and previous positions
+# Initialize node positions
 node_xs = []
 node_ys = []
 prev_xs = []
@@ -21,7 +21,6 @@ def load():
         node_ys.append(200.0)
         prev_ys.append(200.0)
 
-# Pin position
 pin_x = 200.0
 pin_y = 200.0
 speed = 200.0
@@ -42,7 +41,6 @@ def update(dt):
     if keys[pygame.K_DOWN]:
         pin_y += speed * dt
 
-    # Pin the first node
     node_xs[0] = pin_x
     node_ys[0] = pin_y
     prev_xs[0] = pin_x
@@ -75,19 +73,17 @@ def update(dt):
                     node_ys[i + 1] -= dy * diff
 
 def draw():
-    screen.fill((0, 0, 0))
     for i in range(10):
         pygame.draw.circle(screen, (255, 255, 255), (int(node_xs[i]), int(node_ys[i])), 5)
     for i in range(9):
         for j in range(5):
             lt = float(j) / 5.0
-            x = node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt
-            y = node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt
+            x = node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt
+            y = node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt
             pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 2)
     font = pygame.font.Font(None, 36)
     text = font.render("Arrows move anchor", True, (255, 255, 255))
     screen.blit(text, (10, 10))
-    pygame.display.flip()
 
 running = True
 while running:
@@ -98,7 +94,10 @@ while running:
             running = False
 
     update(dt)
+
+    screen.fill((0, 0, 0))
     draw()
+    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

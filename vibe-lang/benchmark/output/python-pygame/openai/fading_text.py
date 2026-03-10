@@ -7,8 +7,10 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Blinking Text")
 clock = pygame.time.Clock()
 
+font = pygame.font.Font(None, 48)
+small_font = pygame.font.Font(None, 36)
+
 timer = 0.0
-font = pygame.font.Font(None, 36)
 
 running = True
 while running:
@@ -22,14 +24,14 @@ while running:
     vis = math.sin(timer * 2.0)
 
     screen.fill((0, 0, 0))
-
+    
     if vis > 0.0:
         text = font.render("Hello Vibe!", True, (255, 255, 255))
         screen.blit(text, (300.0, 280.0))
-
-    timer_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(timer_text, (10.0, 10.0))
-
+    
+    time_text = small_font.render("Time: " + str(int(timer)), True, (255, 255, 255))
+    screen.blit(time_text, (10.0, 10.0))
+    
     pygame.display.flip()
 
 pygame.quit()

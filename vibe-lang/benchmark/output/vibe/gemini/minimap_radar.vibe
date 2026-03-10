@@ -24,6 +24,15 @@ fn update(dt: Float)
     if key_down("up")
         player_y -= speed * dt
 
+    if player_x < 0.0
+        player_x = 0.0
+    if player_x > 2000.0
+        player_x = 2000.0
+    if player_y < 0.0
+        player_y = 0.0
+    if player_y > 2000.0
+        player_y = 2000.0
+
 fn draw()
     -- Main view items
     for i in range(0, len(item_xs))
@@ -42,9 +51,9 @@ fn draw()
         let my = 10.0 + (item_ys[i] / 2000.0) * 120.0
         draw_rect(mx, my, 2.0, 2.0)
 
-    let px = 630.0 + (player_x / 2000.0) * 160.0
-    let py = 10.0 + (player_y / 2000.0) * 120.0
-    draw_rect(px - 1.0, py - 1.0, 2.0, 2.0)
+    let p_mx = 630.0 + (player_x / 2000.0) * 160.0
+    let p_my = 10.0 + (player_y / 2000.0) * 120.0
+    draw_rect(p_mx, p_my, 4.0, 4.0)
 
     -- UI
     draw_text("Pos: " + str(int(player_x)) + ", " + str(int(player_y)), 10.0, 10.0)

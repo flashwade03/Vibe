@@ -21,21 +21,20 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
-        # Jump logic on key down event
+        # Handle jump on key down event
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and on_ground:
                 vy = jump_force
                 on_ground = False
 
-    # Movement logic
+    # Horizontal movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         x -= speed * dt
     if keys[pygame.K_RIGHT]:
         x += speed * dt
 
-    # Physics logic
+    # Vertical movement and gravity
     vy += gravity * dt
     y += vy * dt
 
@@ -48,6 +47,10 @@ while running:
     # Draw logic
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
+    
+    # Draw ground line for reference
+    pygame.draw.line(screen, (255, 255, 255), (0, 582), (800, 582), 2)
+    
     pygame.display.flip()
 
 pygame.quit()

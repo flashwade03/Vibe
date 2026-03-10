@@ -17,9 +17,11 @@ function love.draw()
             local phase = (row * 5 + col) * 0.5
             local radius = 20.0 + 15.0 * math.sin(timer * 3.0 + phase)
             
+            love.graphics.setColor(0.2, 0.6, 1.0)
             love.graphics.circle("fill", cx, cy, radius)
         end
     end
-    
+
+    love.graphics.setColor(1, 1, 1)
     love.graphics.print("Time: " .. math.floor(timer), 10, 10)
 end

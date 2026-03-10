@@ -5,11 +5,9 @@ let inv_dir: Float = 1.0
 let inv_speed: Float = 40.0
 
 let px: Float = 384.0
-
 let bul_xs: List[Float] = []
 let bul_ys: List[Float] = []
 let bul_alive: List[Float] = []
-
 let score: Int = 0
 
 fn load()

@@ -9,36 +9,14 @@ clock = pygame.time.Clock()
 cp_xs = [100.0, 250.0, 550.0, 700.0]
 cp_ys = [500.0, 100.0, 100.0, 500.0]
 selected = 0
-speed = 150.0
+font = pygame.font.Font(None, 36)
 
-def draw_bezier_curve():
-    for i in range(51):
-        t = float(i) / 50.0
-        u = 1.0 - t
-        bx = (u * u * u * cp_xs[0] + 3.0 * u * u * t * cp_xs[1] +
-              3.0 * u * t * t * cp_xs[2] + t * t * t * cp_xs[3])
-        by = (u * u * u * cp_ys[0] + 3.0 * u * u * t * cp_ys[1] +
-              3.0 * u * t * t * cp_ys[2] + t * t * t * cp_ys[3])
-        pygame.draw.circle(screen, (255, 255, 255), (int(bx), int(by)), 2)
+def draw_circle(x, y, radius):
+    pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), int(radius))
 
-def draw_control_points():
-    for i in range(4):
-        pygame.draw.circle(screen, (255, 255, 255), (int(cp_xs[i]), int(cp_ys[i])), 8)
-
-def draw_control_polygon():
-    for i in range(3):
-        for j in range(10):
-            lt = float(j) / 10.0
-            lx = cp_xs[i] + (cp_xs[i + 1] - cp_xs[i]) * lt
-            ly = cp_ys[i] + (cp_ys[i + 1] - cp_ys[i]) * lt
-            pygame.draw.circle(screen, (255, 255, 255), (int(lx), int(ly)), 1)
-
-def draw_text():
-    font = pygame.font.Font(None, 36)
-    text1 = font.render(f"Point: {selected + 1}", True, (255, 255, 255))
-    text2 = font.render("Keys 1-4 select, arrows move", True, (255, 255, 255))
-    screen.blit(text1, (10, 10))
-    screen.blit(text2, (10, 30))
+def draw_text(text, x, y):
+    text_surface = font.render(text, True, (255, 255, 255))
+    screen.blit(text_surface, (x, y))
 
 running = True
 while running:
@@ -59,19 +37,45 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        cp_xs[selected] -= speed * dt
+        cp_xs[selected] -= 150.0 * dt
     if keys[pygame.K_RIGHT]:
-        cp_xs[selected] += speed * dt
+        cp_xs[selected] += 150.0 * dt
     if keys[pygame.K_UP]:
-        cp_ys[selected] -= speed * dt
+        cp_ys[selected] -= 150.0 * dt
     if keys[pygame.K_DOWN]:
-        cp_ys[selected] += speed * dt
+        cp_ys[selected] += 150.0 * dt
 
     screen.fill((0, 0, 0))
-    draw_bezier_curve()
-    draw_control_points()
-    draw_control_polygon()
-    draw_text()
+
+    # Draw the Bezier curve
+    for i in range(51):
+        t = float(i) / 50.0
+        u = 1.0 - t
+        bx = (u * u * u * cp_xs[0] +
+              3.0 * u * u * t * cp_xs[1] +
+              3.0 * u * t * t * cp_xs[2] +
+              t * t * t * cp_xs[3])
+        by = (u * u * u * cp_ys[0] +
+              3.0 * u * u * t * cp_ys[1] +
+              3.0 * u * t * t * cp_ys[2] +
+              t * t * t * cp_ys[3])
+        draw_circle(bx, by, 2.0)
+
+    # Draw control points
+    for i in range(4):
+        draw_circle(cp_xs[i], cp_ys[i], 8.0)
+
+    # Draw control polygon
+    for i in range(3):
+        for j in range(11):
+            lt = float(j) / 10.0
+            lx = cp_xs[i] + (cp_xs[i + 1] - cp_xs[i]) * lt
+            ly = cp_ys[i] + (cp_ys[i + 1] - cp_ys[i]) * lt
+            draw_circle(lx, ly, 1.0)
+
+    draw_text("Point: " + str(selected + 1), 10.0, 10.0)
+    draw_text("Keys 1-4 select, arrows move", 10.0, 30.0)
+
     pygame.display.flip()
 
 pygame.quit()

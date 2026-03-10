@@ -13,8 +13,8 @@ export interface Program {
   loc: Loc;
 }
 
-/** v0: top-level declarations include fn, let, and const. */
-export type TopLevelDecl = FnDecl | LetDecl | ConstDecl;
+/** Top-level declarations: fn, let, const, expression statements, and assignments. */
+export type TopLevelDecl = FnDecl | LetDecl | ConstDecl | ExprStmt | Assignment;
 
 // ── Declarations ─────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ export interface LetDecl {
   kind: "LetDecl";
   name: string;
   typeAnnotation?: string;
-  value: Expr;
+  value?: Expr;
   loc: Loc;
 }
 

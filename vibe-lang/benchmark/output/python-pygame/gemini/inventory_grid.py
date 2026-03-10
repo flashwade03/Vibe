@@ -65,7 +65,7 @@ while running:
                 pygame.draw.circle(screen, (255, 50, 50), (int(x + 40), int(y + 40)), 8)
 
     # UI Text
-    held_text = font.render(f"Held: {int(held_item)}", True, (255, 255, 255))
+    held_text = font.render("Held: " + str(int(held_item)), True, (255, 255, 255))
     screen.blit(held_text, (10, 10))
     instr_text = font.render("1-3: Add | Click: Pick/Place", True, (255, 255, 255))
     screen.blit(instr_text, (200, 540))

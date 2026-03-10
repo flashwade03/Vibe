@@ -11,6 +11,7 @@ note_xs = []
 note_ys = []
 note_lanes = []
 note_hit = []
+
 spawn_timer = 0.0
 note_speed = 200.0
 score = 0
@@ -77,10 +78,10 @@ def draw():
     combo_text = font.render("Combo: " + str(combo), True, (255, 255, 255))
     miss_text = font.render("Miss: " + str(misses), True, (255, 255, 255))
     keys_text = font.render("D F J K", True, (255, 255, 255))
-    screen.blit(score_text, (10, 10))
-    screen.blit(combo_text, (10, 30))
-    screen.blit(miss_text, (10, 50))
-    screen.blit(keys_text, (340, 560))
+    screen.blit(score_text, (10.0, 10.0))
+    screen.blit(combo_text, (10.0, 30.0))
+    screen.blit(miss_text, (10.0, 50.0))
+    screen.blit(keys_text, (340.0, 560.0))
 
 running = True
 while running:

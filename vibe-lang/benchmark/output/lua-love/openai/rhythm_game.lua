@@ -2,6 +2,7 @@ local note_xs = {}
 local note_ys = {}
 local note_lanes = {}
 local note_hit = {}
+
 local spawn_timer = 0.0
 local note_speed = 200.0
 local score = 0

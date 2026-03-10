@@ -6,17 +6,17 @@ let ball_vx: Float = 250.0
 let ball_vy: Float = 150.0
 let score1: Int = 0
 let score2: Int = 0
-const PADDLE_SPEED: Float = 300.0
+const speed: Float = 300.0
 
 fn update(dt: Float)
     if key_down("w")
-        p1_y -= PADDLE_SPEED * dt
+        p1_y -= speed * dt
     if key_down("s")
-        p1_y += PADDLE_SPEED * dt
+        p1_y += speed * dt
     if key_down("up")
-        p2_y -= PADDLE_SPEED * dt
+        p2_y -= speed * dt
     if key_down("down")
-        p2_y += PADDLE_SPEED * dt
+        p2_y += speed * dt
 
     if p1_y < 0.0
         p1_y = 0.0
@@ -30,9 +30,7 @@ fn update(dt: Float)
     ball_x += ball_vx * dt
     ball_y += ball_vy * dt
 
-    if ball_y < 8.0
-        ball_vy = -ball_vy
-    if ball_y > 592.0
+    if ball_y < 8.0 or ball_y > 592.0
         ball_vy = -ball_vy
 
     if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and ball_y >= p1_y and ball_y <= p1_y + 80.0

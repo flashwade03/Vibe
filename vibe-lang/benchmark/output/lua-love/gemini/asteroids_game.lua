@@ -56,9 +56,9 @@ function love.update(dt)
 
         for j = #bx, 1, -1 do
             blife[j] = blife[j] - dt
+            bx[j] = bx[j] + bvx[j] * dt
+            by[j] = by[j] + bvy[j] * dt
             if blife[j] > 0 then
-                bx[j] = bx[j] + bvx[j] * dt
-                by[j] = by[j] + bvy[j] * dt
                 for i = 1, #ax do
                     if aalive[i] == 1.0 then
                         local ddx, ddy = bx[j] - ax[i], by[j] - ay[i]

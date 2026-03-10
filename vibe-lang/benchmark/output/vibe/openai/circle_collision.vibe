@@ -8,15 +8,14 @@ let enemy_ys: List[Float] = [100.0, 100.0, 400.0, 400.0, 500.0]
 
 fn update(dt: Float)
     hit = false
-
     if key_down("right")
-        px += speed * dt
+        px = px + speed * dt
     if key_down("left")
-        px -= speed * dt
+        px = px - speed * dt
     if key_down("down")
-        py += speed * dt
+        py = py + speed * dt
     if key_down("up")
-        py -= speed * dt
+        py = py - speed * dt
 
     for i in range(0, len(enemy_xs))
         let ex = enemy_xs[i]

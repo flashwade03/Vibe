@@ -1,27 +1,18 @@
-use vibe::*;
+local timer = 0.0
 
-struct BlinkingText {
-    timer: Float,
-}
+function love.load()
+    love.window.setMode(800, 600)
+    love.window.setTitle("Blinking Text")
+end
 
-impl Game for BlinkingText {
-    fn new() -> Self {
-        Self { timer: 0.0 }
-    }
+function love.update(dt)
+    timer = timer + dt
+end
 
-    fn update(&mut self, dt: Float) {
-        self.timer += dt;
-    }
-
-    fn draw(&self) {
-        let vis = (self.timer * 2.0).sin();
-        if vis > 0.0 {
-            draw_text("Hello Vibe!", 300.0, 280.0);
-        }
-        draw_text(&format!("Time: {}", self.timer as i32), 10.0, 10.0);
-    }
-}
-
-fn main() {
-    run::<BlinkingText>();
-}
+function love.draw()
+    local vis = math.sin(timer * 2.0)
+    if vis > 0.0 then
+        love.graphics.print("Hello Vibe!", 300, 280)
+    end
+    love.graphics.print("Time: " .. tostring(math.floor(timer)), 10, 10)
+end

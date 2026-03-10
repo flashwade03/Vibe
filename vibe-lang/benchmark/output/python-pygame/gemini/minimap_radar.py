@@ -41,19 +41,18 @@ while running:
     screen.fill((0, 0, 0))
 
     # Draw items in main view
-    camera_offset_x = player_x - 400.0
-    camera_offset_y = player_y - 300.0
-
+    camera_x = player_x - 400.0
+    camera_y = player_y - 300.0
     for i in range(20):
-        draw_x = item_xs[i] - camera_offset_x
-        draw_y = item_ys[i] - camera_offset_y
+        draw_x = item_xs[i] - camera_x
+        draw_y = item_ys[i] - camera_y
         if -20 <= draw_x <= 820 and -20 <= draw_y <= 620:
             pygame.draw.rect(screen, (0, 255, 0), (int(draw_x), int(draw_y), 10, 10))
 
     # Draw player in main view
     pygame.draw.rect(screen, (255, 255, 255), (400 - 8, 300 - 8, 16, 16))
 
-    # Draw minimap
+    # Draw Minimap
     pygame.draw.rect(screen, (50, 50, 50), (630, 10, 160, 120))
     for i in range(20):
         mx = 630.0 + (item_xs[i] / 2000.0) * 160.0

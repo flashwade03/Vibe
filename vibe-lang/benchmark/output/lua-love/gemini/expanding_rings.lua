@@ -22,6 +22,7 @@ function love.update(dt)
         ring_radii[i] = ring_radii[i] + 80.0 * dt
         ring_lifes[i] = ring_lifes[i] - dt
         
+        -- Optional: clean up expired rings
         if ring_lifes[i] <= 0 then
             table.remove(ring_xs, i)
             table.remove(ring_ys, i)
@@ -38,6 +39,6 @@ function love.draw()
         end
     end
     
-    love.graphics.print("Rings: " .. #ring_xs, 10, 10)
-    love.graphics.print("Click to create rings", 280, 560)
+    love.graphics.print("Rings: " .. #ring_xs, 10.0, 10.0)
+    love.graphics.print("Click to create rings", 280.0, 560.0)
 end

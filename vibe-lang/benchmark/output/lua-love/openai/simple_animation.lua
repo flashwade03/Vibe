@@ -27,5 +27,5 @@ function love.draw()
     elseif frame == 3 then
         love.graphics.rectangle("fill", 375.0, 275.0, 50.0, 50.0)
     end
-    love.graphics.print("Frame: " .. tostring(frame), 10.0, 10.0)
+    love.graphics.print("Frame: " .. frame, 10.0, 10.0)
 end

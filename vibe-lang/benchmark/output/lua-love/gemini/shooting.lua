@@ -12,7 +12,7 @@ end
 
 function love.keypressed(k)
     if k == "space" then
-        table.insert(bullet_xs, player_x + 14) -- Center bullet in 32px player
+        table.insert(bullet_xs, player_x + 14) -- Center of 32x32 player
         table.insert(bullet_ys, player_y)
     end
 end

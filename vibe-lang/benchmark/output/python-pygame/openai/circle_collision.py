@@ -12,7 +12,7 @@ player_x, player_y = 400.0, 300.0
 player_radius = 20
 player_speed = 150
 
-# Enemy positions
+# Enemy state
 enemy_radius = 15
 enemy_xs = [100.0, 700.0, 200.0, 600.0, 400.0]
 enemy_ys = [100.0, 100.0, 400.0, 400.0, 500.0]
@@ -40,7 +40,7 @@ while running:
     if keys[pygame.K_DOWN]:
         player_y += player_speed * dt
 
-    # Reset hit state
+    # Reset hit status
     hit = False
 
     # Check for collisions

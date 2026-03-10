@@ -19,5 +19,5 @@ function love.draw()
             love.graphics.circle("fill", cx, cy, radius)
         end
     end
-    love.graphics.print("Time: " .. tostring(math.floor(timer)), 10, 10)
+    love.graphics.print("Time: " .. tostring(math.floor(timer)), 10.0, 10.0)
 end

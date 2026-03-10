@@ -17,13 +17,6 @@ function love.load()
     end
 end
 
-function love.mousepressed(mx, my, button)
-    if button == 1 then
-        well_x = mx
-        well_y = my
-    end
-end
-
 function love.update(dt)
     for i = 1, 50 do
         local dx = well_x - px[i]
@@ -41,6 +34,13 @@ function love.update(dt)
         if px[i] > 800.0 then px[i] = 0.0 end
         if py[i] < 0.0 then py[i] = 600.0 end
         if py[i] > 600.0 then py[i] = 0.0 end
+    end
+end
+
+function love.mousepressed(mx, my, button)
+    if button == 1 then
+        well_x = mx
+        well_y = my
     end
 end
 

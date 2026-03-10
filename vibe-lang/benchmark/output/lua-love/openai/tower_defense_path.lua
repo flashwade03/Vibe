@@ -1,25 +1,22 @@
+-- State variables
 local path_xs = {0.0, 200.0, 200.0, 600.0, 600.0, 800.0}
 local path_ys = {300.0, 300.0, 100.0, 100.0, 500.0, 500.0}
-
 local en_xs = {}
 local en_ys = {}
 local en_wp = {}
 local en_hp = {}
-
+local spawn_timer = 2.0
+local enemy_speed = 80.0
+local score = 0
+local lives = 10
 local tow_xs = {}
 local tow_ys = {}
 local tow_timers = {}
-
 local proj_xs = {}
 local proj_ys = {}
 local proj_txs = {}
 local proj_tys = {}
 local proj_alive = {}
-
-local spawn_timer = 2.0
-local enemy_speed = 80.0
-local score = 0
-local lives = 10
 
 function love.load()
     love.window.setMode(800, 600)
@@ -63,7 +60,7 @@ function love.update(dt)
             local best_d = 151.0
             for i = 1, #en_xs do
                 if en_hp[i] > 0.0 then
-                    local td = math.sqrt((tow_xs[t] - en_xs[i])^2 + (tow_ys[t] - en_ys[i])^2)
+                    local td = math.sqrt((tow_xs[t] - en_xs[i]) ^ 2 + (tow_ys[t] - en_ys[i]) ^ 2)
                     if td < best_d then
                         best_d = td
                         best = i
@@ -81,27 +78,27 @@ function love.update(dt)
         end
     end
 
-    for i = #proj_xs, 1, -1 do
-        if proj_alive[i] > 0.0 then
-            local dx = proj_txs[i] - proj_xs[i]
-            local dy = proj_tys[i] - proj_ys[i]
+    for p = #proj_xs, 1, -1 do
+        if proj_alive[p] > 0.0 then
+            local dx = proj_txs[p] - proj_xs[p]
+            local dy = proj_tys[p] - proj_ys[p]
             local d = math.sqrt(dx * dx + dy * dy)
-            if d < 10.0 then
-                for j = 1, #en_xs do
-                    if en_hp[j] > 0.0 then
-                        local ed = math.sqrt((proj_xs[i] - en_xs[j])^2 + (proj_ys[i] - en_ys[j])^2)
+            if d > 10.0 then
+                proj_xs[p] = proj_xs[p] + (dx / d) * 300 * dt
+                proj_ys[p] = proj_ys[p] + (dy / d) * 300 * dt
+            else
+                for i = 1, #en_xs do
+                    if en_hp[i] > 0.0 then
+                        local ed = math.sqrt((proj_xs[p] - en_xs[i]) ^ 2 + (proj_ys[p] - en_ys[i]) ^ 2)
                         if ed < 10.0 then
-                            en_hp[j] = en_hp[j] - 1.0
-                            if en_hp[j] <= 0.0 then
+                            en_hp[i] = en_hp[i] - 1.0
+                            if en_hp[i] <= 0.0 then
                                 score = score + 1
                             end
                         end
                     end
                 end
-                proj_alive[i] = 0.0
-            else
-                proj_xs[i] = proj_xs[i] + (dx / d) * 300.0 * dt
-                proj_ys[i] = proj_ys[i] + (dy / d) * 300.0 * dt
+                proj_alive[p] = 0.0
             end
         end
     end
@@ -118,14 +115,7 @@ end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     for i = 1, 5 do
-        local sx, sy = path_xs[i], path_ys[i]
-        local ex, ey = path_xs[i + 1], path_ys[i + 1]
-        for j = 0, 20 do
-            local t = j / 20
-            local px = sx + (ex - sx) * t
-            local py = sy + (ey - sy) * t
-            love.graphics.circle("fill", px, py, 2)
-        end
+        love.graphics.line(path_xs[i], path_ys[i], path_xs[i + 1], path_ys[i + 1])
     end
 
     for i = 1, #en_xs do
@@ -134,13 +124,13 @@ function love.draw()
         end
     end
 
-    for i = 1, #tow_xs do
-        love.graphics.rectangle("fill", tow_xs[i] - 10, tow_ys[i] - 10, 20, 20)
+    for t = 1, #tow_xs do
+        love.graphics.rectangle("fill", tow_xs[t] - 10, tow_ys[t] - 10, 20, 20)
     end
 
-    for i = 1, #proj_xs do
-        if proj_alive[i] > 0.0 then
-            love.graphics.rectangle("fill", proj_xs[i] - 2, proj_ys[i] - 2, 4, 4)
+    for p = 1, #proj_xs do
+        if proj_alive[p] > 0.0 then
+            love.graphics.rectangle("fill", proj_xs[p] - 2, proj_ys[p] - 2, 4, 4)
         end
     end
 

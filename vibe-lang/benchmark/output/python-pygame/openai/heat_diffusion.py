@@ -40,6 +40,7 @@ def update(dt):
         heat[i] = next_heat[i]
 
 def draw():
+    screen.fill((0, 0, 0))
     max_t = 0.0
     for row in range(12):
         for col in range(16):
@@ -70,8 +71,6 @@ while running:
             mousepressed(mx, my, event.button)
 
     update(dt)
-
-    screen.fill((0, 0, 0))
     draw()
     pygame.display.flip()
 

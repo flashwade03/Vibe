@@ -6,6 +6,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Inventory Management")
 clock = pygame.time.Clock()
 
+# Initialize inventory and held item
 inv_items = [0.0 for _ in range(20)]
 held_item = 0.0
 
@@ -17,8 +18,8 @@ def draw_circle(x, y, radius):
 
 def draw_text(text, x, y):
     font = pygame.font.Font(None, 36)
-    text_surface = font.render(text, True, (255, 255, 255))
-    screen.blit(text_surface, (x, y))
+    rendered_text = font.render(text, True, (255, 255, 255))
+    screen.blit(rendered_text, (x, y))
 
 running = True
 while running:

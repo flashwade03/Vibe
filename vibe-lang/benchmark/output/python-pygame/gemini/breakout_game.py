@@ -43,14 +43,16 @@ while running:
             ball_vy *= -1
         
         # Paddle collision
-        if ball_y >= 564.0 and ball_y <= 576.0 and paddle_x <= ball_x <= paddle_x + 80.0:
-            ball_vy = -abs(ball_vy)
+        if ball_y >= 564.0 and ball_y <= 576.0:
+            if ball_x >= paddle_x and ball_x <= paddle_x + 80.0:
+                ball_vy *= -1
+                ball_y = 564.0
 
         # Brick collisions
         for i in range(8):
             if brick_alive[i] == 1.0:
-                bx = 5 + (i * 100)
-                if bx <= ball_x <= bx + 90 and 50 <= ball_y <= 70:
+                bx = 5 + i * 100
+                if ball_x >= bx and ball_x <= bx + 90 and ball_y >= 50 and ball_y <= 70:
                     brick_alive[i] = 0.0
                     ball_vy *= -1
                     score += 1
@@ -71,7 +73,7 @@ while running:
     # Draw bricks
     for i in range(8):
         if brick_alive[i] == 1.0:
-            pygame.draw.rect(screen, (255, 255, 255), (5 + (i * 100), 50, 90, 20))
+            pygame.draw.rect(screen, (255, 255, 255), (5 + i * 100, 50, 90, 20))
             
     # Draw UI
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))

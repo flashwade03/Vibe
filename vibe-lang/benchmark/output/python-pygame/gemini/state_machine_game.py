@@ -8,6 +8,7 @@ pygame.display.set_caption("Target Clicker")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
+# Game state variables
 state = 0  # 0=menu, 1=playing, 2=gameover
 score = 0
 timer = 10.0
@@ -38,17 +39,19 @@ while running:
                 target_x = random.uniform(0.0, 780.0)
                 target_y = random.uniform(0.0, 580.0)
 
+    # Update logic
     if state == 1:
         timer -= dt
         if timer <= 0.0:
             state = 2
 
+    # Draw logic
     screen.fill((0, 0, 0))
-
+    
     if state == 0:
         text = font.render("Press SPACE to Start", True, (255, 255, 255))
         screen.blit(text, (250, 280))
-    
+        
     elif state == 1:
         pygame.draw.rect(screen, (255, 255, 255), (int(target_x), int(target_y), 20, 20))
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))

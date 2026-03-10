@@ -7,7 +7,7 @@ local patrol_speed = 120.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Patrol Enemy")
+    love.window.setTitle("Patrol Game")
 end
 
 function love.update(dt)
@@ -42,5 +42,5 @@ function love.draw()
     
     -- Draw UI
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Waypoint: " .. current_wp, 10, 10)
+    love.graphics.print("Waypoint: " .. current_wp, 10.0, 10.0)
 end

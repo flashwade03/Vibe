@@ -34,7 +34,6 @@ while running:
         scroll_speed += 50.0 * dt
     if keys[pygame.K_DOWN]:
         scroll_speed -= 50.0 * dt
-
     if scroll_speed < 20.0:
         scroll_speed = 20.0
     if scroll_speed > 200.0:
@@ -53,20 +52,18 @@ while running:
             new_h = 500.0
         heights[79] = new_h
 
-    # Draw terrain
+    # Draw
     screen.fill((0, 0, 0))
     for i in range(80):
         pygame.draw.rect(screen, (255, 255, 255), (i * 10, heights[i], 10, 600 - heights[i]))
-
-    # Draw player
+    
     player_col = 20
-    pygame.draw.rect(screen, (255, 255, 255), (player_col * 10 - 1, heights[player_col] - 14, 12, 14))
+    pygame.draw.rect(screen, (255, 0, 0), (player_col * 10 - 1, heights[player_col] - 14, 12, 14))
 
-    # Draw text
     font = pygame.font.Font(None, 36)
-    height_text = font.render("Height: " + str(int(heights[20])), True, (255, 255, 255))
-    speed_text = font.render("Speed: " + str(int(scroll_speed)), True, (255, 255, 255))
+    height_text = font.render(f"Height: {int(heights[20])}", True, (255, 255, 255))
     screen.blit(height_text, (10, 10))
+    speed_text = font.render(f"Speed: {int(scroll_speed)}", True, (255, 255, 255))
     screen.blit(speed_text, (10, 30))
 
     pygame.display.flip()

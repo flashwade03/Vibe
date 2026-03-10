@@ -42,7 +42,7 @@ function love.draw()
         love.graphics.rectangle("fill", i * 10.0, heights[i + 1], 10.0, 600.0 - heights[i + 1])
     end
     local player_col = 20
-    love.graphics.rectangle("fill", player_col * 10.0 - 1.0, heights[player_col] - 14.0, 12.0, 14.0)
-    love.graphics.print("Height: " .. tostring(math.floor(heights[21])), 10.0, 10.0)
+    love.graphics.rectangle("fill", player_col * 10.0 - 1.0, heights[player_col + 1] - 14.0, 12.0, 14.0)
+    love.graphics.print("Height: " .. tostring(math.floor(heights[player_col + 1])), 10.0, 10.0)
     love.graphics.print("Speed: " .. tostring(math.floor(scroll_speed)), 10.0, 30.0)
 end

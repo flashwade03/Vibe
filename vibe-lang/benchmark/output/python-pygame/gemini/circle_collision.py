@@ -57,7 +57,7 @@ while running:
     
     # Draw text
     if hit:
-        text = font.render("Hit!", True, (255, 255, 0))
+        text = font.render("Hit!", True, (255, 255, 255))
         screen.blit(text, (10, 10))
 
     pygame.display.flip()

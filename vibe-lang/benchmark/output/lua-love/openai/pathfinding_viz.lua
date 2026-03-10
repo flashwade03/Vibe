@@ -17,8 +17,8 @@ function love.load()
 end
 
 function love.mousepressed(mx, my, button)
-    local col = math.floor(mx / 50)
-    local row = math.floor(my / 50)
+    local col = math.floor(mx / 50.0)
+    local row = math.floor(my / 50.0)
     if col >= 0 and col < 16 and row >= 0 and row < 12 then
         local idx = row * 16 + col
         if idx ~= 0 and idx ~= 191 then
@@ -56,11 +56,15 @@ function love.update(dt)
             local p = 191
             for iter = 0, 191 do
                 if parent[p] <= 0 then break end
-                p = parent[p]
-                if p ~= 0 then grid[p] = 3.0 end
+                p = math.floor(parent[p])
+                if p ~= 0 then
+                    grid[p] = 3.0
+                end
             end
         else
-            if grid[cur] ~= 4.0 then grid[cur] = 2.0 end
+            if grid[cur] ~= 4.0 then
+                grid[cur] = 2.0
+            end
             local neighbors = {cur - 16, cur + 16, cur - 1, cur + 1}
             for _, n in ipairs(neighbors) do
                 if n >= 0 and n < 192 and (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0 then
@@ -78,25 +82,25 @@ function love.draw()
     for row = 0, 11 do
         for col = 0, 15 do
             local idx = row * 16 + col
-            local x = col * 50
-            local y = row * 50
+            local x = col * 50.0
+            local y = row * 50.0
             if grid[idx] == 1.0 then
-                love.graphics.rectangle("fill", x, y, 50, 50)
+                love.graphics.rectangle("fill", x, y, 50.0, 50.0)
             elseif grid[idx] == 2.0 then
-                love.graphics.rectangle("fill", x + 15, y + 15, 20, 20)
+                love.graphics.rectangle("fill", x + 15.0, y + 15.0, 20.0, 20.0)
             elseif grid[idx] == 3.0 then
-                love.graphics.rectangle("fill", x + 5, y + 5, 40, 40)
+                love.graphics.rectangle("fill", x + 5.0, y + 5.0, 40.0, 40.0)
             elseif grid[idx] == 4.0 then
-                love.graphics.circle("fill", x + 25, y + 25, 15)
+                love.graphics.circle("fill", x + 25.0, y + 25.0, 15.0)
             elseif grid[idx] == 5.0 then
-                love.graphics.circle("fill", x + 25, y + 25, 15)
+                love.graphics.circle("fill", x + 25.0, y + 25.0, 15.0)
             end
         end
     end
-    love.graphics.print("Click: walls | Space: BFS", 10, 10)
+    love.graphics.print("Click: walls | Space: BFS", 10.0, 10.0)
     if found then
-        love.graphics.print("Path found!", 300, 10)
+        love.graphics.print("Path found!", 300.0, 10.0)
     elseif not bfs_running and not found and q_ptr > 0 then
-        love.graphics.print("No path", 300, 10)
+        love.graphics.print("No path", 300.0, 10.0)
     end
 end

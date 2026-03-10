@@ -38,7 +38,7 @@ function love.update(dt)
     end
 
     -- Paddle collision
-    if ball_y >= 564 - ball_radius and ball_y <= 570 and ball_x >= paddle_x and ball_x <= paddle_x + 80 then
+    if ball_y >= 564 and ball_y <= 576 and ball_x >= paddle_x and ball_x <= paddle_x + 80 then
         ball_vy = -math.abs(ball_vy)
     end
 
@@ -55,7 +55,7 @@ function love.update(dt)
         end
     end
 
-    -- Game over check
+    -- Game over
     if ball_y > 600 then
         game_over = true
     end

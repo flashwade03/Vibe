@@ -43,6 +43,6 @@ function love.draw()
     -- Draw player
     love.graphics.rectangle("fill", 384.0, 300.0, 32, 32)
     
-    -- Draw instructions
+    -- Draw instruction
     love.graphics.print("Press SPACE to take damage", 230.0, 550.0)
 end

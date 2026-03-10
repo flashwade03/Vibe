@@ -6,7 +6,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Rectangle")
 clock = pygame.time.Clock()
 
-x, y = 400.0 - 16, 300.0 - 16  # Center the rectangle
+x, y = 400.0, 300.0
 speed = 200
 
 running = True
@@ -28,7 +28,7 @@ while running:
         y += speed * dt
 
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
+    pygame.draw.rect(screen, (255, 255, 255), (int(x) - 16, int(y) - 16, 32, 32))
     pygame.display.flip()
 
 pygame.quit()

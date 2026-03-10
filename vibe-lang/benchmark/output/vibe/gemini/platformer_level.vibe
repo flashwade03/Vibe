@@ -28,7 +28,7 @@ fn update(dt: Float)
 
     on_ground = false
 
-    -- Platform collision
+    -- Platform collisions
     for i in range(0, len(plat_xs))
         if vy >= 0.0 and prev_y + 20.0 <= plat_ys[i]
             if py + 20.0 >= plat_ys[i] and px + 20.0 > plat_xs[i] and px < plat_xs[i] + plat_ws[i]
@@ -42,7 +42,7 @@ fn update(dt: Float)
         vy = 0.0
         on_ground = true
 
-    -- Reset
+    -- Reset if fallen
     if py > 620.0
         px = 100.0
         py = 400.0

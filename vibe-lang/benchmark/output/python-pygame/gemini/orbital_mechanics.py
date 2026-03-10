@@ -8,6 +8,7 @@ pygame.display.set_caption("Orbit Simulation")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
+# Orbital data
 orb_angles = [0.0, 2.094, 4.189]
 orb_radii = [100.0, 160.0, 220.0]
 orb_speeds = [1.5, 1.0, 0.6]

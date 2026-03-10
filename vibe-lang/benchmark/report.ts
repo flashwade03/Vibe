@@ -108,7 +108,7 @@ function buildDetailedResults(results: GenerationResult[]): string {
 }
 
 function saveGeneratedCode(results: GenerationResult[]): void {
-  const outputDir = join(process.cwd(), "benchmark", "output");
+  const outputDir = join(process.cwd(), "vibe-lang", "benchmark", "output");
 
   for (const r of results) {
     if (!r.code) continue;
@@ -139,13 +139,13 @@ ${buildDetailedResults(results)}
 `;
 
   // Save report to file
-  const reportPath = join(process.cwd(), "benchmark", "results.md");
+  const reportPath = join(process.cwd(), "vibe-lang", "benchmark", "results.md");
   writeFileSync(reportPath, report, "utf-8");
   console.log(`\nReport saved to: ${reportPath}`);
 
   // Save all generated code files
   saveGeneratedCode(results);
-  console.log(`Generated code saved to: benchmark/output/`);
+  console.log(`Generated code saved to: vibe-lang/benchmark/output/`);
 
   return report;
 }

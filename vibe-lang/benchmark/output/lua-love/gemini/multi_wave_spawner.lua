@@ -32,9 +32,9 @@ function love.update(dt)
             else x, y = 0, love.math.random(0, 600) end
             
             local dx, dy = px - x, py - y
-            local dist = math.sqrt(dx*dx + dy*dy)
+            local len = math.sqrt(dx*dx + dy*dy)
             table.insert(ex, x); table.insert(ey, y)
-            table.insert(evx, (dx/dist) * speed); table.insert(evy, (dy/dist) * speed)
+            table.insert(evx, (dx/len) * speed); table.insert(evy, (dy/len) * speed)
             table.insert(elife, 1.0)
         end
         wave = wave + 1

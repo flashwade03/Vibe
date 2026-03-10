@@ -3,12 +3,14 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Rectangle")
+pygame.display.set_caption("Vibe Movement")
 clock = pygame.time.Clock()
 
-# Initial position at center (800/2 - 32/2, 600/2 - 32/2)
-x, y = 384.0, 284.0
-speed = 200.0
+# Rectangle properties
+rect_size = 32
+x = 400 - (rect_size / 2)
+y = 300 - (rect_size / 2)
+speed = 200
 
 running = True
 while running:
@@ -29,12 +31,10 @@ while running:
     if keys[pygame.K_DOWN]:
         y += speed * dt
 
-    # Keep rectangle within screen bounds
-    x = max(0, min(x, 800 - 32))
-    y = max(0, min(y, 600 - 32))
-
+    # Drawing
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, rect_size, rect_size))
+    
     pygame.display.flip()
 
 pygame.quit()

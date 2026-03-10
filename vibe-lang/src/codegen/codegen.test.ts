@@ -596,4 +596,25 @@ describe("codegen", () => {
     });
     expect(generate(ast)).toBe("function test()\n  x + speed\nend");
   });
+
+  // 28. Let without initializer → local x
+  it("28. let without initializer → local x", () => {
+    const ast = mkProgram({
+      kind: "LetDecl",
+      name: "x",
+      typeAnnotation: "Float",
+      loc,
+    });
+    expect(generate(ast)).toBe("local x");
+  });
+
+  // 29. Top-level expression statement
+  it("29. top-level expression statement", () => {
+    const ast: Program = {
+      kind: "Program",
+      body: [mkExprStmt(mkCall("load", []))],
+      loc,
+    };
+    expect(generate(ast)).toBe("load()");
+  });
 });

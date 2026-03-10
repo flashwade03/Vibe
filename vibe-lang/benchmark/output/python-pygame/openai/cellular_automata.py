@@ -11,7 +11,6 @@ clock = pygame.time.Clock()
 GRID_WIDTH = 20
 GRID_HEIGHT = 15
 CELL_SIZE = 40
-GRID_SIZE = GRID_WIDTH * GRID_HEIGHT
 
 # Game state variables
 cells = []
@@ -22,7 +21,7 @@ paused = False
 
 def load():
     global cells, next_cells
-    for _ in range(GRID_SIZE):
+    for i in range(0, GRID_WIDTH * GRID_HEIGHT):
         if random.random() > 0.7:
             cells.append(1.0)
         else:
@@ -35,14 +34,14 @@ def keypressed(k):
         paused = not paused
 
 def update(dt):
-    global sim_timer, generation, cells, next_cells
+    global sim_timer, generation
     if not paused:
         sim_timer += dt
         if sim_timer >= 0.2:
             sim_timer = 0.0
             generation += 1
-            for row in range(GRID_HEIGHT):
-                for col in range(GRID_WIDTH):
+            for row in range(0, GRID_HEIGHT):
+                for col in range(0, GRID_WIDTH):
                     count = 0
                     # Check 8 neighbors
                     if row > 0 and col > 0 and cells[(row - 1) * GRID_WIDTH + col - 1] == 1.0:
@@ -75,17 +74,17 @@ def update(dt):
                             next_cells[idx] = 0.0
 
             # Copy next_cells to cells
-            for i in range(GRID_SIZE):
+            for i in range(0, GRID_WIDTH * GRID_HEIGHT):
                 cells[i] = next_cells[i]
 
 def draw():
     screen.fill((0, 0, 0))
-    for row in range(GRID_HEIGHT):
-        for col in range(GRID_WIDTH):
+    for row in range(0, GRID_HEIGHT):
+        for col in range(0, GRID_WIDTH):
             if cells[row * GRID_WIDTH + col] == 1.0:
                 pygame.draw.rect(screen, (255, 255, 255), (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE - 2, CELL_SIZE - 2))
     font = pygame.font.Font(None, 36)
-    text = font.render(f"Gen: {generation}", True, (255, 255, 255))
+    text = font.render("Gen: " + str(generation), True, (255, 255, 255))
     screen.blit(text, (10, 10))
     if paused:
         paused_text = font.render("PAUSED", True, (255, 255, 255))
@@ -105,6 +104,7 @@ while running:
 
     update(dt)
     draw()
+
     pygame.display.flip()
 
 pygame.quit()

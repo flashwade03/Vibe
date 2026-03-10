@@ -13,13 +13,14 @@ inv_ys = []
 inv_alive = []
 inv_dir = 1.0
 inv_speed = 40.0
+
 px = 384.0
 bul_xs = []
 bul_ys = []
 bul_alive = []
 score = 0
 
-# Load invaders
+# Load enemies
 for row in range(0, 3):
     for col in range(0, 6):
         inv_xs.append(150.0 + float(col) * 80.0)
@@ -39,7 +40,7 @@ while running:
                 bul_ys.append(540.0)
                 bul_alive.append(1.0)
 
-    # Update logic
+    # Player movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         px -= 250.0 * dt
@@ -52,6 +53,7 @@ while running:
         if inv_alive[i] == 1.0:
             inv_xs[i] += inv_speed * inv_dir * dt
 
+    # Check edges
     reverse = False
     for i in range(len(inv_xs)):
         if inv_alive[i] == 1.0 and (inv_xs[i] < 20.0 or inv_xs[i] > 750.0):
@@ -74,14 +76,12 @@ while running:
     for j in range(len(bul_xs)):
         if bul_alive[j] == 1.0:
             for i in range(len(inv_xs)):
-                if inv_alive[i] == 1.0:
-                    if (bul_xs[j] >= inv_xs[i] and bul_xs[j] <= inv_xs[i] + 30.0 and 
-                        bul_ys[j] >= inv_ys[i] and bul_ys[j] <= inv_ys[i] + 20.0):
-                        inv_alive[i] = 0.0
-                        bul_alive[j] = 0.0
-                        score += 1
+                if inv_alive[i] == 1.0 and bul_xs[j] >= inv_xs[i] and bul_xs[j] <= inv_xs[i] + 30.0 and bul_ys[j] >= inv_ys[i] and bul_ys[j] <= inv_ys[i] + 20.0:
+                    inv_alive[i] = 0.0
+                    bul_alive[j] = 0.0
+                    score += 1
 
-    # Draw logic
+    # Draw
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(px), 550, 32, 16))
     

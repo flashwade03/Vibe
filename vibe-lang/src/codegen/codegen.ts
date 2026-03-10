@@ -107,6 +107,10 @@ function emitTopLevel(decl: TopLevelDecl): string {
       return emitLetDecl(decl, 0);
     case "ConstDecl":
       return emitConstDecl(decl, 0);
+    case "ExprStmt":
+      return emitExprStmt(decl, 0);
+    case "Assignment":
+      return emitAssignment(decl, 0);
   }
 }
 
@@ -132,7 +136,10 @@ function emitFnDecl(node: FnDecl, depth: number): string {
 function emitLetDecl(node: LetDecl, depth: number): string {
   const prefix = indent(depth);
   const name = escapeLuaReserved(node.name);
-  return `${prefix}local ${name} = ${emitExpr(node.value)}`;
+  if (node.value) {
+    return `${prefix}local ${name} = ${emitExpr(node.value)}`;
+  }
+  return `${prefix}local ${name}`;
 }
 
 function emitConstDecl(node: ConstDecl, depth: number): string {

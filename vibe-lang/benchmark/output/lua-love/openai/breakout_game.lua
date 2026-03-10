@@ -7,6 +7,7 @@ local ball_vx = 200
 local ball_vy = -200
 local brick_width = 90
 local brick_height = 20
+local bricks = {}
 local brick_alive = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}
 local score = 0
 local game_over = false
@@ -14,9 +15,14 @@ local game_over = false
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Breakout")
+    for i = 0, 7 do
+        table.insert(bricks, {x = i * 100 + 5, y = 50})
+    end
 end
 
 function love.update(dt)
+    if game_over then return end
+
     if love.keyboard.isDown("left") then
         paddle_x = paddle_x - paddle_speed * dt
     end
@@ -33,24 +39,23 @@ function love.update(dt)
     if ball_y < ball_radius then
         ball_vy = -ball_vy
     end
+    if ball_y > 600 then
+        game_over = true
+    end
 
     if ball_y >= 564 and ball_x >= paddle_x and ball_x <= paddle_x + 80 then
         ball_vy = -ball_vy
     end
 
-    for i = 0, 7 do
-        if brick_alive[i + 1] == 1.0 then
-            local brick_x = i * 100 + 5
-            if ball_x > brick_x and ball_x < brick_x + brick_width and ball_y > 50 and ball_y < 50 + brick_height then
-                brick_alive[i + 1] = 0.0
+    for i, brick in ipairs(bricks) do
+        if brick_alive[i] == 1.0 then
+            if ball_x >= brick.x and ball_x <= brick.x + brick_width and
+               ball_y >= brick.y and ball_y <= brick.y + brick_height then
+                brick_alive[i] = 0.0
                 ball_vy = -ball_vy
                 score = score + 1
             end
         end
-    end
-
-    if ball_y > 600 then
-        game_over = true
     end
 end
 
@@ -58,10 +63,9 @@ function love.draw()
     love.graphics.rectangle("fill", paddle_x, 570, 80, 12)
     love.graphics.circle("fill", ball_x, ball_y, ball_radius)
 
-    for i = 0, 7 do
-        if brick_alive[i + 1] == 1.0 then
-            local brick_x = i * 100 + 5
-            love.graphics.rectangle("fill", brick_x, 50, brick_width, brick_height)
+    for i, brick in ipairs(bricks) do
+        if brick_alive[i] == 1.0 then
+            love.graphics.rectangle("fill", brick.x, brick.y, brick_width, brick_height)
         end
     end
 

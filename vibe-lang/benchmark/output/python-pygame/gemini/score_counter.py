@@ -17,15 +17,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         
-        # Handling key press event for spacebar
+        # Handling key press event for the spacebar
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 score += 1
 
-    # Rendering
     screen.fill((0, 0, 0))
     
-    # Draw score
+    # Render score text
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
     

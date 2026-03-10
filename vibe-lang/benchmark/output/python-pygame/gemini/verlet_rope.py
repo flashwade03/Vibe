@@ -78,13 +78,13 @@ while running:
     for i in range(10):
         pygame.draw.circle(screen, (255, 255, 255), (int(node_xs[i]), int(node_ys[i])), 5)
     
-    # Draw segments
+    # Draw rope segments
     for i in range(9):
         for j in range(5):
             lt = float(j) / 5.0
-            x = node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt
-            y = node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt
-            pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 2)
+            rx = node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt
+            ry = node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt
+            pygame.draw.circle(screen, (255, 255, 255), (int(rx), int(ry)), 2)
 
     text = font.render("Arrows move anchor", True, (255, 255, 255))
     screen.blit(text, (10, 10))

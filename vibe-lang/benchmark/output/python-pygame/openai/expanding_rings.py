@@ -13,26 +13,6 @@ ring_lifes = []
 
 font = pygame.font.Font(None, 36)
 
-def mousepressed(mx, my, button):
-    ring_xs.append(mx)
-    ring_ys.append(my)
-    ring_radii.append(5.0)
-    ring_lifes.append(2.0)
-
-def update(dt):
-    for i in range(len(ring_xs)):
-        ring_radii[i] += 80.0 * dt
-        ring_lifes[i] -= dt
-
-def draw():
-    for i in range(len(ring_xs)):
-        if ring_lifes[i] > 0.0:
-            pygame.draw.circle(screen, (255, 255, 255), (int(ring_xs[i]), int(ring_ys[i])), int(ring_radii[i]))
-    rings_text = font.render("Rings: " + str(len(ring_xs)), True, (255, 255, 255))
-    screen.blit(rings_text, (10.0, 10.0))
-    click_text = font.render("Click to create rings", True, (255, 255, 255))
-    screen.blit(click_text, (280.0, 560.0))
-
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -42,12 +22,27 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
-            mousepressed(mx, my, event.button)
+            ring_xs.append(mx)
+            ring_ys.append(my)
+            ring_radii.append(5.0)
+            ring_lifes.append(2.0)
 
-    update(dt)
+    for i in range(len(ring_xs)):
+        ring_radii[i] += 80.0 * dt
+        ring_lifes[i] -= dt
 
     screen.fill((0, 0, 0))
-    draw()
+
+    for i in range(len(ring_xs)):
+        if ring_lifes[i] > 0.0:
+            pygame.draw.circle(screen, (255, 255, 255), (int(ring_xs[i]), int(ring_ys[i])), int(ring_radii[i]))
+
+    rings_text = font.render("Rings: " + str(len(ring_xs)), True, (255, 255, 255))
+    screen.blit(rings_text, (10.0, 10.0))
+
+    click_text = font.render("Click to create rings", True, (255, 255, 255))
+    screen.blit(click_text, (280.0, 560.0))
+
     pygame.display.flip()
 
 pygame.quit()

@@ -36,7 +36,6 @@ while running:
     if keys[pygame.K_RIGHT] and player_x < 768:
         player_x += player_speed * dt
     
-    # Shooting logic
     if keys[pygame.K_SPACE]:
         if current_time - last_shot_time > shoot_delay:
             bullet_xs.append(player_x + 14) # Center of 32px rect

@@ -36,7 +36,7 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    -- Draw the Bezier curve
+    -- Draw Bezier curve
     for i = 0, 50 do
         local t = i / 50.0
         local u = 1.0 - t

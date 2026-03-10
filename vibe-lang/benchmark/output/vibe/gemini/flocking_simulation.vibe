@@ -21,11 +21,9 @@ fn update(dt: Float)
     let center_y: Float = sum_y / 15.0
 
     for i in range(0, 15)
-        -- Cohesion
         boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
 
-        -- Separation
         for j in range(0, 15)
             if i != j
                 let dx: Float = boid_xs[i] - boid_xs[j]
@@ -35,17 +33,14 @@ fn update(dt: Float)
                     boid_vxs[i] += (dx / dist) * 100.0 * dt
                     boid_vys[i] += (dy / dist) * 100.0 * dt
 
-        -- Clamp speed
         let speed: Float = sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
         if speed > 150.0
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
             boid_vys[i] = (boid_vys[i] / speed) * 150.0
 
-        -- Update position
         boid_xs[i] += boid_vxs[i] * dt
         boid_ys[i] += boid_vys[i] * dt
 
-        -- Wrap around
         if boid_xs[i] < 0.0
             boid_xs[i] = 800.0
         if boid_xs[i] > 800.0

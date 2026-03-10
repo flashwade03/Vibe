@@ -19,7 +19,7 @@ def rand_float(min_val, max_val):
 
 def mousepressed(mx, my, button):
     for _ in range(10):
-        angle = rand_float(0.0, 6.283)  # 0 to 2*pi
+        angle = rand_float(0.0, 6.283)  # 2 * pi
         speed = rand_float(50.0, 200.0)
         vx = math.cos(angle) * speed
         vy = math.sin(angle) * speed

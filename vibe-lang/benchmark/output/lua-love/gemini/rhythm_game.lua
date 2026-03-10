@@ -74,7 +74,9 @@ function love.draw()
     end
 
     if flash_timer > 0.0 then
+        love.graphics.setColor(1, 1, 0)
         love.graphics.rectangle("fill", 220.0 + flash_lane * 100.0, 488.0, 60.0, 24.0)
+        love.graphics.setColor(1, 1, 1)
     end
 
     love.graphics.print("Score: " .. score, 10.0, 10.0)

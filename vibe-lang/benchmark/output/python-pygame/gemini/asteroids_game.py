@@ -63,7 +63,7 @@ while running:
         ship_x %= 800.0
         ship_y %= 600.0
 
-        # Update Asteroids
+        # Update asteroids
         for i in range(len(ax)):
             if aalive[i] == 1.0:
                 ax[i] = (ax[i] + avx[i] * dt) % 800.0
@@ -74,7 +74,7 @@ while running:
                 if math.sqrt(sdx*sdx + sdy*sdy) < asize[i] + 8.0:
                     game_over = True
 
-        # Update Bullets
+        # Update bullets
         for j in range(len(bx)):
             if blife[j] > 0.0:
                 bx[j] += bvx[j] * dt
@@ -92,23 +92,23 @@ while running:
 
     screen.fill((0, 0, 0))
     
-    # Draw Ship
+    # Draw ship
     pygame.draw.circle(screen, (255, 255, 255), (int(ship_x), int(ship_y)), 8)
-    pygame.draw.circle(screen, (255, 255, 255), (int(ship_x + math.cos(ship_angle) * 15.0), int(ship_y + math.sin(ship_angle) * 15.0)), 3)
+    pygame.draw.circle(screen, (255, 255, 255), (int(ship_x + math.cos(ship_angle)*15), int(ship_y + math.sin(ship_angle)*15)), 3)
     
-    # Draw Asteroids
+    # Draw asteroids
     for i in range(len(ax)):
         if aalive[i] == 1.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(ax[i]), int(ay[i])), int(asize[i]), 1)
             
-    # Draw Bullets
+    # Draw bullets
     for j in range(len(bx)):
         if blife[j] > 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(bx[j]), int(by[j])), 2)
-            
+
     # UI
-    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-    screen.blit(score_text, (10, 10))
+    text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(text, (10, 10))
     if game_over:
         go_text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(go_text, (340, 280))

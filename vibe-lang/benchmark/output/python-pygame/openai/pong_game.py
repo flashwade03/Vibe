@@ -30,7 +30,7 @@ def update(dt):
     if keys[pygame.K_DOWN]:
         p2_y += paddle_speed * dt
 
-    # Clamp paddles within screen
+    # Clamp paddles within screen bounds
     p1_y = max(0.0, min(520.0, p1_y))
     p2_y = max(0.0, min(520.0, p2_y))
 
@@ -39,15 +39,15 @@ def update(dt):
     ball_y += ball_vy * dt
 
     # Ball collision with top and bottom
-    if ball_y < 8.0 or ball_y > 592.0:
+    if ball_y < 8.0:
+        ball_vy = -ball_vy
+    if ball_y > 592.0:
         ball_vy = -ball_vy
 
-    # Ball collision with left paddle
+    # Ball collision with paddles
     if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and p1_y <= ball_y <= p1_y + 80.0:
         ball_vx = -ball_vx
         ball_x = 50.0
-
-    # Ball collision with right paddle
     if ball_x + 8.0 >= 758.0 and ball_x < 770.0 and p2_y <= ball_y <= p2_y + 80.0:
         ball_vx = -ball_vx
         ball_x = 750.0

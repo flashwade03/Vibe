@@ -44,11 +44,11 @@ while running:
     for i in range(6):
         box_vys[i] += 300.0 * dt
         box_ys[i] += box_vys[i] * dt
-
+        
         if box_ys[i] + box_hs[i] > 580.0:
             box_ys[i] = 580.0 - box_hs[i]
             box_vys[i] = 0.0
-
+            
         for j in range(3):
             if box_vys[i] >= 0.0 and box_xs[i] + box_ws[i] > plat_xs[j] and box_xs[i] < plat_xs[j] + plat_ws[j] and box_ys[i] + box_hs[i] >= plat_ys[j] and box_ys[i] + box_hs[i] <= plat_ys[j] + 20.0:
                 box_ys[i] = plat_ys[j] - box_hs[i]
@@ -56,11 +56,12 @@ while running:
 
     for i in range(6):
         for j in range(6):
-            if j > i and box_xs[i] < box_xs[j] + box_ws[j] and box_xs[i] + box_ws[i] > box_xs[j] and box_ys[i] < box_ys[j] + box_hs[j] and box_ys[i] + box_hs[i] > box_ys[j]:
-                ov = (box_xs[i] + box_ws[i]) - box_xs[j]
-                if ov > 0.0:
-                    box_xs[i] -= ov * 0.5
-                    box_xs[j] += ov * 0.5
+            if j > i:
+                if box_xs[i] < box_xs[j] + box_ws[j] and box_xs[i] + box_ws[i] > box_xs[j] and box_ys[i] < box_ys[j] + box_hs[j] and box_ys[i] + box_hs[i] > box_ys[j]:
+                    ov = (box_xs[i] + box_ws[i]) - box_xs[j]
+                    if ov > 0.0:
+                        box_xs[i] -= ov * 0.5
+                        box_xs[j] += ov * 0.5
 
     screen.fill((0, 0, 0))
     
@@ -69,7 +70,7 @@ while running:
     
     for j in range(3):
         pygame.draw.rect(screen, (255, 255, 255), (int(plat_xs[j]), int(plat_ys[j]), int(plat_ws[j]), 15))
-    
+        
     text = font.render("Space: Reset", True, (255, 255, 255))
     screen.blit(text, (10, 10))
     

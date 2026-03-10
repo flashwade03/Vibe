@@ -21,18 +21,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         
-        # Handle input
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT and dir_x != 1.0:
-                dir_x, dir_y = -1.0, 0.0
-            elif event.key == pygame.K_RIGHT and dir_x != -1.0:
+            if event.key == pygame.K_RIGHT and dir_x == 0:
                 dir_x, dir_y = 1.0, 0.0
-            elif event.key == pygame.K_UP and dir_y != 1.0:
+            elif event.key == pygame.K_LEFT and dir_x == 0:
+                dir_x, dir_y = -1.0, 0.0
+            elif event.key == pygame.K_UP and dir_y == 0:
                 dir_x, dir_y = 0.0, -1.0
-            elif event.key == pygame.K_DOWN and dir_y != -1.0:
+            elif event.key == pygame.K_DOWN and dir_y == 0:
                 dir_x, dir_y = 0.0, 1.0
 
-    # Update logic
     move_timer -= dt
     if move_timer <= 0:
         move_timer = 0.15
@@ -55,11 +53,12 @@ while running:
         snake_xs[0] = new_x
         snake_ys[0] = new_y
 
-    # Draw logic
     screen.fill((0, 0, 0))
+    
+    # Draw snake
     for i in range(len(snake_xs)):
         pygame.draw.rect(screen, (255, 255, 255), (int(snake_xs[i]), int(snake_ys[i]), 18, 18))
-    
+        
     pygame.display.flip()
 
 pygame.quit()

@@ -11,7 +11,7 @@ font = pygame.font.Font(None, 36)
 # Game state variables
 heights = []
 h = 300.0
-for i in range(80):
+for i in range(0, 80):
     h += random.uniform(-30.0, 30.0)
     h = max(100.0, min(500.0, h))
     heights.append(h)
@@ -31,8 +31,10 @@ while running:
     scroll_timer += scroll_speed * dt
     if scroll_timer >= 10.0:
         scroll_timer -= 10.0
-        for i in range(79):
+        # Shift terrain
+        for i in range(0, 79):
             heights[i] = heights[i + 1]
+        
         new_h = heights[78] + random.uniform(-30.0, 30.0)
         new_h = max(100.0, min(500.0, new_h))
         heights[79] = new_h
@@ -48,13 +50,13 @@ while running:
     # Draw logic
     screen.fill((0, 0, 0))
     
-    for i in range(80):
-        pygame.draw.rect(screen, (255, 255, 255), (i * 10, int(heights[i]), 10, 600 - int(heights[i])))
+    for i in range(0, 80):
+        pygame.draw.rect(screen, (255, 255, 255), (i * 10.0, heights[i], 10.0, 600.0 - heights[i]))
     
     player_col = 20
-    pygame.draw.rect(screen, (255, 0, 0), (player_col * 10 - 1, int(heights[player_col]) - 14, 12, 14))
+    pygame.draw.rect(screen, (255, 0, 0), (player_col * 10.0 - 1.0, heights[player_col] - 14.0, 12.0, 14.0))
     
-    text_h = font.render("Height: " + str(int(heights[player_col])), True, (255, 255, 255))
+    text_h = font.render("Height: " + str(int(heights[20])), True, (255, 255, 255))
     text_s = font.render("Speed: " + str(int(scroll_speed)), True, (255, 255, 255))
     screen.blit(text_h, (10, 10))
     screen.blit(text_s, (10, 30))

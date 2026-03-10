@@ -1,6 +1,6 @@
-local player_x = 1000.0
-local player_y = 1000.0
-local speed = 300.0
+local player_x = 1000
+local player_y = 1000
+local speed = 300
 local item_xs = {}
 local item_ys = {}
 
@@ -8,8 +8,8 @@ function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Large World with Minimap")
     for i = 1, 20 do
-        item_xs[i] = love.math.random() * 2000.0
-        item_ys[i] = love.math.random() * 2000.0
+        item_xs[i] = love.math.random() * 2000
+        item_ys[i] = love.math.random() * 2000
     end
 end
 
@@ -42,7 +42,7 @@ function love.draw()
     love.graphics.rectangle("fill", 400, 300, 16, 16)
 
     -- Draw minimap background
-    love.graphics.setColor(0.5, 0.5, 0.5)
+    love.graphics.setColor(0.2, 0.2, 0.2)
     love.graphics.rectangle("fill", 630, 10, 160, 120)
     love.graphics.setColor(1, 1, 1)
 
@@ -54,9 +54,9 @@ function love.draw()
     end
 
     -- Draw player on minimap
-    local player_minimap_x = 630.0 + (player_x / 2000.0) * 160.0
-    local player_minimap_y = 10.0 + (player_y / 2000.0) * 120.0
-    love.graphics.rectangle("fill", player_minimap_x, player_minimap_y, 2, 2)
+    local minimap_player_x = 630.0 + (player_x / 2000.0) * 160.0
+    local minimap_player_y = 10.0 + (player_y / 2000.0) * 120.0
+    love.graphics.rectangle("fill", minimap_player_x, minimap_player_y, 4, 4)
 
     -- Draw player position
     love.graphics.print("Pos: " .. tostring(math.floor(player_x)) .. ", " .. tostring(math.floor(player_y)), 10, 10)

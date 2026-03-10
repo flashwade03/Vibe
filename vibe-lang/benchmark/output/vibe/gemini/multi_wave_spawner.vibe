@@ -1,6 +1,10 @@
 let px: Float = 400.0
 let py: Float = 300.0
-let p_speed: Float = 250.0
+let speed: Float = 250.0
+let wave: Int = 1
+let spawn_timer: Float = 2.0
+let enemies_per_wave: Int = 3
+let game_over: Bool = false
 
 let ex: List[Float] = []
 let ey: List[Float] = []
@@ -8,29 +12,23 @@ let evx: List[Float] = []
 let evy: List[Float] = []
 let elife: List[Float] = []
 
-let wave: Int = 1
-let spawn_timer: Float = 2.0
-let enemies_per_wave: Int = 3
-let game_over: Bool = false
-
 fn update(dt: Float)
     if game_over
         return
 
-    if key_down("up")
-        py -= p_speed * dt
-    if key_down("down")
-        py += p_speed * dt
-    if key_down("left")
-        px -= p_speed * dt
     if key_down("right")
-        px += p_speed * dt
+        px += speed * dt
+    if key_down("left")
+        px -= speed * dt
+    if key_down("up")
+        py -= speed * dt
+    if key_down("down")
+        py += speed * dt
 
     spawn_timer -= dt
     if spawn_timer <= 0.0
-        let i: Int = 0
-        for i < enemies_per_wave
-            let side: Float = rand_float(0.0, 4.0)
+        for i in range(0, enemies_per_wave)
+            let side = rand_float(0.0, 4.0)
             let x: Float = 0.0
             let y: Float = 0.0
             if side < 1.0
@@ -46,16 +44,15 @@ fn update(dt: Float)
                 x = 0.0
                 y = rand_float(0.0, 600.0)
 
-            let dx: Float = px - x
-            let dy: Float = py - y
-            let dist: Float = sqrt(dx * dx + dy * dy)
-            let speed: Float = 80.0 + float(wave) * 20.0
+            let dx = px - x
+            let dy = py - y
+            let dist = sqrt(dx * dx + dy * dy)
+            let s = 80.0 + float(wave) * 20.0
             ex += [x]
             ey += [y]
-            evx += [(dx / dist) * speed]
-            evy += [(dy / dist) * speed]
+            evx += [(dx / dist) * s]
+            evy += [(dy / dist) * s]
             elife += [1.0]
-            i += 1
 
         wave += 1
         enemies_per_wave = 3 + wave
@@ -63,26 +60,20 @@ fn update(dt: Float)
         if spawn_timer < 0.5
             spawn_timer = 0.5
 
-    let j: Int = 0
-    for j < len(ex)
-        if elife[j] > 0.0
-            ex[j] += evx[j] * dt
-            ey[j] += evy[j] * dt
-            elife[j] -= dt
-
-            let dist_x: Float = px - ex[j]
-            let dist_y: Float = py - ey[j]
-            if sqrt(dist_x * dist_x + dist_y * dist_y) < 20.0
+    for i in range(0, len(ex))
+        if elife[i] > 0.0
+            ex[i] += evx[i] * dt
+            ey[i] += evy[i] * dt
+            let dx = px - ex[i]
+            let dy = py - ey[i]
+            if sqrt(dx * dx + dy * dy) < 20.0
                 game_over = true
-        j += 1
 
 fn draw()
     draw_circle(px, py, 12.0)
-    let k: Int = 0
-    for k < len(ex)
-        if elife[k] > 0.0
-            draw_rect(ex[k] - 8.0, ey[k] - 8.0, 16.0, 16.0)
-        k += 1
+    for i in range(0, len(ex))
+        if elife[i] > 0.0
+            draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)
 
     draw_text("Wave: " + str(wave), 10.0, 10.0)
     if game_over

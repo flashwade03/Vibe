@@ -7,7 +7,6 @@ let enemy_y: Float = 100.0
 let enemy_speed: Float = 100.0
 
 fn update(dt: Float)
-    -- Player movement
     if key_down("right")
         player_x += player_speed * dt
     if key_down("left")
@@ -17,7 +16,6 @@ fn update(dt: Float)
     if key_down("up")
         player_y -= player_speed * dt
 
-    -- Enemy movement
     let dx: Float = player_x - enemy_x
     let dy: Float = player_y - enemy_y
     let distance: Float = sqrt(dx * dx + dy * dy)
@@ -29,7 +27,5 @@ fn update(dt: Float)
         enemy_y += dy * enemy_speed * dt
 
 fn draw()
-    -- Draw enemy first (red)
     draw_rect(enemy_x, enemy_y, 32, 32)
-    -- Draw player on top (blue)
     draw_rect(player_x, player_y, 32, 32)

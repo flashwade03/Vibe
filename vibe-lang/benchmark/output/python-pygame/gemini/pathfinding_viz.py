@@ -7,7 +7,7 @@ pygame.display.set_caption("BFS Visualization")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
+# Grid state
 grid = [0.0] * 192
 grid[0] = 4.0
 grid[191] = 5.0
@@ -18,8 +18,8 @@ bfs_running = False
 found = False
 
 def get_neighbors(idx):
-    neighbors = []
     row, col = divmod(idx, 16)
+    neighbors = []
     if row > 0: neighbors.append(idx - 16)
     if row < 11: neighbors.append(idx + 16)
     if col > 0: neighbors.append(idx - 1)
@@ -54,7 +54,7 @@ while running:
                 bfs_running = True
                 found = False
 
-    # BFS Update logic
+    # BFS Update Logic
     if bfs_running and q_ptr < len(queue):
         cur = int(queue[q_ptr])
         q_ptr += 1
@@ -67,17 +67,17 @@ while running:
                 grid[p] = 3.0
                 p = int(parent[p])
         else:
-            if grid[cur] != 4.0:
-                grid[cur] = 2.0
             for n in get_neighbors(cur):
                 if (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0:
                     parent[n] = float(cur)
                     queue.append(float(n))
+                    if grid[n] == 0.0:
+                        grid[n] = 2.0
         
         if q_ptr >= len(queue) and not found:
             bfs_running = False
 
-    # Draw logic
+    # Draw
     screen.fill((0, 0, 0))
     for row in range(12):
         for col in range(16):

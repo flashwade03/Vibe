@@ -10,10 +10,10 @@ fn keypressed(k: String)
 
 fn update(dt: Float)
     if shake_timer > 0.0
-        shake_timer = shake_timer - dt
+        shake_timer -= dt
         shake_x = rand_float(-shake_intensity, shake_intensity)
         shake_y = rand_float(-shake_intensity, shake_intensity)
-        shake_intensity = shake_intensity - 20.0 * dt
+        shake_intensity -= 20.0 * dt
     else
         shake_x = 0.0
         shake_y = 0.0

@@ -8,6 +8,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Boids Simulation")
 clock = pygame.time.Clock()
 
+# Boid data
 boid_xs = []
 boid_ys = []
 boid_vxs = []
@@ -24,7 +25,7 @@ def load():
         boid_vys.append(rand_float(-50.0, 50.0))
 
 def update(dt):
-    # Calculate center of mass
+    # Compute center of mass
     center_x = sum(boid_xs) / 15
     center_y = sum(boid_ys) / 15
 
@@ -33,7 +34,7 @@ def update(dt):
         boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
 
-        # Separation: avoid crowding
+        # Separation: push away from nearby boids
         for j in range(15):
             if i != j:
                 dx = boid_xs[i] - boid_xs[j]
@@ -44,7 +45,7 @@ def update(dt):
                     boid_vys[i] += (dy / distance) * 100.0 * dt
 
         # Clamp speed
-        speed = math.sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
+        speed = math.sqrt(boid_vxs[i] ** 2 + boid_vys[i] ** 2)
         if speed > 150.0:
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
             boid_vys[i] = (boid_vys[i] / speed) * 150.0

@@ -2,7 +2,7 @@ local cells = {}
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Grid")
+    love.window.setTitle("Grid Toggle")
     for i = 0, 47 do
         table.insert(cells, 0.0)
     end

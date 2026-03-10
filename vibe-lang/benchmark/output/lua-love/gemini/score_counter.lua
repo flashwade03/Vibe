@@ -12,7 +12,7 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-    -- Update logic
+    -- Update logic if needed
 end
 
 function love.draw()

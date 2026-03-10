@@ -15,7 +15,7 @@ local p_speed = 300.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Spiral Bullet Hell")
+    love.window.setTitle("Spiral Bullet Pattern")
 end
 
 function love.update(dt)
@@ -36,13 +36,13 @@ function love.update(dt)
         end
 
         if love.keyboard.isDown("left") then
-            px = math.max(p_radius, px - p_speed * dt)
+            px = px - p_speed * dt
         end
         if love.keyboard.isDown("right") then
-            px = math.min(800 - p_radius, px + p_speed * dt)
+            px = px + p_speed * dt
         end
 
-        for i = #bul_xs, 1, -1 do
+        for i = #bul_lifes, 1, -1 do
             bul_xs[i] = bul_xs[i] + bul_vxs[i] * dt
             bul_ys[i] = bul_ys[i] + bul_vys[i] * dt
             bul_lifes[i] = bul_lifes[i] - dt
@@ -50,7 +50,7 @@ function love.update(dt)
             if bul_lifes[i] > 0.0 then
                 local ddx = px - bul_xs[i]
                 local ddy = py - bul_ys[i]
-                if math.sqrt(ddx * ddx + ddy * ddy) < (p_radius + 3.0) then
+                if math.sqrt(ddx * ddx + ddy * ddy) < 11.0 then
                     game_over = true
                 end
             end
@@ -61,7 +61,7 @@ end
 function love.draw()
     love.graphics.circle("fill", 400.0, 200.0, 12.0)
     
-    for i = 1, #bul_xs do
+    for i = 1, #bul_lifes do
         if bul_lifes[i] > 0.0 then
             love.graphics.circle("fill", bul_xs[i], bul_ys[i], 3.0)
         end

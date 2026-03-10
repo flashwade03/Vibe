@@ -29,6 +29,7 @@ fn update(dt: Float)
         scroll_speed += 50.0 * dt
     if key_down("down")
         scroll_speed -= 50.0 * dt
+
     if scroll_speed < 20.0
         scroll_speed = 20.0
     if scroll_speed > 200.0
@@ -37,6 +38,7 @@ fn update(dt: Float)
 fn draw()
     for i in range(0, 80)
         draw_rect(float(i) * 10.0, heights[i], 10.0, 600.0 - heights[i])
+
     let player_col: Int = 20
     draw_rect(float(player_col) * 10.0 - 1.0, heights[player_col] - 14.0, 12.0, 14.0)
     draw_text("Height: " + str(int(heights[20])), 10.0, 10.0)

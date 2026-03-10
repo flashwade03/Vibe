@@ -25,7 +25,6 @@ while running:
                 shake_timer = 0.5
                 shake_intensity = 15.0
 
-    # Update logic
     if shake_timer > 0.0:
         shake_timer -= dt
         shake_x = random.uniform(-shake_intensity, shake_intensity)
@@ -39,17 +38,20 @@ while running:
 
     screen.fill((0, 0, 0))
 
-    # Draw logic
-    # Main rect
-    pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64, 64))
-    
-    # Corner markers
-    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 50.0 + shake_y, 16, 16))
-    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 50.0 + shake_y, 16, 16))
-    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 534.0 + shake_y, 16, 16))
-    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 534.0 + shake_y, 16, 16))
-    
-    # Text
+    # Draw main rect
+    pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0))
+
+    # Draw corner markers
+    corners = [
+        (50.0, 50.0),
+        (734.0, 50.0),
+        (50.0, 534.0),
+        (734.0, 534.0)
+    ]
+    for cx, cy in corners:
+        pygame.draw.rect(screen, (255, 255, 255), (cx + shake_x, cy + shake_y, 16.0, 16.0))
+
+    # Draw text
     text = font.render("Press SPACE to shake", True, (255, 255, 255))
     screen.blit(text, (280.0 + shake_x, 550.0 + shake_y))
 

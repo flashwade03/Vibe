@@ -7,10 +7,10 @@ fn update(dt: Float)
         x += speed * dt
     if key_down("left")
         x -= speed * dt
-    if key_down("up")
-        y -= speed * dt
     if key_down("down")
         y += speed * dt
+    if key_down("up")
+        y -= speed * dt
 
 fn draw()
     draw_rect(x, y, 64.0, 64.0)

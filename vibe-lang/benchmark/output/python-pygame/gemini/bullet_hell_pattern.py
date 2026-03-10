@@ -19,9 +19,8 @@ emit_angle = 0.0
 emit_timer = 0.0
 game_over = False
 
-px = 400.0
-py = 500.0
-p_speed = 300.0
+px, py = 400.0, 500.0
+player_speed = 300.0
 
 running = True
 while running:
@@ -48,11 +47,11 @@ while running:
         # Player movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            px -= p_speed * dt
+            px -= player_speed * dt
         if keys[pygame.K_RIGHT]:
-            px += p_speed * dt
+            px += player_speed * dt
 
-        # Update bullets
+        # Bullet update
         for i in range(len(bul_xs)):
             bul_xs[i] += bul_vxs[i] * dt
             bul_ys[i] += bul_vys[i] * dt
@@ -71,9 +70,11 @@ while running:
     pygame.draw.circle(screen, (255, 255, 255), (400, 200), 12)
     
     # Draw bullets
+    alive_count = 0
     for i in range(len(bul_xs)):
         if bul_lifes[i] > 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(bul_xs[i]), int(bul_ys[i])), 3)
+            alive_count += 1
             
     # Draw player
     pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), 8)
@@ -83,9 +84,8 @@ while running:
         text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(text, (340, 300))
         
-    alive = sum(1 for life in bul_lifes if life > 0.0)
-    ui_text = font.render("Bullets: " + str(alive), True, (255, 255, 255))
-    screen.blit(ui_text, (10, 10))
+    bullet_text = font.render("Bullets: " + str(alive_count), True, (255, 255, 255))
+    screen.blit(bullet_text, (10, 10))
 
     pygame.display.flip()
 

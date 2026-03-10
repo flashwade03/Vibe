@@ -1,7 +1,7 @@
 let timer: Float = 0.0
 
 fn update(dt: Float)
-    timer += dt
+    timer = timer + dt
 
 fn draw()
     let vis: Float = sin(timer * 2.0)

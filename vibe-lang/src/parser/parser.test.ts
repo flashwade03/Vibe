@@ -42,7 +42,7 @@ describe("Parser", () => {
     const decl = prog.body[0] as LetDecl;
     expect(decl.kind).toBe("LetDecl");
     expect(decl.name).toBe("x");
-    expect(decl.value.kind).toBe("IntLiteral");
+    expect(decl.value!.kind).toBe("IntLiteral");
     expect((decl.value as IntLiteral).value).toBe(42);
   });
 
@@ -65,7 +65,7 @@ describe("Parser", () => {
     expect(decl.kind).toBe("LetDecl");
     expect(decl.name).toBe("x");
     expect(decl.typeAnnotation).toBe("Float");
-    expect(decl.value.kind).toBe("FloatLiteral");
+    expect(decl.value!.kind).toBe("FloatLiteral");
     expect((decl.value as FloatLiteral).value).toBe(1.0);
   });
 
@@ -372,5 +372,34 @@ fn draw()
     const fn2 = ast.body[1] as FnDecl;
     expect(fn2.name).toBe("draw");
     expect(fn2.body).toHaveLength(0);
+  });
+
+  // 25. Let without initializer
+  it("parses let without initializer", () => {
+    const prog = p("let x: Float");
+    expect(prog.body).toHaveLength(1);
+    const decl = prog.body[0] as LetDecl;
+    expect(decl.kind).toBe("LetDecl");
+    expect(decl.name).toBe("x");
+    expect(decl.typeAnnotation).toBe("Float");
+    expect(decl.value).toBeUndefined();
+  });
+
+  // 26. Top-level expression statement (function call)
+  it("parses top-level expression statement", () => {
+    const prog = p("load()");
+    expect(prog.body).toHaveLength(1);
+    const stmt = prog.body[0] as ExprStmt;
+    expect(stmt.kind).toBe("ExprStmt");
+    expect(stmt.expr.kind).toBe("CallExpr");
+  });
+
+  // 27. Top-level assignment
+  it("parses top-level assignment", () => {
+    const prog = p("x = 42");
+    expect(prog.body).toHaveLength(1);
+    const stmt = prog.body[0] as Assignment;
+    expect(stmt.kind).toBe("Assignment");
+    expect(stmt.op).toBe("=");
   });
 });

@@ -53,7 +53,7 @@ while running:
         color = (255, 0, 0) if i == selected else (0, 255, 0)
         pygame.draw.circle(screen, color, (int(cp_xs[i]), int(cp_ys[i])), 8)
 
-    # Draw UI
+    # UI
     text1 = font.render("Point: " + str(selected + 1), True, (255, 255, 255))
     text2 = font.render("Keys 1-4 select, arrows move", True, (255, 255, 255))
     screen.blit(text1, (10, 10))

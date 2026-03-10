@@ -6,12 +6,11 @@ local pin_x = 200.0
 local pin_y = 200.0
 local speed = 200.0
 local rest_len = 40.0
-local num_nodes = 10
 
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Verlet Rope")
-    for i = 0, num_nodes - 1 do
+    for i = 0, 9 do
         local xv = 200.0 + i * 40.0
         table.insert(node_xs, xv)
         table.insert(prev_xs, xv)
@@ -31,7 +30,7 @@ function love.update(dt)
     prev_xs[1] = pin_x
     prev_ys[1] = pin_y
 
-    for i = 2, num_nodes do
+    for i = 2, 10 do
         local vx = node_xs[i] - prev_xs[i]
         local vy = node_ys[i] - prev_ys[i]
         prev_xs[i] = node_xs[i]
@@ -41,7 +40,7 @@ function love.update(dt)
     end
 
     for iter = 1, 3 do
-        for i = 1, num_nodes - 1 do
+        for i = 1, 9 do
             local dx = node_xs[i + 1] - node_xs[i]
             local dy = node_ys[i + 1] - node_ys[i]
             local dist = math.sqrt(dx * dx + dy * dy)
@@ -62,14 +61,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    for i = 1, num_nodes do
+    for i = 1, 10 do
         love.graphics.circle("fill", node_xs[i], node_ys[i], 5.0)
     end
-    for i = 1, num_nodes - 1 do
+    for i = 1, 9 do
         for j = 0, 4 do
             local lt = j / 5.0
-            local lx = node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt
-            local ly = node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt
+            local lx = node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt
+            local ly = node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt
             love.graphics.circle("fill", lx, ly, 2.0)
         end
     end

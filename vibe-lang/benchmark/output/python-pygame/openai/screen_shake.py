@@ -36,12 +36,16 @@ while running:
 
     screen.fill((0, 0, 0))
 
+    # Draw rectangle in the center
     pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0))
+
+    # Draw corner markers
     pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 50.0 + shake_y, 16.0, 16.0))
     pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 50.0 + shake_y, 16.0, 16.0))
     pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
     pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
 
+    # Display text
     text = font.render("Press SPACE to shake", True, (255, 255, 255))
     screen.blit(text, (280.0 + shake_x, 550.0 + shake_y))
 

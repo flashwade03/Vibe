@@ -1,35 +1,20 @@
-use vibe::*;
+local last_key = "none"
+local key_count = 0
 
-struct Game {
-    last_key: String,
-    key_count: Int,
-}
+function love.load()
+    love.window.setMode(800, 600)
+    love.window.setTitle("Key Press Tracker")
+end
 
-impl Game {
-    fn new() -> Self {
-        Game {
-            last_key: "none".to_string(),
-            key_count: 0,
-        }
-    }
-}
+function love.keypressed(k)
+    last_key = k
+    key_count = key_count + 1
+end
 
-impl Vibe for Game {
-    fn keypressed(&mut self, k: String) {
-        self.last_key = k;
-        self.key_count += 1;
-    }
-
-    fn draw(&self) {
-        draw_text(&format!("Last Key: {}", self.last_key), 250.0, 250.0);
-        draw_text(&format!("Total Presses: {}", self.key_count), 250.0, 290.0);
-        
-        draw_rectangle(300.0, 350.0, 200.0, 80.0);
-        draw_text(&self.last_key, 370.0, 380.0);
-    }
-}
-
-fn main() {
-    let game = Game::new();
-    run(game);
-}
+function love.draw()
+    love.graphics.print("Last Key: " .. last_key, 250, 250)
+    love.graphics.print("Total Presses: " .. tostring(key_count), 250, 290)
+    
+    love.graphics.rectangle("line", 300, 350, 200, 80)
+    love.graphics.print(last_key, 370, 380)
+end

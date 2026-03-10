@@ -55,6 +55,7 @@ function love.draw()
             local x = 200.0 + col * 80.0
             local y = 100.0 + row * 80.0
             love.graphics.rectangle("line", x, y, 80, 80)
+
             local val = inv_items[row * 5 + col + 1]
             if val == 1.0 then
                 love.graphics.rectangle("fill", x + 25.0, y + 20.0, 30.0, 8.0)
@@ -66,6 +67,7 @@ function love.draw()
             end
         end
     end
+
     love.graphics.print("Held: " .. tostring(held_item), 10.0, 10.0)
     love.graphics.print("1-3: Add | Click: Pick/Place", 200.0, 540.0)
 end

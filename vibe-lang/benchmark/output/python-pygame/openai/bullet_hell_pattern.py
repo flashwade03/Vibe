@@ -7,15 +7,16 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Spiral Bullet Pattern")
 clock = pygame.time.Clock()
 
-# Game state variables
 bul_xs = []
 bul_ys = []
 bul_vxs = []
 bul_vys = []
 bul_lifes = []
+
 emit_angle = 0.0
 emit_timer = 0.0
 game_over = False
+
 px, py = 400.0, 500.0
 player_speed = 300
 
@@ -29,7 +30,7 @@ def update(dt):
         emit_timer += dt
         if emit_timer >= 0.05:
             emit_timer = 0.0
-            for k in range(3):
+            for k in range(0, 3):
                 angle = emit_angle + float(k) * 2.094
                 bul_xs.append(400.0)
                 bul_ys.append(200.0)

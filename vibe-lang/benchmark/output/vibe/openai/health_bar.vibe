@@ -28,5 +28,5 @@ fn draw()
     -- Draw player
     draw_rect(384.0, 300.0, 32.0, 32.0)
 
-    -- Display instruction text
+    -- Display instructions
     draw_text("Press SPACE to take damage", 230.0, 550.0)

@@ -23,6 +23,6 @@ end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", cx, cy, 20)
-    love.graphics.circle("fill", target_x, target_y, 4.0)
-    love.graphics.print("Click to move", 10.0, 10.0)
+    love.graphics.circle("fill", target_x, target_y, 4)
+    love.graphics.print("Click to move", 10, 10)
 end

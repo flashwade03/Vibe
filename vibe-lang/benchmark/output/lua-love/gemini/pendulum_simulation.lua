@@ -36,8 +36,8 @@ function love.draw()
     love.graphics.circle("fill", bob_x, bob_y, 15.0)
 
     -- Display text
-    love.graphics.print("Angle: " .. tostring(angle), 10, 10)
-    love.graphics.print("Click to push", 10, 30)
+    love.graphics.print("Angle: " .. tostring(angle), 10.0, 10.0)
+    love.graphics.print("Click to push", 10.0, 30.0)
 end
 
 function love.mousepressed(mx, my, button)

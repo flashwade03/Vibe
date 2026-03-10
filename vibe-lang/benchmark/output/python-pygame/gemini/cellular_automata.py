@@ -8,7 +8,7 @@ pygame.display.set_caption("Conway's Game of Life")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
+# Game state
 cells = []
 next_cells = []
 for i in range(300):
@@ -64,7 +64,6 @@ while running:
                         else:
                             next_cells[idx] = 0.0
             
-            # Copy next_cells to cells
             for i in range(300):
                 cells[i] = next_cells[i]
 
@@ -75,7 +74,7 @@ while running:
             if cells[row * 20 + col] == 1.0:
                 pygame.draw.rect(screen, (255, 255, 255), (col * 40.0, row * 40.0, 38.0, 38.0))
     
-    gen_text = font.render("Gen: " + str(generation), True, (255, 255, 255))
+    gen_text = font.render(f"Gen: {generation}", True, (255, 255, 255))
     screen.blit(gen_text, (10, 10))
     
     if paused:

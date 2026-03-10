@@ -31,8 +31,8 @@ while running:
         screen.blit(text_surface, (300.0, 280.0))
     
     # Draw timer text
-    timer_surface = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(timer_surface, (10.0, 10.0))
+    timer_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
+    screen.blit(timer_text, (10.0, 10.0))
 
     pygame.display.flip()
 

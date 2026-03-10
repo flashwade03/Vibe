@@ -12,7 +12,6 @@ inv_ys = []
 inv_alive = []
 inv_dir = 1.0
 inv_speed = 40.0
-
 px = 384.0
 bul_xs = []
 bul_ys = []
@@ -72,20 +71,25 @@ def update(dt):
 def draw():
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (px, 550.0, 32.0, 16.0))
+
     for i in range(len(inv_xs)):
         if inv_alive[i] == 1.0:
             pygame.draw.rect(screen, (255, 255, 255), (inv_xs[i], inv_ys[i], 30.0, 20.0))
+
     for j in range(len(bul_xs)):
         if bul_alive[j] == 1.0:
             pygame.draw.rect(screen, (255, 255, 255), (bul_xs[j], bul_ys[j], 4.0, 10.0))
+
     font = pygame.font.Font(None, 36)
     text = font.render("Score: " + str(score), True, (255, 255, 255))
     screen.blit(text, (10.0, 10.0))
 
-    alive = sum(inv_alive)
+    alive = sum(1 for i in inv_alive if i == 1.0)
     if alive == 0:
         win_text = font.render("YOU WIN!", True, (255, 255, 255))
         screen.blit(win_text, (340.0, 280.0))
+
+    pygame.display.flip()
 
 load()
 running = True
@@ -95,12 +99,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             keypressed(event.key)
 
     update(dt)
     draw()
-    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

@@ -13,31 +13,21 @@ fn update(dt: Float)
         p1_y = p1_y - 300.0 * dt
     if key_down("s")
         p1_y = p1_y + 300.0 * dt
-    -- Clamp left paddle
-    if p1_y < 0.0
-        p1_y = 0.0
-    if p1_y > 520.0
-        p1_y = 520.0
+    p1_y = max(0.0, min(520.0, p1_y))
 
     -- Move right paddle
     if key_down("up")
         p2_y = p2_y - 300.0 * dt
     if key_down("down")
         p2_y = p2_y + 300.0 * dt
-    -- Clamp right paddle
-    if p2_y < 0.0
-        p2_y = 0.0
-    if p2_y > 520.0
-        p2_y = 520.0
+    p2_y = max(0.0, min(520.0, p2_y))
 
     -- Move ball
     ball_x = ball_x + ball_vx * dt
     ball_y = ball_y + ball_vy * dt
 
     -- Ball collision with top and bottom
-    if ball_y < 8.0
-        ball_vy = -ball_vy
-    if ball_y > 592.0
+    if ball_y < 8.0 or ball_y > 592.0
         ball_vy = -ball_vy
 
     -- Ball collision with left paddle
@@ -50,7 +40,7 @@ fn update(dt: Float)
         ball_vx = -ball_vx
         ball_x = 750.0
 
-    -- Ball out of bounds left
+    -- Ball out of bounds
     if ball_x < 0.0
         score2 = score2 + 1
         ball_x = 400.0
@@ -58,7 +48,6 @@ fn update(dt: Float)
         ball_vx = 250.0
         ball_vy = 150.0
 
-    -- Ball out of bounds right
     if ball_x > 800.0
         score1 = score1 + 1
         ball_x = 400.0
@@ -67,14 +56,10 @@ fn update(dt: Float)
         ball_vy = -150.0
 
 fn draw()
-    -- Draw paddles
     draw_rect(30.0, p1_y, 12.0, 80.0)
     draw_rect(758.0, p2_y, 12.0, 80.0)
-    -- Draw ball
     draw_circle(ball_x, ball_y, 8.0)
-    -- Draw center line
     for i in range(0, 30)
         draw_rect(398.0, float(i) * 20.0, 4.0, 10.0)
-    -- Draw scores
     draw_text(str(score1), 300.0, 20.0)
     draw_text(str(score2), 480.0, 20.0)

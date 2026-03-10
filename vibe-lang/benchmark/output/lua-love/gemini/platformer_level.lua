@@ -25,15 +25,13 @@ function love.update(dt)
     if love.keyboard.isDown("right") then vx = speed end
     px = px + vx * dt
     
-    -- Vertical movement
+    -- Gravity and Jump
     vy = vy + gravity * dt
-    py = py + vy * dt
-    
-    -- Jump
-    if on_ground and love.keyboard.isDown("up") then
+    if love.keyboard.isDown("up") and on_ground then
         vy = jump_vel
         on_ground = false
     end
+    py = py + vy * dt
     
     -- Platform collisions
     on_ground = false
@@ -41,12 +39,12 @@ function love.update(dt)
         for i = 1, #plat_xs do
             if prev_y + 20 <= plat_ys[i] and py + 20 >= plat_ys[i] and 
                px + 20 > plat_xs[i] and px < plat_xs[i] + plat_ws[i] then
-                py = plat_ys[i] - 20
+                py = plat_ys[i] - 20.0
                 vy = 0
                 on_ground = true
             end
         end
-        -- Floor collision
+        -- Ground collision
         if py + 20 >= 580 then
             py = 580 - 20
             vy = 0

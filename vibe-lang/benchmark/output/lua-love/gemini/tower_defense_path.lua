@@ -27,12 +27,11 @@ function love.update(dt)
         if en_hp[i] > 0.0 then
             local wi = math.floor(en_wp[i])
             if wi < 6 then
-                local dx = path_xs[wi] - en_xs[i]
-                local dy = path_ys[wi] - en_ys[i]
-                local d = math.sqrt(dx*dx + dy*dy)
+                local dx, dy = path_xs[wi] - en_xs[i], path_ys[wi] - en_ys[i]
+                local d = math.sqrt(dx * dx + dy * dy)
                 if d > 3.0 then
-                    en_xs[i] = en_xs[i] + (dx/d) * enemy_speed * dt
-                    en_ys[i] = en_ys[i] + (dy/d) * enemy_speed * dt
+                    en_xs[i] = en_xs[i] + (dx / d) * enemy_speed * dt
+                    en_ys[i] = en_ys[i] + (dy / d) * enemy_speed * dt
                 else
                     en_wp[i] = en_wp[i] + 1.0
                 end
@@ -49,7 +48,7 @@ function love.update(dt)
             local best, best_d = -1, 151.0
             for i = 1, #en_xs do
                 if en_hp[i] > 0.0 then
-                    local td = math.sqrt((tow_xs[t]-en_xs[i])^2 + (tow_ys[t]-en_ys[i])^2)
+                    local td = math.sqrt((tow_xs[t] - en_xs[i])^2 + (tow_ys[t] - en_ys[i])^2)
                     if td < best_d then best_d, best = td, i end
                 end
             end
@@ -64,28 +63,28 @@ function love.update(dt)
         end
     end
 
-    for i = 1, #proj_xs do
-        if proj_alive[i] == 1.0 then
-            local dx, dy = proj_txs[i] - proj_xs[i], proj_tys[i] - proj_ys[i]
-            local d = math.sqrt(dx*dx + dy*dy)
-            if d < 10.0 then
-                proj_alive[i] = 0.0
-                for j = 1, #en_xs do
-                    if en_hp[j] > 0.0 and math.sqrt((en_xs[j]-proj_xs[i])^2 + (en_ys[j]-proj_ys[i])^2) < 10.0 then
-                        en_hp[j] = en_hp[j] - 1.0
-                        if en_hp[j] <= 0.0 then score = score + 10 end
+    for p = 1, #proj_xs do
+        if proj_alive[p] == 1.0 then
+            local dx, dy = proj_txs[p] - proj_xs[p], proj_tys[p] - proj_ys[p]
+            local d = math.sqrt(dx * dx + dy * dy)
+            if d < 10 then
+                proj_alive[p] = 0.0
+                for i = 1, #en_xs do
+                    if en_hp[i] > 0.0 and math.sqrt((proj_xs[p] - en_xs[i])^2 + (proj_ys[p] - en_ys[i])^2) < 20 then
+                        en_hp[i] = en_hp[i] - 1.0
+                        if en_hp[i] <= 0 then score = score + 10 end
                     end
                 end
             else
-                proj_xs[i] = proj_xs[i] + (dx/d) * 300 * dt
-                proj_ys[i] = proj_ys[i] + (dy/d) * 300 * dt
+                proj_xs[p] = proj_xs[p] + (dx / d) * 300 * dt
+                proj_ys[p] = proj_ys[p] + (dy / d) * 300 * dt
             end
         end
     end
 end
 
 function love.mousepressed(x, y, button)
-    if #tow_xs < 5 then
+    if button == 1 and #tow_xs < 5 then
         table.insert(tow_xs, x)
         table.insert(tow_ys, y)
         table.insert(tow_timers, 0.0)
@@ -97,17 +96,17 @@ function love.draw()
     for i = 1, 5 do
         for j = 0, 20 do
             local t = j / 20
-            local x = path_xs[i] + (path_xs[i+1]-path_xs[i])*t
-            local y = path_ys[i] + (path_ys[i+1]-path_ys[i])*t
-            love.graphics.circle("fill", x, y, 2)
+            local px = path_xs[i] + (path_xs[i+1] - path_xs[i]) * t
+            local py = path_ys[i] + (path_ys[i+1] - path_ys[i]) * t
+            love.graphics.circle("fill", px, py, 2)
         end
     end
     love.graphics.setColor(1, 0, 0)
-    for i = 1, #en_xs do if en_hp[i] > 0.0 then love.graphics.circle("fill", en_xs[i], en_ys[i], 8) end end
+    for i = 1, #en_xs do if en_hp[i] > 0 then love.graphics.circle("fill", en_xs[i], en_ys[i], 8) end end
     love.graphics.setColor(0, 1, 0)
     for i = 1, #tow_xs do love.graphics.rectangle("fill", tow_xs[i]-10, tow_ys[i]-10, 20, 20) end
     love.graphics.setColor(1, 1, 0)
-    for i = 1, #proj_xs do if proj_alive[i] == 1.0 then love.graphics.rectangle("fill", proj_xs[i]-2, proj_ys[i]-2, 4, 4) end end
+    for i = 1, #proj_xs do if proj_alive[i] == 1 then love.graphics.rectangle("fill", proj_xs[i]-2, proj_ys[i]-2, 4, 4) end end
     love.graphics.setColor(1, 1, 1)
     love.graphics.print("Lives: " .. lives .. " Score: " .. score, 10, 10)
     love.graphics.print("Click to place tower (" .. #tow_xs .. "/5)", 10, 30)

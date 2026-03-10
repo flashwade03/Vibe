@@ -4,7 +4,7 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe - Dodge the Asteroids")
+pygame.display.set_caption("Vibe: Dodge the Asteroids")
 clock = pygame.time.Clock()
 
 player_x, player_y = 100.0, 300.0
@@ -21,9 +21,6 @@ score = 0.0
 
 font = pygame.font.Font(None, 36)
 
-def clamp(value, min_value, max_value):
-    return max(min_value, min(value, max_value))
-
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -32,14 +29,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    keys = pygame.key.get_pressed()
     if not game_over:
-        keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             player_y -= player_speed * dt
         if keys[pygame.K_DOWN]:
             player_y += player_speed * dt
 
-        player_y = clamp(player_y, 0.0, 576.0)
+        player_y = max(0.0, min(576.0, player_y))
 
         spawn_timer += dt
         if spawn_timer >= 0.4:
@@ -61,6 +58,7 @@ while running:
         score += dt
 
     screen.fill((0, 0, 0))
+
     pygame.draw.rect(screen, (255, 255, 255), (int(player_x), int(player_y), 24, 24))
 
     for i in range(len(ast_xs)):

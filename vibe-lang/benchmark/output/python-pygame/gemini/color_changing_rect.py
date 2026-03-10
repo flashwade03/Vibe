@@ -7,7 +7,7 @@ pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
+# Rectangle state
 rect_size = 64
 x = 400.0 - (rect_size / 2)
 y = 300.0 - (rect_size / 2)
@@ -21,7 +21,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Update logic
+    # Movement logic
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         x -= speed * dt
@@ -32,7 +32,7 @@ while running:
     if keys[pygame.K_DOWN]:
         y += speed * dt
 
-    # Draw logic
+    # Rendering
     screen.fill((0, 0, 0))
     
     # Draw rectangle

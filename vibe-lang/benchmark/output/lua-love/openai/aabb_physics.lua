@@ -40,8 +40,8 @@ function love.update(dt)
     end
 
     for i = 1, 6 do
-        for j = 1, 6 do
-            if j > i and box_xs[i] < box_xs[j] + box_ws[j] and box_xs[i] + box_ws[i] > box_xs[j] and box_ys[i] < box_ys[j] + box_hs[j] and box_ys[i] + box_hs[i] > box_ys[j] then
+        for j = i + 1, 6 do
+            if box_xs[i] < box_xs[j] + box_ws[j] and box_xs[i] + box_ws[i] > box_xs[j] and box_ys[i] < box_ys[j] + box_hs[j] and box_ys[i] + box_hs[i] > box_ys[j] then
                 local ov = (box_xs[i] + box_ws[i]) - box_xs[j]
                 if ov > 0.0 then
                     box_xs[i] = box_xs[i] - ov * 0.5
@@ -52,8 +52,8 @@ function love.update(dt)
     end
 end
 
-function love.keypressed(k)
-    if k == "space" then
+function love.keypressed(key)
+    if key == "space" then
         for i = 1, 6 do
             box_ys[i] = love.math.random(50.0, 200.0)
             box_vys[i] = 0.0

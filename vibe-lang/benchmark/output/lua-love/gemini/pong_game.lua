@@ -58,11 +58,11 @@ function love.draw()
     love.graphics.rectangle("fill", 30.0, p1_y, 12.0, 80.0)
     love.graphics.rectangle("fill", 758.0, p2_y, 12.0, 80.0)
     love.graphics.circle("fill", ball_x, ball_y, 8.0)
-
+    
     for i = 0, 29 do
         love.graphics.rectangle("fill", 398.0, i * 20.0, 4.0, 10.0)
     end
-
+    
     love.graphics.print(tostring(score1), 300.0, 20.0)
     love.graphics.print(tostring(score2), 480.0, 20.0)
 end

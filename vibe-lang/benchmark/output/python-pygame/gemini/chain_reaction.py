@@ -50,7 +50,7 @@ while running:
             if ctimer[i] > 1.0:
                 cstate[i] = 2.0
             
-            # Check for chain reaction
+            # Check collisions
             for j in range(num_circles):
                 if cstate[j] == 0.0:
                     dist = math.hypot(cx[i] - cx[j], cy[i] - cy[j])
@@ -58,10 +58,14 @@ while running:
                         cstate[j] = 1.0
 
     # Count exploded
-    exploded_count = sum(1 for s in cstate if s > 0.0)
+    exploded_count = 0
+    for s in cstate:
+        if s > 0.0:
+            exploded_count += 1
 
-    # Draw logic
     screen.fill((0, 0, 0))
+    
+    # Draw logic
     for i in range(num_circles):
         if cstate[i] == 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(cx[i]), int(cy[i])), 15)

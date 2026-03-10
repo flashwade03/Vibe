@@ -2,7 +2,7 @@ let timer: Float = 30.0
 
 fn update(dt: Float)
     if timer > 0.0
-        timer -= dt
+        timer = timer - dt
     if timer < 0.0
         timer = 0.0
 

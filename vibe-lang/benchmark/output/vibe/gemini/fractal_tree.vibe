@@ -9,8 +9,8 @@ let q_angles: List[Float] = []
 let q_lens: List[Float] = []
 let q_depths: List[Float] = []
 
-const max_depth: Int = 7
-const branch_angle: Float = 0.5
+let max_depth: Int = 7
+let branch_angle: Float = 0.5
 let built: Bool = false
 
 fn update(dt: Float)

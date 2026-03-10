@@ -6,11 +6,12 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
 
+# Player state variables
 x, y = 384.0, 550.0
 speed = 200
 vy = 0.0
-gravity = 500.0
 on_ground = True
+gravity = 500.0
 
 running = True
 while running:
@@ -29,9 +30,11 @@ while running:
         vy = -300.0
         on_ground = False
 
+    # Apply gravity
     vy += gravity * dt
     y += vy * dt
 
+    # Check if on the ground
     if y >= 550:
         y = 550
         vy = 0

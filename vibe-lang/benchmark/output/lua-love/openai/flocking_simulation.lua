@@ -5,7 +5,7 @@ local boid_vys = {}
 local num_boids = 15
 
 function rand_float(min, max)
-    return min + math.random() * (max - min)
+    return min + (max - min) * love.math.random()
 end
 
 function love.load()
@@ -21,9 +21,7 @@ end
 
 function love.update(dt)
     for i = 1, num_boids do
-        -- Calculate center of mass
-        local center_x = 0
-        local center_y = 0
+        local center_x, center_y = 0, 0
         for j = 1, num_boids do
             center_x = center_x + boid_xs[j]
             center_y = center_y + boid_ys[j]
@@ -51,8 +49,8 @@ function love.update(dt)
         -- Clamp speed
         local speed = math.sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
         if speed > 150.0 then
-            boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
-            boid_vys[i] = (boid_vys[i] / speed) * 150.0
+            boid_vxs[i] = boid_vxs[i] / speed * 150.0
+            boid_vys[i] = boid_vys[i] / speed * 150.0
         end
 
         -- Update positions
@@ -60,10 +58,10 @@ function love.update(dt)
         boid_ys[i] = boid_ys[i] + boid_vys[i] * dt
 
         -- Wrap around screen edges
-        if boid_xs[i] < 0 then boid_xs[i] = boid_xs[i] + 800 end
-        if boid_xs[i] > 800 then boid_xs[i] = boid_xs[i] - 800 end
-        if boid_ys[i] < 0 then boid_ys[i] = boid_ys[i] + 600 end
-        if boid_ys[i] > 600 then boid_ys[i] = boid_ys[i] - 600 end
+        if boid_xs[i] < 0 then boid_xs[i] = 800 end
+        if boid_xs[i] > 800 then boid_xs[i] = 0 end
+        if boid_ys[i] < 0 then boid_ys[i] = 600 end
+        if boid_ys[i] > 600 then boid_ys[i] = 0 end
     end
 end
 

@@ -17,8 +17,8 @@ function love.load()
     end
 end
 
-function love.keypressed(key)
-    if key == "space" then
+function love.keypressed(k)
+    if k == "space" then
         paused = not paused
     end
 end
@@ -40,7 +40,6 @@ function love.update(dt)
                     if row < 14 and col > 0 and cells[(row + 1) * 20 + col - 1] == 1.0 then count = count + 1 end
                     if row < 14 and cells[(row + 1) * 20 + col] == 1.0 then count = count + 1 end
                     if row < 14 and col < 19 and cells[(row + 1) * 20 + col + 1] == 1.0 then count = count + 1 end
-
                     local idx = row * 20 + col
                     if cells[idx] == 1.0 then
                         if count == 2 or count == 3 then
@@ -72,8 +71,8 @@ function love.draw()
             end
         end
     end
-    love.graphics.print("Gen: " .. generation, 10, 10)
+    love.graphics.print("Gen: " .. generation, 10.0, 10.0)
     if paused then
-        love.graphics.print("PAUSED", 350, 10)
+        love.graphics.print("PAUSED", 350.0, 10.0)
     end
 end

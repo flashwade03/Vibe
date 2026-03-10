@@ -34,12 +34,12 @@ while running:
     # Draw logic
     screen.fill((0, 0, 0))
     
-    # Draw bar background
+    # Draw health bar background
     pygame.draw.rect(screen, (100, 100, 100), (250, 50, 300, 30))
     
     # Draw filled portion
     bar_width = (health / max_health) * 300.0
-    pygame.draw.rect(screen, (255, 0, 0), (250, 50, int(bar_width), 30))
+    pygame.draw.rect(screen, (0, 255, 0), (250, 50, int(bar_width), 30))
     
     # Display HP text
     hp_text = font.render(f"HP: {int(health)} / 100", True, (255, 255, 255))
@@ -48,7 +48,7 @@ while running:
     # Draw player
     pygame.draw.rect(screen, (255, 255, 255), (384, 300, 32, 32))
     
-    # Draw instructions
+    # Display instructions
     instr_text = font.render("Press SPACE to take damage", True, (255, 255, 255))
     screen.blit(instr_text, (230, 550))
 

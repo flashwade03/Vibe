@@ -1,10 +1,11 @@
--- State variables
 local player_x = 100.0
 local player_y = 300.0
 local player_speed = 250.0
+
 local ast_xs = {}
 local ast_ys = {}
 local ast_sizes = {}
+
 local spawn_timer = 0.0
 local scroll_speed = 200.0
 local game_over = false
@@ -24,10 +25,11 @@ function love.update(dt)
         if love.keyboard.isDown("down") then
             player_y = player_y + player_speed * dt
         end
-        -- Clamp player position
-        player_y = math.max(0, math.min(576, player_y))
 
-        -- Spawn asteroids
+        -- Clamp player position
+        player_y = math.max(0.0, math.min(576.0, player_y))
+
+        -- Update spawn timer
         spawn_timer = spawn_timer + dt
         if spawn_timer >= 0.4 then
             spawn_timer = 0.0
@@ -36,13 +38,16 @@ function love.update(dt)
             table.insert(ast_sizes, love.math.random(15.0, 40.0))
         end
 
-        -- Move asteroids and check collisions
+        -- Move asteroids and check for collisions
         for i = #ast_xs, 1, -1 do
             ast_xs[i] = ast_xs[i] - scroll_speed * dt
+
             if ast_xs[i] < player_x + 24.0 and ast_xs[i] + ast_sizes[i] > player_x and
                ast_ys[i] < player_y + 24.0 and ast_ys[i] + ast_sizes[i] > player_y then
                 game_over = true
             end
+
+            -- Remove off-screen asteroids
             if ast_xs[i] < -50 then
                 table.remove(ast_xs, i)
                 table.remove(ast_ys, i)

@@ -6,7 +6,6 @@ fn update(dt: Float)
     if frame_timer >= 0.25
         frame_timer -= 0.25
         frame += 1
-
     if frame >= 4
         frame = 0
 

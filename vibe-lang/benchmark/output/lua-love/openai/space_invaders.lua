@@ -25,11 +25,12 @@ end
 
 function love.update(dt)
     if love.keyboard.isDown("left") then
-        px = math.max(0.0, px - 250.0 * dt)
+        px = px - 250 * dt
     end
     if love.keyboard.isDown("right") then
-        px = math.min(768.0, px + 250.0 * dt)
+        px = px + 250 * dt
     end
+    px = math.max(0, math.min(px, 768))
 
     local reverse = false
     for i = 1, #inv_xs do

@@ -1,20 +1,16 @@
 let path_xs: List[Float] = [0.0, 200.0, 200.0, 600.0, 600.0, 800.0]
 let path_ys: List[Float] = [300.0, 300.0, 100.0, 100.0, 500.0, 500.0]
-
 let en_xs: List[Float] = []
 let en_ys: List[Float] = []
 let en_wp: List[Float] = []
 let en_hp: List[Float] = []
-
 let spawn_timer: Float = 2.0
 let enemy_speed: Float = 80.0
 let score: Int = 0
 let lives: Int = 10
-
 let tow_xs: List[Float] = []
 let tow_ys: List[Float] = []
 let tow_timers: List[Float] = []
-
 let proj_xs: List[Float] = []
 let proj_ys: List[Float] = []
 let proj_txs: List[Float] = []
@@ -74,6 +70,7 @@ fn update(dt: Float)
                 proj_xs[p] += (dx/d) * 300.0 * dt
                 proj_ys[p] += (dy/d) * 300.0 * dt
             else
+                proj_alive[p] = 0.0
                 for i in range(0, len(en_xs))
                     if en_hp[i] > 0.0
                         let ed: Float = sqrt((proj_xs[p]-en_xs[i])*(proj_xs[p]-en_xs[i]) + (proj_ys[p]-en_ys[i])*(proj_ys[p]-en_ys[i]))
@@ -81,7 +78,6 @@ fn update(dt: Float)
                             en_hp[i] -= 1.0
                             if en_hp[i] <= 0.0
                                 score += 1
-                proj_alive[p] = 0.0
 
 fn mousepressed(mx: Float, my: Float, button: Int)
     if len(tow_xs) < 5
@@ -97,9 +93,7 @@ fn draw()
         let ey: Float = path_ys[i+1]
         for j in range(0, 20)
             let t: Float = float(j) / 20.0
-            let px: Float = sx + (ex - sx) * t
-            let py: Float = sy + (ey - sy) * t
-            draw_circle(px, py, 2.0)
+            draw_circle(sx + (ex-sx)*t, sy + (ey-sy)*t, 2.0)
 
     for i in range(0, len(en_xs))
         if en_hp[i] > 0.0
