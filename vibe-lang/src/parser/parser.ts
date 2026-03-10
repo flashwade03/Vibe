@@ -12,12 +12,25 @@ import {
   Param,
   LetDecl,
   ConstDecl,
+  StructDecl,
+  StructField,
+  EnumDecl,
+  EnumVariant,
+  VariantField,
+  TraitDecl,
+  TraitImplDecl,
+  Annotation,
   Stmt,
   IfStmt,
   ForStmt,
   ForInVariant,
   ForCondVariant,
+  MatchStmt,
+  MatchArm,
+  MatchPattern,
   ReturnStmt,
+  BreakStmt,
+  ContinueStmt,
   Assignment,
   ExprStmt,
   Expr,
@@ -33,6 +46,8 @@ import {
   IndexAccess,
   GroupExpr,
   ListLiteral,
+  MapLiteral,
+  MatchExpr,
 } from "./ast.js";
 
 // ── Public API ──────────────────────────────────────────────
@@ -88,6 +103,28 @@ class Parser {
     return { line: token.line, col: token.col };
   }
 
+  /**
+   * Expect an identifier or a keyword usable as a field/method name (e.g., `obj.has()`).
+   * Keywords like `has`, `in`, `not` etc. may appear after `.` as method names.
+   */
+  private expectIdentOrKeyword(): Token {
+    const tok = this.peek();
+    if (tok.type === TokenType.IDENT) {
+      return this.advance();
+    }
+    // Allow keywords as field/method names after `.`
+    if (tok.type.startsWith("KW_")) {
+      return this.advance();
+    }
+    throw new VibeError(
+      this.filename,
+      tok.line,
+      tok.col,
+      "parser",
+      `expected identifier, got ${tok.type} ("${tok.value}")`,
+    );
+  }
+
   /** Skip any NEWLINE tokens (blank lines between statements). */
   private skipNewlines(): void {
     while (this.peek().type === TokenType.NEWLINE) {
@@ -113,6 +150,13 @@ class Parser {
   // ── Top-level declarations ──────────────────────────────
 
   private parseTopLevelDecl(): TopLevelDecl {
+    // Collect annotations before the declaration
+    const annotations: Annotation[] = [];
+    while (this.at(TokenType.AT)) {
+      annotations.push(this.parseAnnotation());
+      this.skipNewlines();
+    }
+
     const tok = this.peek();
     switch (tok.type) {
       case TokenType.KW_FN:
@@ -121,6 +165,12 @@ class Parser {
         return this.parseLetDecl();
       case TokenType.KW_CONST:
         return this.parseConstDecl();
+      case TokenType.KW_STRUCT:
+        return this.parseStructDecl(annotations);
+      case TokenType.KW_ENUM:
+        return this.parseEnumDecl(annotations);
+      case TokenType.KW_TRAIT:
+        return this.parseTraitDecl(annotations);
       default:
         // Allow top-level expression statements (e.g. function calls like load())
         return this.parseAssignOrExprStmt() as ExprStmt | Assignment;
@@ -139,7 +189,7 @@ class Parser {
     // Optional return type annotation: -> Type
     if (this.at(TokenType.ARROW)) {
       this.advance(); // consume ->
-      this.expect(TokenType.IDENT); // consume type name (discarded)
+      this.consumeTypeAnnotation(); // consume full type (e.g., Map[String, Float])
     }
 
     this.expect(TokenType.NEWLINE);
@@ -179,7 +229,7 @@ class Parser {
     return { name: nameTok.value, typeAnnotation, loc: this.loc(nameTok) };
   }
 
-  /** Consume a type annotation like `Float`, `List[Float]`, `Map[String, Int]`. */
+  /** Consume a type annotation like `Float`, `List[Float]`, `Map[String, Int]`, `Int?`. */
   private consumeTypeAnnotation(): string {
     const typeTok = this.expect(TokenType.IDENT);
     let annotation = typeTok.value;
@@ -196,7 +246,267 @@ class Parser {
       this.expect(TokenType.RBRACKET);
       annotation += "]";
     }
+    // Handle Optional type suffix: Int?, Vec2?, List[String]?
+    if (this.at(TokenType.QUESTION)) {
+      this.advance();
+      annotation += "?";
+    }
     return annotation;
+  }
+
+  // ── Annotation ─────────────────────────────────────────
+
+  private parseAnnotation(): Annotation {
+    const atTok = this.expect(TokenType.AT);
+    const nameTok = this.expect(TokenType.IDENT);
+    const args: Expr[] = [];
+
+    // Optional args: @on("collision", "enemy")
+    if (this.at(TokenType.LPAREN)) {
+      this.advance(); // consume (
+      if (!this.at(TokenType.RPAREN)) {
+        args.push(this.parseExpr());
+        while (this.at(TokenType.COMMA)) {
+          this.advance();
+          args.push(this.parseExpr());
+        }
+      }
+      this.expect(TokenType.RPAREN);
+    }
+
+    this.expectNewlineOrEOF();
+    return { name: nameTok.value, args, loc: this.loc(atTok) };
+  }
+
+  // ── StructDecl ────────────────────────────────────────
+
+  private parseStructDecl(annotations: Annotation[]): StructDecl {
+    const kwTok = this.expect(TokenType.KW_STRUCT);
+    const nameTok = this.expect(TokenType.IDENT);
+
+    // Optional: has Trait1, Trait2
+    const traits = this.parseHasClause();
+
+    this.expect(TokenType.NEWLINE);
+
+    // Parse struct body: fields and methods
+    const fields: StructField[] = [];
+    const methods: FnDecl[] = [];
+
+    if (this.at(TokenType.INDENT)) {
+      this.advance(); // consume INDENT
+      this.skipNewlines();
+
+      while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+        if (this.at(TokenType.KW_FN)) {
+          methods.push(this.parseFnDecl());
+        } else {
+          fields.push(this.parseStructField());
+        }
+        this.skipNewlines();
+      }
+
+      this.expect(TokenType.DEDENT);
+    }
+
+    return {
+      kind: "StructDecl",
+      name: nameTok.value,
+      traits,
+      fields,
+      methods,
+      annotations,
+      loc: this.loc(kwTok),
+    };
+  }
+
+  private parseStructField(): StructField {
+    const nameTok = this.expect(TokenType.IDENT);
+    this.expect(TokenType.COLON);
+    const typeAnnotation = this.consumeTypeAnnotation();
+
+    let defaultValue: Expr | undefined;
+    if (this.at(TokenType.EQ)) {
+      this.advance(); // consume =
+      defaultValue = this.parseExpr();
+    }
+
+    this.expectNewlineOrEOF();
+    return {
+      name: nameTok.value,
+      typeAnnotation,
+      defaultValue,
+      loc: this.loc(nameTok),
+    };
+  }
+
+  /** Parse optional `has Trait1, Trait2` clause. */
+  private parseHasClause(): string[] {
+    const traits: string[] = [];
+    if (this.at(TokenType.KW_HAS)) {
+      this.advance(); // consume has
+      traits.push(this.expect(TokenType.IDENT).value);
+      while (this.at(TokenType.COMMA)) {
+        this.advance();
+        traits.push(this.expect(TokenType.IDENT).value);
+      }
+    }
+    return traits;
+  }
+
+  // ── EnumDecl ──────────────────────────────────────────
+
+  private parseEnumDecl(annotations: Annotation[]): EnumDecl {
+    const kwTok = this.expect(TokenType.KW_ENUM);
+    const nameTok = this.expect(TokenType.IDENT);
+    this.expect(TokenType.NEWLINE);
+
+    const variants: EnumVariant[] = [];
+
+    if (this.at(TokenType.INDENT)) {
+      this.advance(); // consume INDENT
+      this.skipNewlines();
+
+      while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+        variants.push(this.parseEnumVariant());
+        this.skipNewlines();
+      }
+
+      this.expect(TokenType.DEDENT);
+    }
+
+    return {
+      kind: "EnumDecl",
+      name: nameTok.value,
+      variants,
+      annotations,
+      loc: this.loc(kwTok),
+    };
+  }
+
+  private parseEnumVariant(): EnumVariant {
+    const nameTok = this.expect(TokenType.IDENT);
+    const fields: VariantField[] = [];
+
+    // Optional: Variant(field1: Type1, field2: Type2)
+    if (this.at(TokenType.LPAREN)) {
+      this.advance(); // consume (
+      if (!this.at(TokenType.RPAREN)) {
+        fields.push(this.parseVariantField());
+        while (this.at(TokenType.COMMA)) {
+          this.advance();
+          fields.push(this.parseVariantField());
+        }
+      }
+      this.expect(TokenType.RPAREN);
+    }
+
+    this.expectNewlineOrEOF();
+    return { name: nameTok.value, fields, loc: this.loc(nameTok) };
+  }
+
+  private parseVariantField(): VariantField {
+    // Could be `name: Type` or just `Type`
+    const tok = this.expect(TokenType.IDENT);
+    if (this.at(TokenType.COLON)) {
+      // Named field: name: Type
+      this.advance(); // consume :
+      const typeAnnotation = this.consumeTypeAnnotation();
+      return { name: tok.value, typeAnnotation };
+    }
+    // Positional: just a type name
+    return { typeAnnotation: tok.value };
+  }
+
+  // ── TraitDecl / TraitImplDecl ─────────────────────────
+
+  private parseTraitDecl(annotations: Annotation[]): TraitDecl | TraitImplDecl {
+    const kwTok = this.expect(TokenType.KW_TRAIT);
+    const nameTok = this.expect(TokenType.IDENT);
+
+    // Check for trait impl: `trait Drawable has Player`
+    // Per PEG: TraitImplDecl <- 'trait' IDENT 'has' IDENT NEWLINE TraitImplBody
+    if (this.at(TokenType.KW_HAS)) {
+      this.advance(); // consume has
+      const targetTok = this.expect(TokenType.IDENT);
+
+      this.expect(TokenType.NEWLINE);
+      const methods: FnDecl[] = [];
+
+      if (this.at(TokenType.INDENT)) {
+        this.advance();
+        this.skipNewlines();
+        while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+          methods.push(this.parseFnDecl());
+          this.skipNewlines();
+        }
+        this.expect(TokenType.DEDENT);
+      }
+
+      return {
+        kind: "TraitImplDecl",
+        traitName: nameTok.value,
+        targetType: targetTok.value,
+        methods,
+        loc: this.loc(kwTok),
+      };
+    }
+
+    // Regular trait declaration
+    this.expect(TokenType.NEWLINE);
+    const methods: FnDecl[] = [];
+
+    if (this.at(TokenType.INDENT)) {
+      this.advance();
+      this.skipNewlines();
+      while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+        methods.push(this.parseTraitMethod());
+        this.skipNewlines();
+      }
+      this.expect(TokenType.DEDENT);
+    }
+
+    return {
+      kind: "TraitDecl",
+      name: nameTok.value,
+      supertraits: [],
+      methods,
+      annotations,
+      loc: this.loc(kwTok),
+    };
+  }
+
+  /** Parse a trait method: either signature-only or with a default body. */
+  private parseTraitMethod(): FnDecl {
+    const kwTok = this.expect(TokenType.KW_FN);
+    const nameTok = this.expect(TokenType.IDENT);
+    this.expect(TokenType.LPAREN);
+    const params = this.parseParamList();
+    this.expect(TokenType.RPAREN);
+
+    // Optional return type: -> Type
+    if (this.at(TokenType.ARROW)) {
+      this.advance();
+      this.consumeTypeAnnotation();
+    }
+
+    // Check if there's a body (default implementation) or just a signature
+    let body: Stmt[] = [];
+    if (this.at(TokenType.NEWLINE)) {
+      this.advance(); // consume NEWLINE
+      if (this.at(TokenType.INDENT)) {
+        body = this.parseIndentedBlock();
+      }
+      // else: signature-only, body stays empty
+    }
+
+    return {
+      kind: "FnDecl",
+      name: nameTok.value,
+      params,
+      body,
+      loc: this.loc(kwTok),
+    };
   }
 
   // ── LetDecl / ConstDecl ─────────────────────────────────
@@ -214,7 +524,10 @@ class Parser {
       this.advance();
       value = this.parseExpr();
     }
-    this.expectNewlineOrEOF();
+    // Block expressions (match) already consumed their DEDENT; don't require NEWLINE
+    if (!value || value.kind !== "MatchExpr") {
+      this.expectNewlineOrEOF();
+    }
     return {
       kind: "LetDecl",
       name: nameTok.value,
@@ -288,8 +601,20 @@ class Parser {
         return this.parseIfStmt();
       case TokenType.KW_FOR:
         return this.parseForStmt();
+      case TokenType.KW_MATCH:
+        return this.parseMatchStmt();
       case TokenType.KW_RETURN:
         return this.parseReturnStmt();
+      case TokenType.KW_BREAK: {
+        const brkTok = this.advance();
+        this.expectNewlineOrEOF();
+        return { kind: "BreakStmt", loc: this.loc(brkTok) } as BreakStmt;
+      }
+      case TokenType.KW_CONTINUE: {
+        const contTok = this.advance();
+        this.expectNewlineOrEOF();
+        return { kind: "ContinueStmt", loc: this.loc(contTok) } as ContinueStmt;
+      }
       default:
         return this.parseAssignOrExprStmt();
     }
@@ -464,7 +789,7 @@ class Parser {
 
   // Precedence 4: ==, !=, <, >, <=, >=
   private parseComparison(): Expr {
-    let left = this.parseAddition();
+    let left = this.parseRange();
     while (
       this.at(TokenType.EQEQ) ||
       this.at(TokenType.NEQ) ||
@@ -474,7 +799,7 @@ class Parser {
       this.at(TokenType.GTEQ)
     ) {
       const opTok = this.advance();
-      const right = this.parseAddition();
+      const right = this.parseRange();
       left = {
         kind: "BinaryExpr",
         op: opTok.value,
@@ -486,7 +811,24 @@ class Parser {
     return left;
   }
 
-  // Precedence 5: +, -
+  // Precedence 5: .. (range)
+  private parseRange(): Expr {
+    let left = this.parseAddition();
+    if (this.at(TokenType.DOTDOT)) {
+      const opTok = this.advance();
+      const right = this.parseAddition();
+      left = {
+        kind: "BinaryExpr",
+        op: "..",
+        left,
+        right,
+        loc: this.loc(opTok),
+      };
+    }
+    return left;
+  }
+
+  // Precedence 6: +, -
   private parseAddition(): Expr {
     let left = this.parseMultiplication();
     while (this.at(TokenType.PLUS) || this.at(TokenType.MINUS)) {
@@ -546,7 +888,7 @@ class Parser {
     while (true) {
       if (this.at(TokenType.DOT)) {
         const dotTok = this.advance();
-        const fieldTok = this.expect(TokenType.IDENT);
+        const fieldTok = this.expectIdentOrKeyword();
         expr = {
           kind: "FieldAccess",
           object: expr,
@@ -587,13 +929,194 @@ class Parser {
       return args;
     }
 
-    args.push(this.parseExpr());
+    args.push(this.parseArgExpr());
     while (this.at(TokenType.COMMA)) {
       this.advance();
-      args.push(this.parseExpr());
+      args.push(this.parseArgExpr());
     }
 
     return args;
+  }
+
+  /**
+   * Parse a single argument: either a named arg `name: expr` or a positional expr.
+   * Named args like `Player(health: 100)` — the `name: value` is parsed as a regular
+   * expression since the colon creates ambiguity. We skip the name and colon and just
+   * return the value expression.
+   */
+  private parseArgExpr(): Expr {
+    // Look ahead for named argument pattern: IDENT COLON
+    if (
+      this.at(TokenType.IDENT) &&
+      this.pos + 1 < this.tokens.length &&
+      this.tokens[this.pos + 1].type === TokenType.COLON
+    ) {
+      // Named argument: consume name and colon, then parse value
+      this.advance(); // consume name
+      this.advance(); // consume :
+      return this.parseExpr();
+    }
+    return this.parseExpr();
+  }
+
+  // ── MatchExpr (match as expression in PrimaryExpr) ────────
+
+  private parseMatchExpr(): Expr {
+    const kwTok = this.expect(TokenType.KW_MATCH);
+    const subject = this.parseExpr();
+    this.expect(TokenType.NEWLINE);
+
+    // Parse indented match body (same structure as MatchStmt)
+    this.expect(TokenType.INDENT);
+    const arms: MatchArm[] = [];
+    this.skipNewlines();
+    while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+      arms.push(this.parseMatchArm());
+      this.skipNewlines();
+    }
+    this.expect(TokenType.DEDENT);
+
+    return { kind: "MatchExpr", subject, arms, loc: this.loc(kwTok) };
+  }
+
+  // ── MapLiteral ────────────────────────────────────────────
+
+  private parseMapLiteral(): MapLiteral {
+    const tok = this.expect(TokenType.LBRACE);
+    const entries: { key: Expr; value: Expr }[] = [];
+
+    if (!this.at(TokenType.RBRACE)) {
+      const key = this.parseExpr();
+      this.expect(TokenType.COLON);
+      const value = this.parseExpr();
+      entries.push({ key, value });
+
+      while (this.at(TokenType.COMMA)) {
+        this.advance();
+        if (this.at(TokenType.RBRACE)) break; // trailing comma
+        const k = this.parseExpr();
+        this.expect(TokenType.COLON);
+        const v = this.parseExpr();
+        entries.push({ key: k, value: v });
+      }
+    }
+
+    this.expect(TokenType.RBRACE);
+    return { kind: "MapLiteral", entries, loc: this.loc(tok) };
+  }
+
+  // ── MatchStmt ─────────────────────────────────────────────
+
+  private parseMatchStmt(): MatchStmt {
+    const kwTok = this.expect(TokenType.KW_MATCH);
+    const subject = this.parseExpr();
+    this.expect(TokenType.NEWLINE);
+
+    // Parse indented match body
+    this.expect(TokenType.INDENT);
+    const arms: MatchArm[] = [];
+    this.skipNewlines();
+    while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+      arms.push(this.parseMatchArm());
+      this.skipNewlines();
+    }
+    this.expect(TokenType.DEDENT);
+
+    return { kind: "MatchStmt", subject, arms, loc: this.loc(kwTok) };
+  }
+
+  private parseMatchArm(): MatchArm {
+    const patternTok = this.peek();
+    const pattern = this.parseMatchPattern();
+
+    if (this.at(TokenType.ARROW)) {
+      // One-line arm: Pattern -> Stmt
+      this.advance(); // consume ->
+      const body = this.parseInlineStmt();
+      return { pattern, body, loc: this.loc(patternTok) };
+    } else {
+      // Multi-line arm: Pattern NEWLINE Block
+      this.expect(TokenType.NEWLINE);
+      const body = this.parseIndentedBlock();
+      return { pattern, body, loc: this.loc(patternTok) };
+    }
+  }
+
+  /** Parse a single inline statement (for one-line match arms). */
+  private parseInlineStmt(): Stmt[] {
+    const startTok = this.peek();
+    const expr = this.parseExpr();
+
+    // Check for assignment after expression
+    const assignOps: Record<string, Assignment["op"]> = {
+      [TokenType.EQ]: "=",
+      [TokenType.PLUSEQ]: "+=",
+      [TokenType.MINUSEQ]: "-=",
+      [TokenType.STAREQ]: "*=",
+      [TokenType.SLASHEQ]: "/=",
+      [TokenType.PERCENTEQ]: "%=",
+    };
+
+    const op = assignOps[this.peek().type];
+    if (op) {
+      this.advance();
+      const value = this.parseExpr();
+      this.expectNewlineOrEOF();
+      return [{ kind: "Assignment", op, target: expr, value, loc: this.loc(startTok) } as Assignment];
+    }
+
+    this.expectNewlineOrEOF();
+    return [{ kind: "ExprStmt", expr, loc: this.loc(startTok) } as ExprStmt];
+  }
+
+  private parseMatchPattern(): MatchPattern {
+    const tok = this.peek();
+
+    // Wildcard: _ or else
+    if (tok.type === TokenType.IDENT && tok.value === "_") {
+      this.advance();
+      return { kind: "WildcardPattern" };
+    }
+    if (tok.type === TokenType.KW_ELSE) {
+      this.advance();
+      return { kind: "WildcardPattern" };
+    }
+
+    // Literal patterns: int, float, string, true, false
+    if (tok.type === TokenType.INT_LIT) {
+      this.advance();
+      return { kind: "LiteralPattern", value: { kind: "IntLiteral", value: parseInt(tok.value, 10), loc: this.loc(tok) } };
+    }
+    if (tok.type === TokenType.FLOAT_LIT) {
+      this.advance();
+      return { kind: "LiteralPattern", value: { kind: "FloatLiteral", value: parseFloat(tok.value), loc: this.loc(tok) } };
+    }
+    if (tok.type === TokenType.STRING_LIT) {
+      this.advance();
+      return { kind: "LiteralPattern", value: { kind: "StringLiteral", value: tok.value, loc: this.loc(tok) } };
+    }
+    if (tok.type === TokenType.KW_TRUE) {
+      this.advance();
+      return { kind: "LiteralPattern", value: { kind: "BoolLiteral", value: true, loc: this.loc(tok) } };
+    }
+    if (tok.type === TokenType.KW_FALSE) {
+      this.advance();
+      return { kind: "LiteralPattern", value: { kind: "BoolLiteral", value: false, loc: this.loc(tok) } };
+    }
+
+    // Identifier pattern (variant name or binding)
+    if (tok.type === TokenType.IDENT) {
+      this.advance();
+      return { kind: "IdentifierPattern", name: tok.value };
+    }
+
+    throw new VibeError(
+      this.filename,
+      tok.line,
+      tok.col,
+      "parser",
+      `unexpected token in match pattern: ${tok.type} ("${tok.value}")`,
+    );
   }
 
   // Precedence 9: primary
@@ -656,6 +1179,12 @@ class Parser {
         }
         this.expect(TokenType.RBRACKET);
         return { kind: "ListLiteral", elements, loc: this.loc(tok) } as ListLiteral;
+      }
+      case TokenType.LBRACE: {
+        return this.parseMapLiteral();
+      }
+      case TokenType.KW_MATCH: {
+        return this.parseMatchExpr();
       }
       default:
         throw new VibeError(

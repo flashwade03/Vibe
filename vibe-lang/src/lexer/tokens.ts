@@ -31,8 +31,17 @@ export enum TokenType {
   KW_TRUE = "KW_TRUE",
   KW_FALSE = "KW_FALSE",
 
+  // ── Type keywords ────────────────────────────────────────
+  KW_STRUCT = "KW_STRUCT",
+  KW_ENUM = "KW_ENUM",
+  KW_TRAIT = "KW_TRAIT",
+  KW_HAS = "KW_HAS",
+
   // ── Other keywords (parsed, minimal use in v0) ───────────
   KW_IN = "KW_IN",
+  KW_MATCH = "KW_MATCH",
+  KW_BREAK = "KW_BREAK",
+  KW_CONTINUE = "KW_CONTINUE",
 
   // ── Operators ────────────────────────────────────────────
   PLUS = "PLUS",       // +
@@ -55,12 +64,19 @@ export enum TokenType {
   GTEQ = "GTEQ",       // >=
 
   DOT = "DOT",         // .
+  DOTDOT = "DOTDOT",   // ..
+
+  // ── Annotation & Optional ────────────────────────────────
+  AT = "AT",             // @
+  QUESTION = "QUESTION", // ?
 
   // ── Delimiters ───────────────────────────────────────────
   LPAREN = "LPAREN",     // (
   RPAREN = "RPAREN",     // )
   LBRACKET = "LBRACKET", // [
   RBRACKET = "RBRACKET", // ]
+  LBRACE = "LBRACE",     // {
+  RBRACE = "RBRACE",     // }
   COMMA = "COMMA",       // ,
   COLON = "COLON",       // :
   ARROW = "ARROW",       // ->

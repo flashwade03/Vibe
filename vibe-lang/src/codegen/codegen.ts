@@ -9,10 +9,19 @@ import type {
   FnDecl,
   LetDecl,
   ConstDecl,
+  StructDecl,
+  EnumDecl,
+  TraitDecl,
+  TraitImplDecl,
   Stmt,
   IfStmt,
   ForStmt,
+  MatchStmt,
+  MatchArm,
+  MatchPattern,
   ReturnStmt,
+  BreakStmt,
+  ContinueStmt,
   Assignment,
   ExprStmt,
   Expr,
@@ -28,6 +37,8 @@ import type {
   IndexAccess,
   GroupExpr,
   ListLiteral,
+  MapLiteral,
+  MatchExpr,
 } from "../parser/ast.js";
 
 // ── Constants ───────────────────────────────────────────────
@@ -73,8 +84,8 @@ export function generate(program: Program): string {
   for (let i = 0; i < program.body.length; i++) {
     const decl = program.body[i];
 
-    // Add blank line before function declarations (unless first item)
-    if (decl.kind === "FnDecl" && i > 0) {
+    // Add blank line before function/struct/enum declarations (unless first item)
+    if ((decl.kind === "FnDecl" || decl.kind === "StructDecl" || decl.kind === "EnumDecl" || decl.kind === "TraitImplDecl") && i > 0) {
       parts.push("");
     }
 
@@ -107,6 +118,14 @@ function emitTopLevel(decl: TopLevelDecl): string {
       return emitLetDecl(decl, 0);
     case "ConstDecl":
       return emitConstDecl(decl, 0);
+    case "StructDecl":
+      return emitStructDecl(decl);
+    case "EnumDecl":
+      return emitEnumDecl(decl);
+    case "TraitDecl":
+      return emitTraitDecl(decl);
+    case "TraitImplDecl":
+      return emitTraitImplDecl(decl);
     case "ExprStmt":
       return emitExprStmt(decl, 0);
     case "Assignment":
@@ -137,6 +156,10 @@ function emitLetDecl(node: LetDecl, depth: number): string {
   const prefix = indent(depth);
   const name = escapeLuaReserved(node.name);
   if (node.value) {
+    // Special case: match expression as value
+    if (node.value.kind === "MatchExpr") {
+      return emitMatchExprAsDecl(name, node.value, depth);
+    }
     return `${prefix}local ${name} = ${emitExpr(node.value)}`;
   }
   return `${prefix}local ${name}`;
@@ -146,6 +169,134 @@ function emitConstDecl(node: ConstDecl, depth: number): string {
   const prefix = indent(depth);
   const name = escapeLuaReserved(node.name);
   return `${prefix}local ${name} = ${emitExpr(node.value)}`;
+}
+
+// ── Struct / Enum / Trait ────────────────────────────────────
+
+/**
+ * struct Position
+ *   x: Float = 0.0
+ *   y: Float = 0.0
+ * →
+ * function Position(x, y)
+ *   local self = {}
+ *   self.x = x or 0.0
+ *   self.y = y or 0.0
+ *   return self
+ * end
+ */
+function emitStructDecl(node: StructDecl): string {
+  const lines: string[] = [];
+  const name = node.name;
+  const params = node.fields.map((f) => escapeLuaReserved(f.name)).join(", ");
+
+  lines.push(`function ${name}(${params})`);
+
+  // Initialize fields
+  for (const field of node.fields) {
+    const fieldName = escapeLuaReserved(field.name);
+    if (field.defaultValue) {
+      lines.push(`${INDENT}local _${fieldName} = ${fieldName}`);
+      lines.push(`${INDENT}if _${fieldName} == nil then _${fieldName} = ${emitExpr(field.defaultValue)} end`);
+    }
+  }
+
+  // Build self table
+  if (node.fields.length > 0) {
+    const fieldInits = node.fields.map((f) => {
+      const n = escapeLuaReserved(f.name);
+      return f.defaultValue ? `${n} = _${n}` : `${n} = ${n}`;
+    });
+    lines.push(`${INDENT}local self = {${fieldInits.join(", ")}}`);
+  } else {
+    lines.push(`${INDENT}local self = {}`);
+  }
+
+  lines.push(`${INDENT}return self`);
+  lines.push("end");
+
+  // Emit methods as Name_methodName functions
+  for (const method of node.methods) {
+    lines.push("");
+    lines.push(emitFnDecl({ ...method, name: `${name}_${method.name}` }, 0));
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * enum Direction
+ *   Up
+ *   Down
+ * →
+ * Direction = {}
+ * Direction.Up = "Up"
+ * Direction.Down = "Down"
+ *
+ * enum State
+ *   Idle
+ *   Walking(speed: Float)
+ * →
+ * State = {}
+ * State.Idle = "Idle"
+ * function State.Walking(speed)
+ *   return {_type = "Walking", speed = speed}
+ * end
+ */
+function emitEnumDecl(node: EnumDecl): string {
+  const lines: string[] = [];
+  const name = node.name;
+
+  lines.push(`${name} = {}`);
+
+  for (const variant of node.variants) {
+    if (variant.fields.length === 0) {
+      // Simple variant: string constant
+      lines.push(`${name}.${variant.name} = "${variant.name}"`);
+    } else {
+      // Data variant: constructor function
+      const params = variant.fields.map((f) => escapeLuaReserved(f.name || `_${variant.fields.indexOf(f)}`)).join(", ");
+      const fieldInits = variant.fields.map((f) => {
+        const fieldName = escapeLuaReserved(f.name || `_${variant.fields.indexOf(f)}`);
+        return `${fieldName} = ${fieldName}`;
+      });
+      lines.push(`function ${name}.${variant.name}(${params})`);
+      lines.push(`${INDENT}return {_type = "${variant.name}", ${fieldInits.join(", ")}}`);
+      lines.push("end");
+    }
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * TraitDecl: skip in v0 (no runtime representation needed).
+ * Emit as a comment for documentation.
+ */
+function emitTraitDecl(node: TraitDecl): string {
+  return `-- trait ${node.name}`;
+}
+
+/**
+ * TraitImplDecl: emit methods as standalone functions.
+ * trait Drawable has Player
+ *   fn draw(p: Player)
+ *     ...
+ * →
+ * function Player_draw(p)
+ *   ...
+ * end
+ */
+function emitTraitImplDecl(node: TraitImplDecl): string {
+  const lines: string[] = [];
+
+  for (let i = 0; i < node.methods.length; i++) {
+    const method = node.methods[i];
+    if (i > 0) lines.push("");
+    lines.push(emitFnDecl({ ...method, name: `${node.targetType}_${method.name}` }, 0));
+  }
+
+  return lines.join("\n");
 }
 
 // ── Statements ──────────────────────────────────────────────
@@ -160,8 +311,15 @@ function emitStmt(stmt: Stmt, depth: number): string {
       return emitIfStmt(stmt, depth);
     case "ForStmt":
       return emitForStmt(stmt, depth);
+    case "MatchStmt":
+      return emitMatchStmt(stmt, depth);
     case "ReturnStmt":
       return emitReturnStmt(stmt, depth);
+    case "BreakStmt":
+      return `${indent(depth)}break`;
+    case "ContinueStmt":
+      // Lua doesn't have continue; skip for now
+      return `${indent(depth)}-- continue`;
     case "Assignment":
       return emitAssignment(stmt, depth);
     case "ExprStmt":
@@ -206,8 +364,15 @@ function emitForStmt(node: ForStmt, depth: number): string {
     const varName = escapeLuaReserved(variant.variable);
     const iterable = variant.iterable;
 
+    // Check for range operator: for i in 0..10
+    if (iterable.kind === "BinaryExpr" && iterable.op === "..") {
+      const start = emitExpr(iterable.left);
+      const end = iterable.right;
+      const upper = end.kind === "IntLiteral" ? String(end.value - 1) : `${emitExpr(end)} - 1`;
+      lines.push(`${prefix}for ${varName} = ${start}, ${upper} do`);
+    }
     // Check for range() pattern
-    if (
+    else if (
       iterable.kind === "CallExpr" &&
       iterable.callee.kind === "Identifier" &&
       iterable.callee.name === "range"
@@ -240,6 +405,77 @@ function emitForStmt(node: ForStmt, depth: number): string {
   lines.push(`${prefix}end`);
 
   return lines.join("\n");
+}
+
+function emitMatchStmt(node: MatchStmt, depth: number): string {
+  const prefix = indent(depth);
+  const lines: string[] = [];
+  const subject = emitExpr(node.subject);
+
+  let first = true;
+  let hasWildcard = false;
+
+  for (const arm of node.arms) {
+    if (arm.pattern.kind === "WildcardPattern") {
+      hasWildcard = true;
+      lines.push(`${prefix}else`);
+    } else {
+      const condition = emitPatternCondition(subject, arm.pattern);
+      const keyword = first ? "if" : "elseif";
+      lines.push(`${prefix}${keyword} ${condition} then`);
+      first = false;
+    }
+
+    for (const stmt of arm.body) {
+      lines.push(emitStmt(stmt, depth + 1));
+    }
+  }
+
+  lines.push(`${prefix}end`);
+  return lines.join("\n");
+}
+
+/** Emit `local name; if ... then name = ... elseif ... end` for match expressions. */
+function emitMatchExprAsDecl(name: string, node: MatchExpr, depth: number): string {
+  const prefix = indent(depth);
+  const lines: string[] = [];
+  const subject = emitExpr(node.subject);
+
+  lines.push(`${prefix}local ${name}`);
+
+  let first = true;
+  for (const arm of node.arms) {
+    if (arm.pattern.kind === "WildcardPattern") {
+      lines.push(`${prefix}else`);
+    } else {
+      const condition = emitPatternCondition(subject, arm.pattern);
+      const keyword = first ? "if" : "elseif";
+      lines.push(`${prefix}${keyword} ${condition} then`);
+      first = false;
+    }
+    // Each arm body should be a single ExprStmt — extract the value
+    if (arm.body.length === 1 && arm.body[0].kind === "ExprStmt") {
+      lines.push(`${indent(depth + 1)}${name} = ${emitExpr(arm.body[0].expr)}`);
+    } else {
+      for (const stmt of arm.body) {
+        lines.push(emitStmt(stmt, depth + 1));
+      }
+    }
+  }
+  lines.push(`${prefix}end`);
+
+  return lines.join("\n");
+}
+
+function emitPatternCondition(subject: string, pattern: MatchPattern): string {
+  switch (pattern.kind) {
+    case "LiteralPattern":
+      return `${subject} == ${emitExpr(pattern.value)}`;
+    case "IdentifierPattern":
+      return `${subject} == "${pattern.name}"`;
+    case "WildcardPattern":
+      return "true";
+  }
 }
 
 function emitReturnStmt(node: ReturnStmt, depth: number): string {
@@ -296,6 +532,12 @@ function emitExpr(expr: Expr): string {
       return `(${emitExpr(expr.expr)})`;
     case "ListLiteral":
       return `{${expr.elements.map(emitExpr).join(", ")}}`;
+    case "MapLiteral":
+      if (expr.entries.length === 0) return "{}";
+      return `{${expr.entries.map((e) => `[${emitExpr(e.key)}] = ${emitExpr(e.value)}`).join(", ")}}`;
+    case "MatchExpr":
+      // Fallback: shouldn't normally reach here (handled in emitLetDecl)
+      return `--[[ match expr ]]`;
   }
 }
 

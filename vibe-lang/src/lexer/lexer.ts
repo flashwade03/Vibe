@@ -23,6 +23,13 @@ const KEYWORDS: Record<string, TokenType> = {
   true: TokenType.KW_TRUE,
   false: TokenType.KW_FALSE,
   in: TokenType.KW_IN,
+  match: TokenType.KW_MATCH,
+  break: TokenType.KW_BREAK,
+  continue: TokenType.KW_CONTINUE,
+  struct: TokenType.KW_STRUCT,
+  enum: TokenType.KW_ENUM,
+  trait: TokenType.KW_TRAIT,
+  has: TokenType.KW_HAS,
 };
 
 // ── Public API ──────────────────────────────────────────────
@@ -367,8 +374,22 @@ class Lexer {
         }
         return;
       case ".":
+        if (next === ".") {
+          this.advance();
+          this.advance();
+          this.emit(TokenType.DOTDOT, "..", this.line, startCol);
+        } else {
+          this.advance();
+          this.emit(TokenType.DOT, ".", this.line, startCol);
+        }
+        return;
+      case "@":
         this.advance();
-        this.emit(TokenType.DOT, ".", this.line, startCol);
+        this.emit(TokenType.AT, "@", this.line, startCol);
+        return;
+      case "?":
+        this.advance();
+        this.emit(TokenType.QUESTION, "?", this.line, startCol);
         return;
       case ",":
         this.advance();
@@ -397,6 +418,16 @@ class Lexer {
         this.parenDepth = Math.max(0, this.parenDepth - 1);
         this.advance();
         this.emit(TokenType.RBRACKET, "]", this.line, startCol);
+        return;
+      case "{":
+        this.parenDepth++;
+        this.advance();
+        this.emit(TokenType.LBRACE, "{", this.line, startCol);
+        return;
+      case "}":
+        this.parenDepth = Math.max(0, this.parenDepth - 1);
+        this.advance();
+        this.emit(TokenType.RBRACE, "}", this.line, startCol);
         return;
       case "-":
         if (next === ">") {

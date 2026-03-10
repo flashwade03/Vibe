@@ -12,6 +12,16 @@ import type {
   ConstDecl,
   IfStmt,
   ForStmt,
+  MatchStmt,
+  MatchArm,
+  MatchExpr,
+  MapLiteral,
+  StructDecl,
+  StructField,
+  EnumDecl,
+  EnumVariant,
+  TraitDecl,
+  TraitImplDecl,
   Assignment,
   ExprStmt,
   Stmt,
@@ -616,5 +626,321 @@ describe("codegen", () => {
       loc,
     };
     expect(generate(ast)).toBe("load()");
+  });
+
+  // ── Match codegen tests ────────────────────────────────────
+
+  // 30. Match statement → if/elseif chain
+  it("30. match statement → if/elseif chain", () => {
+    const matchStmt: MatchStmt = {
+      kind: "MatchStmt",
+      subject: mkId("state"),
+      arms: [
+        {
+          pattern: { kind: "LiteralPattern", value: mkInt(1) },
+          body: [mkExprStmt(mkCall("foo", []))],
+          loc,
+        },
+        {
+          pattern: { kind: "LiteralPattern", value: mkInt(2) },
+          body: [mkExprStmt(mkCall("bar", []))],
+          loc,
+        },
+        {
+          pattern: { kind: "WildcardPattern" },
+          body: [mkExprStmt(mkCall("baz", []))],
+          loc,
+        },
+      ],
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [matchStmt],
+      loc,
+    });
+    expect(generate(ast)).toBe(
+      "function test()\n  if state == 1 then\n    foo()\n  elseif state == 2 then\n    bar()\n  else\n    baz()\n  end\nend"
+    );
+  });
+
+  // 31. Match statement with string patterns
+  it("31. match statement with string patterns", () => {
+    const matchStmt: MatchStmt = {
+      kind: "MatchStmt",
+      subject: mkId("dir"),
+      arms: [
+        {
+          pattern: { kind: "LiteralPattern", value: mkStr("up") },
+          body: [mkExprStmt(mkInt(1))],
+          loc,
+        },
+        {
+          pattern: { kind: "WildcardPattern" },
+          body: [mkExprStmt(mkInt(0))],
+          loc,
+        },
+      ],
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [matchStmt],
+      loc,
+    });
+    expect(generate(ast)).toBe(
+      'function test()\n  if dir == "up" then\n    1\n  else\n    0\n  end\nend'
+    );
+  });
+
+  // 32. Match expression → local + if/elseif
+  it("32. match expression as let value", () => {
+    const matchExpr: MatchExpr = {
+      kind: "MatchExpr",
+      subject: mkId("x"),
+      arms: [
+        {
+          pattern: { kind: "LiteralPattern", value: mkInt(1) },
+          body: [mkExprStmt(mkInt(10))],
+          loc,
+        },
+        {
+          pattern: { kind: "WildcardPattern" },
+          body: [mkExprStmt(mkInt(0))],
+          loc,
+        },
+      ],
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "LetDecl",
+      name: "result",
+      value: matchExpr,
+      loc,
+    });
+    expect(generate(ast)).toBe(
+      "local result\nif x == 1 then\n  result = 10\nelse\n  result = 0\nend"
+    );
+  });
+
+  // ── MapLiteral codegen tests ──────────────────────────────
+
+  // 33. Empty map literal → {}
+  it("33. empty map literal → {}", () => {
+    const ast = mkProgram({
+      kind: "LetDecl",
+      name: "m",
+      value: { kind: "MapLiteral", entries: [], loc } as MapLiteral,
+      loc,
+    });
+    expect(generate(ast)).toBe("local m = {}");
+  });
+
+  // 34. Map literal with entries → Lua table
+  it("34. map literal with entries → Lua table", () => {
+    const map: MapLiteral = {
+      kind: "MapLiteral",
+      entries: [
+        { key: mkStr("a"), value: mkInt(1) },
+        { key: mkStr("b"), value: mkInt(2) },
+      ],
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "LetDecl",
+      name: "m",
+      value: map,
+      loc,
+    });
+    expect(generate(ast)).toBe('local m = {["a"] = 1, ["b"] = 2}');
+  });
+
+  // ── Break / Continue codegen tests ─────────────────────────
+
+  // 35. Break → break
+  it("35. break → break", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [{ kind: "BreakStmt", loc } as Stmt],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  break\nend");
+  });
+
+  // 36. Continue → -- continue (Lua workaround)
+  it("36. continue → -- continue", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [{ kind: "ContinueStmt", loc } as Stmt],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  -- continue\nend");
+  });
+
+  // ── Struct codegen tests ──────────────────────────────────
+
+  // 37. Simple struct → constructor function
+  it("37. struct → constructor function", () => {
+    const ast = mkProgram({
+      kind: "StructDecl",
+      name: "Position",
+      traits: [],
+      fields: [
+        { name: "x", typeAnnotation: "Float", loc } as StructField,
+        { name: "y", typeAnnotation: "Float", loc } as StructField,
+      ],
+      methods: [],
+      annotations: [],
+      loc,
+    } as StructDecl);
+    expect(generate(ast)).toBe(
+      "function Position(x, y)\n  local self = {x = x, y = y}\n  return self\nend"
+    );
+  });
+
+  // 38. Struct with default values → nil-check
+  it("38. struct with defaults → nil-check pattern", () => {
+    const ast = mkProgram({
+      kind: "StructDecl",
+      name: "Player",
+      traits: [],
+      fields: [
+        { name: "health", typeAnnotation: "Int", defaultValue: mkInt(100), loc } as StructField,
+      ],
+      methods: [],
+      annotations: [],
+      loc,
+    } as StructDecl);
+    const result = generate(ast);
+    expect(result).toContain("function Player(health)");
+    expect(result).toContain("local _health = health");
+    expect(result).toContain("if _health == nil then _health = 100 end");
+    expect(result).toContain("local self = {health = _health}");
+    expect(result).toContain("return self");
+  });
+
+  // 39. Empty struct → empty self table
+  it("39. empty struct → empty self table", () => {
+    const ast = mkProgram({
+      kind: "StructDecl",
+      name: "Marker",
+      traits: [],
+      fields: [],
+      methods: [],
+      annotations: [],
+      loc,
+    } as StructDecl);
+    expect(generate(ast)).toBe(
+      "function Marker()\n  local self = {}\n  return self\nend"
+    );
+  });
+
+  // 40. Struct with method → Name_method standalone function
+  it("40. struct method → Name_method function", () => {
+    const ast = mkProgram({
+      kind: "StructDecl",
+      name: "Player",
+      traits: [],
+      fields: [
+        { name: "x", typeAnnotation: "Float", loc } as StructField,
+      ],
+      methods: [
+        {
+          kind: "FnDecl",
+          name: "move",
+          params: [mkParam("dx")],
+          body: [mkExprStmt(mkId("dx"))],
+          loc,
+        },
+      ],
+      annotations: [],
+      loc,
+    } as StructDecl);
+    const result = generate(ast);
+    expect(result).toContain("function Player(x)");
+    expect(result).toContain("function Player_move(dx)");
+  });
+
+  // ── Enum codegen tests ────────────────────────────────────
+
+  // 41. Simple enum → string constants
+  it("41. simple enum → string constants", () => {
+    const ast = mkProgram({
+      kind: "EnumDecl",
+      name: "Direction",
+      variants: [
+        { name: "Up", fields: [], loc } as EnumVariant,
+        { name: "Down", fields: [], loc } as EnumVariant,
+      ],
+      annotations: [],
+      loc,
+    } as EnumDecl);
+    expect(generate(ast)).toBe(
+      'Direction = {}\nDirection.Up = "Up"\nDirection.Down = "Down"'
+    );
+  });
+
+  // 42. Enum with data variant → constructor function
+  it("42. enum data variant → constructor function", () => {
+    const ast = mkProgram({
+      kind: "EnumDecl",
+      name: "State",
+      variants: [
+        { name: "Idle", fields: [], loc } as EnumVariant,
+        { name: "Walking", fields: [{ name: "speed", typeAnnotation: "Float" }], loc } as EnumVariant,
+      ],
+      annotations: [],
+      loc,
+    } as EnumDecl);
+    const result = generate(ast);
+    expect(result).toContain("State = {}");
+    expect(result).toContain('State.Idle = "Idle"');
+    expect(result).toContain("function State.Walking(speed)");
+    expect(result).toContain('{_type = "Walking", speed = speed}');
+  });
+
+  // ── Trait codegen tests ───────────────────────────────────
+
+  // 43. TraitDecl → comment only
+  it("43. trait decl → comment", () => {
+    const ast = mkProgram({
+      kind: "TraitDecl",
+      name: "Drawable",
+      supertraits: [],
+      methods: [],
+      annotations: [],
+      loc,
+    } as TraitDecl);
+    expect(generate(ast)).toBe("-- trait Drawable");
+  });
+
+  // 44. TraitImplDecl → Target_method standalone functions
+  it("44. trait impl → Target_method functions", () => {
+    const ast = mkProgram({
+      kind: "TraitImplDecl",
+      traitName: "Drawable",
+      targetType: "Player",
+      methods: [
+        {
+          kind: "FnDecl",
+          name: "draw",
+          params: [mkParam("p")],
+          body: [mkExprStmt(mkCall("draw_rect", [mkInt(0), mkInt(0), mkInt(32), mkInt(32)]))],
+          loc,
+        },
+      ],
+      loc,
+    } as TraitImplDecl);
+    const result = generate(ast);
+    expect(result).toContain("function Player_draw(p)");
+    expect(result).toContain('love.graphics.rectangle("fill", 0, 0, 32, 32)');
   });
 });
