@@ -1,4 +1,3 @@
--- Particle Burst: click to spawn 10 particles that spread outward
 let particle_xs: List[Float] = []
 let particle_ys: List[Float] = []
 let particle_vxs: List[Float] = []
@@ -17,13 +16,11 @@ fn mousepressed(mx: Float, my: Float, button: Int)
 
 fn update(dt: Float)
     for i in range(0, len(particle_xs))
-        if particle_lifes[i] > 0.0
-            particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
-            particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
-            particle_lifes[i] = particle_lifes[i] - dt
+        particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
+        particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
+        particle_lifes[i] = particle_lifes[i] - dt
 
 fn draw()
     for i in range(0, len(particle_xs))
         if particle_lifes[i] > 0.0
             draw_rect(particle_xs[i], particle_ys[i], 4.0, 4.0)
-    draw_text("Click to spawn particles", 10.0, 10.0)

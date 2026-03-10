@@ -18,26 +18,29 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Update position
     x += vx * dt
     y += vy * dt
 
+    # Collision with edges
     if x - radius <= 0:
         x = radius
-        vx = -vx
+        vx = abs(vx)
     elif x + radius >= 800:
         x = 800 - radius
-        vx = -vx
+        vx = -abs(vx)
 
     if y - radius <= 0:
         y = radius
-        vy = -vy
+        vy = abs(vy)
     elif y + radius >= 600:
         y = 600 - radius
-        vy = -vy
+        vy = -abs(vy)
 
+    # Draw
     screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), radius)
-
+    
     pygame.display.flip()
 
 pygame.quit()

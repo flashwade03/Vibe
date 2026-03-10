@@ -8,10 +8,10 @@ fn update(dt: Float)
     bx = bx + vx * dt
     by = by + vy * dt
 
-    if bx < radius or bx > 800.0 - radius
+    if bx - radius < 0.0 or bx + radius > 800.0
         vx = -vx
 
-    if by < radius or by > 600.0 - radius
+    if by - radius < 0.0 or by + radius > 600.0
         vy = -vy
 
 fn draw()

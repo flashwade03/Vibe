@@ -1,4 +1,3 @@
--- Score Counter: press spacebar to increment score
 let score: Int = 0
 
 fn keypressed(k: String)

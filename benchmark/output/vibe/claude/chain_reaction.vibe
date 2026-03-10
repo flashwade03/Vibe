@@ -1,4 +1,3 @@
--- Chain Reaction: click to trigger expanding circles that chain react
 let cx: List[Float] = []
 let cy: List[Float] = []
 let cstate: List[Float] = []
@@ -14,42 +13,38 @@ fn load()
         ctimer = ctimer + [0.0]
 
 fn mousepressed(mx: Float, my: Float, button: Int)
-    for i in range(0, len(cx))
+    for i in range(0, 30)
         if cstate[i] == 0.0
-            let dx: Float = mx - cx[i]
-            let dy: Float = my - cy[i]
-            let dist: Float = sqrt(dx * dx + dy * dy)
+            let ddx: Float = mx - cx[i]
+            let ddy: Float = my - cy[i]
+            let dist: Float = sqrt(ddx * ddx + ddy * ddy)
             if dist < 15.0
                 cstate[i] = 1.0
 
 fn update(dt: Float)
-    for i in range(0, len(cx))
+    for i in range(0, 30)
         if cstate[i] == 1.0
             cradius[i] = cradius[i] + 80.0 * dt
             ctimer[i] = ctimer[i] + dt
             if ctimer[i] > 1.0
                 cstate[i] = 2.0
-            -- Chain: trigger nearby idle circles
-            for j in range(0, len(cx))
+            for j in range(0, 30)
                 if cstate[j] == 0.0
-                    let dx: Float = cx[i] - cx[j]
-                    let dy: Float = cy[i] - cy[j]
-                    let dist: Float = sqrt(dx * dx + dy * dy)
+                    let ddx: Float = cx[i] - cx[j]
+                    let ddy: Float = cy[i] - cy[j]
+                    let dist: Float = sqrt(ddx * ddx + ddy * ddy)
                     if dist < cradius[i] + 15.0
                         cstate[j] = 1.0
 
 fn draw()
-    for i in range(0, len(cx))
+    let exploded: Int = 0
+    for i in range(0, 30)
         if cstate[i] == 0.0
             draw_circle(cx[i], cy[i], 15.0)
         else if cstate[i] == 1.0
             draw_circle(cx[i], cy[i], cradius[i])
         else
             draw_circle(cx[i], cy[i], 3.0)
-    -- Count exploded
-    let exploded: Int = 0
-    for i in range(0, len(cx))
         if cstate[i] > 0.0
             exploded = exploded + 1
-    draw_text("Exploded: " + str(exploded) + " / " + str(len(cx)), 10.0, 10.0)
-    draw_text("Click a circle to start!", 10.0, 35.0)
+    draw_text("Exploded: " + str(exploded), 10.0, 10.0)

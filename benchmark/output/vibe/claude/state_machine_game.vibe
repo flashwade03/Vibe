@@ -1,10 +1,8 @@
--- State Machine Game: menu, playing, gameover states
--- state: 0=menu, 1=playing, 2=gameover
 let state: Int = 0
 let score: Int = 0
 let timer: Float = 10.0
-let target_x: Float = 300.0
-let target_y: Float = 200.0
+let target_x: Float = 390.0
+let target_y: Float = 290.0
 
 fn keypressed(k: String)
     if k == "space"
@@ -36,7 +34,7 @@ fn draw()
     else if state == 1
         draw_rect(target_x, target_y, 20.0, 20.0)
         draw_text("Score: " + str(score), 10.0, 10.0)
-        draw_text("Time: " + str(int(timer)), 10.0, 35.0)
-    else
+        draw_text("Time: " + str(int(timer)), 10.0, 30.0)
+    else if state == 2
         draw_text("Game Over! Score: " + str(score), 250.0, 260.0)
         draw_text("Press SPACE to Restart", 250.0, 300.0)

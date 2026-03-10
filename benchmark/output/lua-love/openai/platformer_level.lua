@@ -20,15 +20,15 @@ function love.update(dt)
     local prev_y = player_y
 
     -- Horizontal movement
-    player_vx = 0
     if love.keyboard.isDown("left") then
         player_vx = -player_speed
-    end
-    if love.keyboard.isDown("right") then
+    elseif love.keyboard.isDown("right") then
         player_vx = player_speed
+    else
+        player_vx = 0
     end
 
-    -- Jumping
+    -- Jump
     if love.keyboard.isDown("up") and on_ground then
         player_vy = jump_velocity
         on_ground = false
@@ -41,17 +41,20 @@ function love.update(dt)
     player_x = player_x + player_vx * dt
     player_y = player_y + player_vy * dt
 
-    -- Collision detection
+    -- Collision detection with platforms
     on_ground = false
     for i = 1, #plat_xs do
-        if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and player_y + 20 >= plat_ys[i] and player_x + 20 > plat_xs[i] and player_x < plat_xs[i] + plat_ws[i] then
+        if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and
+           player_y + 20 >= plat_ys[i] and
+           player_x + 20 > plat_xs[i] and
+           player_x < plat_xs[i] + plat_ws[i] then
             player_y = plat_ys[i] - 20
             player_vy = 0
             on_ground = true
         end
     end
 
-    -- Ground collision
+    -- Check ground level
     if player_y + 20 >= 580 then
         player_y = 580 - 20
         player_vy = 0

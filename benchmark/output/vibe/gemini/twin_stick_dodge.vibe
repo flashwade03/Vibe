@@ -1,8 +1,79 @@
 let px: Float = 400.0
 let py: Float = 300.0
-let p_speed: Float = 300.0
-let p_radius: Float = 10.0
-
 let bx: List[Float] = []
 let by: List[Float] = []
 let bvx: List[Float] = []
+let bvy: List[Float] = []
+let blife: List[Float] = []
+let spawn_timer: Float = 0.3
+let survived_time: Float = 0.0
+let hit: Bool = false
+
+fn update(dt: Float)
+    if hit
+        return
+
+    survived_time = survived_time + dt
+
+    if key_down("left")
+        px = px - 300.0 * dt
+    if key_down("right")
+        px = px + 300.0 * dt
+    if key_down("up")
+        py = py - 300.0 * dt
+    if key_down("down")
+        py = py + 300.0 * dt
+
+    spawn_timer = spawn_timer - dt
+    if spawn_timer <= 0.0
+        spawn_timer = 0.3
+        let edge: Float = rand_float(0.0, 4.0)
+        let sx: Float = 0.0
+        let sy: Float = 0.0
+        if edge < 1.0
+            sx = rand_float(0.0, 800.0)
+            sy = 0.0
+        else if edge < 2.0
+            sx = 800.0
+            sy = rand_float(0.0, 600.0)
+        else if edge < 3.0
+            sx = rand_float(0.0, 800.0)
+            sy = 600.0
+        else
+            sx = 0.0
+            sy = rand_float(0.0, 600.0)
+
+        let dx: Float = px - sx
+        let dy: Float = py - sy
+        let dist: Float = sqrt(dx * dx + dy * dy)
+        if dist > 0.0
+            dx = dx / dist
+            dy = dy / dist
+
+        bx = bx + [sx]
+        by = by + [sy]
+        bvx = bvx + [dx * 250.0]
+        bvy = bvy + [dy * 250.0]
+        blife = blife + [4.0]
+
+    for i in range(0, len(bx))
+        if blife[i] > 0.0
+            bx[i] = bx[i] + bvx[i] * dt
+            by[i] = by[i] + bvy[i] * dt
+            blife[i] = blife[i] - dt
+
+            let cdx: Float = px - bx[i]
+            let cdy: Float = py - by[i]
+            let cdist: Float = sqrt(cdx * cdx + cdy * cdy)
+            if cdist < 13.0
+                hit = true
+
+fn draw()
+    if hit
+        draw_text("HIT! Time: " + str(int(survived_time)), 350.0, 300.0)
+    else
+        draw_circle(px, py, 10.0)
+        for i in range(0, len(bx))
+            if blife[i] > 0.0
+                draw_rect(bx[i] - 3.0, by[i] - 3.0, 6.0, 6.0)
+        draw_text("Time: " + str(int(survived_time)), 10.0, 10.0)

@@ -9,12 +9,12 @@ function love.update(dt)
     -- Update logic
 end
 
-function love.draw()
-    love.graphics.print("Score: " .. tostring(score), 10, 10)
-end
-
-function love.keypressed(key)
-    if key == "space" then
+function love.keypressed(k)
+    if k == "space" then
         score = score + 1
     end
+end
+
+function love.draw()
+    love.graphics.print("Score: " .. tostring(score), 10, 10)
 end

@@ -1,6 +1,6 @@
 let px: Float = 400.0
 let py: Float = 300.0
-let pspeed: Float = 250.0
+let player_speed: Float = 250.0
 let wave: Int = 1
 let spawn_timer: Float = 2.0
 let enemies_per_wave: Int = 3
@@ -17,44 +17,44 @@ fn update(dt: Float)
         return
 
     if key_down("right")
-        px = px + pspeed * dt
+        px = px + player_speed * dt
     if key_down("left")
-        px = px - pspeed * dt
+        px = px - player_speed * dt
     if key_down("down")
-        py = py + pspeed * dt
+        py = py + player_speed * dt
     if key_down("up")
-        py = py - pspeed * dt
+        py = py - player_speed * dt
 
     spawn_timer = spawn_timer - dt
     if spawn_timer <= 0.0
-        for i in range(0, enemies_per_wave)
+        for _ in range(0, enemies_per_wave)
             let edge = rand_float(0.0, 4.0)
-            let ex_pos: Float
-            let ey_pos: Float
+            let x: Float = 0.0
+            let y: Float = 0.0
             if edge < 1.0
-                ex_pos = rand_float(0.0, 800.0)
-                ey_pos = 0.0
+                x = rand_float(0.0, 800.0)
+                y = 0.0
             else if edge < 2.0
-                ex_pos = 800.0
-                ey_pos = rand_float(0.0, 600.0)
+                x = 800.0
+                y = rand_float(0.0, 600.0)
             else if edge < 3.0
-                ex_pos = rand_float(0.0, 800.0)
-                ey_pos = 600.0
+                x = rand_float(0.0, 800.0)
+                y = 600.0
             else
-                ex_pos = 0.0
-                ey_pos = rand_float(0.0, 600.0)
+                x = 0.0
+                y = rand_float(0.0, 600.0)
 
-            let dx = px - ex_pos
-            let dy = py - ey_pos
+            let dx = px - x
+            let dy = py - y
             let dist = sqrt(dx * dx + dy * dy)
             let speed = 80.0 + wave * 20.0
-            let evx_val = (dx / dist) * speed
-            let evy_val = (dy / dist) * speed
+            let vx = (dx / dist) * speed
+            let vy = (dy / dist) * speed
 
-            ex = ex + [ex_pos]
-            ey = ey + [ey_pos]
-            evx = evx + [evx_val]
-            evy = evy + [evy_val]
+            ex = ex + [x]
+            ey = ey + [y]
+            evx = evx + [vx]
+            evy = evy + [vy]
             elife = elife + [1.0]
 
         wave = wave + 1
@@ -74,12 +74,13 @@ fn update(dt: Float)
                 game_over = true
 
 fn draw()
-    draw_text("Wave: " + str(wave), 10.0, 10.0)
     draw_circle(px, py, 12.0)
 
     for i in range(0, len(ex))
         if elife[i] > 0.0
             draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)
+
+    draw_text("Wave: " + str(wave), 10.0, 10.0)
 
     if game_over
         draw_text("GAME OVER", 350.0, 290.0)

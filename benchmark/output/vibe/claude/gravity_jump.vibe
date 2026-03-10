@@ -1,26 +1,20 @@
--- Gravity Jump: player with gravity, press up to jump
 let x: Float = 384.0
 let y: Float = 550.0
 let vy: Float = 0.0
-let speed: Float = 200.0
-let gravity: Float = 500.0
 let on_ground: Bool = true
+let gravity: Float = 500.0
+let speed: Float = 200.0
 
 fn update(dt: Float)
-    -- Horizontal movement
     if key_down("left")
         x = x - speed * dt
     if key_down("right")
         x = x + speed * dt
-    -- Jump
-    if key_down("up")
-        if on_ground
-            vy = -300.0
-            on_ground = false
-    -- Apply gravity
+    if key_down("up") and on_ground
+        vy = -300.0
+        on_ground = false
     vy = vy + gravity * dt
     y = y + vy * dt
-    -- Ground collision
     if y >= 550.0
         y = 550.0
         vy = 0.0
@@ -28,4 +22,3 @@ fn update(dt: Float)
 
 fn draw()
     draw_rect(x, y, 32.0, 32.0)
-    draw_text("Press UP to jump", 10.0, 10.0)

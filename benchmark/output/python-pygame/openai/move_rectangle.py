@@ -3,7 +3,7 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Move Rectangle")
+pygame.display.set_caption("Vibe Rectangle")
 clock = pygame.time.Clock()
 
 x, y = 400.0 - 16, 300.0 - 16  # Center the rectangle

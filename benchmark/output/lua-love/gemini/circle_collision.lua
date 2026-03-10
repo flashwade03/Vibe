@@ -11,7 +11,7 @@ local hit = false
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Circle Collision")
+    love.window.setTitle("Vibe")
 end
 
 function love.update(dt)
@@ -34,7 +34,6 @@ function love.update(dt)
         local ex = enemy_xs[i]
         local ey = enemy_ys[i]
         local dist = math.sqrt((px - ex) * (px - ex) + (py - ey) * (py - ey))
-        
         if dist < (p_radius + e_radius) then
             hit = true
         end
@@ -42,15 +41,12 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", px, py, p_radius)
 
-    love.graphics.setColor(1, 0, 0)
     for i = 1, #enemy_xs do
         love.graphics.circle("fill", enemy_xs[i], enemy_ys[i], e_radius)
     end
 
-    love.graphics.setColor(1, 1, 1)
     if hit then
         love.graphics.print("Hit!", 10, 10)
     end

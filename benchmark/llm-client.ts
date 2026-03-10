@@ -40,7 +40,7 @@ async function callGemini(
     ],
     generationConfig: {
       temperature,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
     },
   };
 
@@ -82,7 +82,7 @@ async function callOpenAI(
       { role: "user", content: userPrompt },
     ],
     temperature,
-    max_tokens: 2048,
+    max_tokens: 4096,
   };
 
   const response = await fetch(url, {

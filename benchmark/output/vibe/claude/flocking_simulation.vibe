@@ -1,4 +1,3 @@
--- Flocking Simulation: 15 simplified boids with cohesion and separation
 let boid_xs: List[Float] = []
 let boid_ys: List[Float] = []
 let boid_vxs: List[Float] = []
@@ -12,37 +11,30 @@ fn load()
         boid_vys = boid_vys + [rand_float(-50.0, 50.0)]
 
 fn update(dt: Float)
-    -- Compute center of mass
-    let cx: Float = 0.0
-    let cy: Float = 0.0
+    let center_x: Float = 0.0
+    let center_y: Float = 0.0
     for i in range(0, 15)
-        cx = cx + boid_xs[i]
-        cy = cy + boid_ys[i]
-    cx = cx / 15.0
-    cy = cy / 15.0
-    -- Update each boid
+        center_x = center_x + boid_xs[i]
+        center_y = center_y + boid_ys[i]
+    center_x = center_x / 15.0
+    center_y = center_y / 15.0
     for i in range(0, 15)
-        -- Cohesion: steer toward center
-        boid_vxs[i] = boid_vxs[i] + (cx - boid_xs[i]) * 0.5 * dt
-        boid_vys[i] = boid_vys[i] + (cy - boid_ys[i]) * 0.5 * dt
-        -- Separation: push away from nearby boids
+        boid_vxs[i] = boid_vxs[i] + (center_x - boid_xs[i]) * 0.5 * dt
+        boid_vys[i] = boid_vys[i] + (center_y - boid_ys[i]) * 0.5 * dt
         for j in range(0, 15)
             if i != j
-                let dx: Float = boid_xs[i] - boid_xs[j]
-                let dy: Float = boid_ys[i] - boid_ys[j]
-                let dist: Float = sqrt(dx * dx + dy * dy)
-                if dist < 30.0 and dist > 0.1
-                    boid_vxs[i] = boid_vxs[i] + (dx / dist) * 100.0 * dt
-                    boid_vys[i] = boid_vys[i] + (dy / dist) * 100.0 * dt
-        -- Clamp speed
+                let sdx: Float = boid_xs[i] - boid_xs[j]
+                let sdy: Float = boid_ys[i] - boid_ys[j]
+                let sdist: Float = sqrt(sdx * sdx + sdy * sdy)
+                if sdist < 30.0 and sdist > 0.1
+                    boid_vxs[i] = boid_vxs[i] + (sdx / sdist) * 100.0 * dt
+                    boid_vys[i] = boid_vys[i] + (sdy / sdist) * 100.0 * dt
         let spd: Float = sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
         if spd > 150.0
             boid_vxs[i] = boid_vxs[i] / spd * 150.0
             boid_vys[i] = boid_vys[i] / spd * 150.0
-        -- Move
         boid_xs[i] = boid_xs[i] + boid_vxs[i] * dt
         boid_ys[i] = boid_ys[i] + boid_vys[i] * dt
-        -- Wrap edges
         if boid_xs[i] > 800.0
             boid_xs[i] = 0.0
         if boid_xs[i] < 0.0
@@ -55,4 +47,3 @@ fn update(dt: Float)
 fn draw()
     for i in range(0, 15)
         draw_rect(boid_xs[i], boid_ys[i], 4.0, 4.0)
-    draw_text("Boids: 15", 10.0, 10.0)

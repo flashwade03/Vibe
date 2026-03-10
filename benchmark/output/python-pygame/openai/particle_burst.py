@@ -30,10 +30,16 @@ def mousepressed(mx, my, button):
         particle_lifes.append(2.0)
 
 def update(dt):
-    for i in range(len(particle_xs)):
+    for i in range(len(particle_xs) - 1, -1, -1):
         particle_xs[i] += particle_vxs[i] * dt
         particle_ys[i] += particle_vys[i] * dt
         particle_lifes[i] -= dt
+        if particle_lifes[i] <= 0.0:
+            del particle_xs[i]
+            del particle_ys[i]
+            del particle_vxs[i]
+            del particle_vys[i]
+            del particle_lifes[i]
 
 def draw():
     for i in range(len(particle_xs)):

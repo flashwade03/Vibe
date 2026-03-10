@@ -29,11 +29,11 @@ function love.update(dt)
     -- Enemy movement
     local dx = player_x - enemy_x
     local dy = player_y - enemy_y
-    local distance = math.sqrt(dx * dx + dy * dy)
+    local dist = math.sqrt(dx * dx + dy * dy)
 
-    if distance > 1.0 then
-        local nx = dx / distance
-        local ny = dy / distance
+    if dist > 1.0 then
+        local nx = dx / dist
+        local ny = dy / dist
         enemy_x = enemy_x + nx * enemy_speed * dt
         enemy_y = enemy_y + ny * enemy_speed * dt
     end
@@ -47,7 +47,7 @@ function love.draw()
     -- Draw player (blue)
     love.graphics.setColor(0, 0, 1)
     love.graphics.rectangle("fill", player_x, player_y, 32, 32)
-    
-    -- Reset color to default
+
+    -- Reset color to white
     love.graphics.setColor(1, 1, 1)
 end

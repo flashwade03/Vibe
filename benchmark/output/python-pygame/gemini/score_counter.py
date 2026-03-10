@@ -6,8 +6,13 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Score Counter")
 clock = pygame.time.Clock()
 
-font = pygame.font.Font(None, 36)
 score = 0
+font = pygame.font.Font(None, 36)
+
+def keypressed(k: str):
+    global score
+    if k == "space":
+        score += 1
 
 running = True
 while running:
@@ -18,12 +23,12 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                score += 1
+                keypressed("space")
 
     screen.fill((0, 0, 0))
     
-    text = font.render("Score: " + str(score), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
 
     pygame.display.flip()
 

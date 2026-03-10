@@ -6,4 +6,6 @@ let initialized: Bool = false
 
 fn load()
     for i in range(0, 15)
-        b
+        boid_xs = boid_xs + [rand_float(0.0, 800.0)]
+        boid_ys = boid_ys + [rand_float(0.0, 600.0)]
+        boid_vxs = boid_vxs + [rand_float(-50.0, 50.0)]

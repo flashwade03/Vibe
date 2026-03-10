@@ -1,4 +1,3 @@
--- Countdown Timer: counts down from 30 seconds
 let timer: Float = 30.0
 
 fn update(dt: Float)
@@ -9,6 +8,6 @@ fn update(dt: Float)
 
 fn draw()
     if timer > 0.0
-        draw_text("Time: " + str(int(timer) + 1), 350.0, 280.0)
+        draw_text("Time: " + str(int(timer)), 350.0, 280.0)
     else
         draw_text("Time Up!", 330.0, 280.0)

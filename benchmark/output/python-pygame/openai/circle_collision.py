@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Program")
+pygame.display.set_caption("Vibe Game")
 clock = pygame.time.Clock()
 
 # Player state
@@ -37,8 +37,7 @@ def update(dt):
         player_y += player_speed * dt
 
     for ex, ey in zip(enemy_xs, enemy_ys):
-        distance = math.sqrt((player_x - ex) ** 2 + (player_y - ey) ** 2)
-        if distance < player_radius + enemy_radius:
+        if math.sqrt((player_x - ex) ** 2 + (player_y - ey) ** 2) < player_radius + enemy_radius:
             hit = True
 
 def draw():

@@ -6,9 +6,10 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Bouncing Ball")
 clock = pygame.time.Clock()
 
-ball_pos = [400.0, 300.0]
-ball_velocity = [150.0, 150.0]
-ball_radius = 16
+# Ball properties
+x, y = 400.0, 300.0
+radius = 16
+velocity_x, velocity_y = 150, 150
 
 running = True
 while running:
@@ -19,17 +20,17 @@ while running:
             running = False
 
     # Update ball position
-    ball_pos[0] += ball_velocity[0] * dt
-    ball_pos[1] += ball_velocity[1] * dt
+    x += velocity_x * dt
+    y += velocity_y * dt
 
-    # Check for collision with window edges and bounce
-    if ball_pos[0] - ball_radius < 0 or ball_pos[0] + ball_radius > 800:
-        ball_velocity[0] = -ball_velocity[0]
-    if ball_pos[1] - ball_radius < 0 or ball_pos[1] + ball_radius > 600:
-        ball_velocity[1] = -ball_velocity[1]
+    # Bounce off the edges
+    if x - radius < 0 or x + radius > 800:
+        velocity_x = -velocity_x
+    if y - radius < 0 or y + radius > 600:
+        velocity_y = -velocity_y
 
     screen.fill((0, 0, 0))
-    pygame.draw.circle(screen, (255, 255, 255), (int(ball_pos[0]), int(ball_pos[1])), ball_radius)
+    pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), radius)
     pygame.display.flip()
 
 pygame.quit()

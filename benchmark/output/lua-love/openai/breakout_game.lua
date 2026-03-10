@@ -5,6 +5,9 @@ local ball_y = 400
 local ball_radius = 6
 local ball_vx = 200
 local ball_vy = -200
+local brick_width = 90
+local brick_height = 20
+local bricks = {}
 local brick_alive = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}
 local score = 0
 local game_over = false
@@ -12,6 +15,9 @@ local game_over = false
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Breakout")
+    for i = 0, 7 do
+        table.insert(bricks, {x = i * 100 + 5, y = 50})
+    end
 end
 
 function love.update(dt)
@@ -24,6 +30,7 @@ function love.update(dt)
     if love.keyboard.isDown("right") then
         paddle_x = paddle_x + paddle_speed * dt
     end
+    paddle_x = math.max(0, math.min(720, paddle_x))
 
     -- Ball movement
     ball_x = ball_x + ball_vx * dt
@@ -43,11 +50,11 @@ function love.update(dt)
     end
 
     -- Ball collision with bricks
-    for i = 0, 7 do
-        if brick_alive[i + 1] == 1.0 then
-            local brick_x = i * 100 + 5
-            if ball_x >= brick_x and ball_x <= brick_x + 90 and ball_y >= 50 and ball_y <= 70 then
-                brick_alive[i + 1] = 0.0
+    for i, brick in ipairs(bricks) do
+        if brick_alive[i] == 1.0 then
+            if ball_x > brick.x and ball_x < brick.x + brick_width and
+               ball_y > brick.y and ball_y < brick.y + brick_height then
+                brick_alive[i] = 0.0
                 ball_vy = -ball_vy
                 score = score + 1
             end
@@ -68,9 +75,9 @@ function love.draw()
     love.graphics.circle("fill", ball_x, ball_y, ball_radius)
 
     -- Draw bricks
-    for i = 0, 7 do
-        if brick_alive[i + 1] == 1.0 then
-            love.graphics.rectangle("fill", i * 100 + 5, 50, 90, 20)
+    for i, brick in ipairs(bricks) do
+        if brick_alive[i] == 1.0 then
+            love.graphics.rectangle("fill", brick.x, brick.y, brick_width, brick_height)
         end
     end
 

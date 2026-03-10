@@ -8,9 +8,9 @@ pygame.display.set_caption("Player and Enemy")
 clock = pygame.time.Clock()
 
 player_x, player_y = 400.0, 300.0
-enemy_x, enemy_y = 100.0, 100.0
-
 player_speed = 200.0
+
+enemy_x, enemy_y = 100.0, 100.0
 enemy_speed = 100.0
 
 running = True
@@ -33,11 +33,13 @@ while running:
 
     dx = player_x - enemy_x
     dy = player_y - enemy_y
-    dist = math.sqrt(dx * dx + dy * dy)
+    distance = math.sqrt(dx * dx + dy * dy)
     
-    if dist > 1.0:
-        enemy_x += (dx / dist) * enemy_speed * dt
-        enemy_y += (dy / dist) * enemy_speed * dt
+    if distance > 1.0:
+        dx /= distance
+        dy /= distance
+        enemy_x += dx * enemy_speed * dt
+        enemy_y += dy * enemy_speed * dt
 
     screen.fill((0, 0, 0))
     

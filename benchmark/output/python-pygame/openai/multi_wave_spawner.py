@@ -5,7 +5,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Game")
+pygame.display.set_caption("Vibe Wave Spawner")
 clock = pygame.time.Clock()
 
 # Player variables
@@ -27,26 +27,28 @@ def rand_float(min_val, max_val):
 
 def spawn_enemies():
     global wave, enemies_per_wave, spawn_timer
-    speed = 80 + wave * 20
     for _ in range(enemies_per_wave):
         edge = rand_float(0.0, 4.0)
         if 0 <= edge < 1:
-            x, y = rand_float(0, 800), 0
+            ex.append(rand_float(0, 800))
+            ey.append(0)
         elif 1 <= edge < 2:
-            x, y = 800, rand_float(0, 600)
+            ex.append(800)
+            ey.append(rand_float(0, 600))
         elif 2 <= edge < 3:
-            x, y = rand_float(0, 800), 600
+            ex.append(rand_float(0, 800))
+            ey.append(600)
         else:
-            x, y = 0, rand_float(0, 600)
+            ex.append(0)
+            ey.append(rand_float(0, 600))
 
-        direction_x = player_x - x
-        direction_y = player_y - y
-        length = math.sqrt(direction_x ** 2 + direction_y ** 2)
+        direction_x = player_x - ex[-1]
+        direction_y = player_y - ey[-1]
+        length = math.sqrt(direction_x**2 + direction_y**2)
         direction_x /= length
         direction_y /= length
 
-        ex.append(x)
-        ey.append(y)
+        speed = 80 + wave * 20
         evx.append(direction_x * speed)
         evy.append(direction_y * speed)
         elife.append(1.0)
@@ -79,12 +81,12 @@ while running:
             spawn_enemies()
 
         for i in range(len(ex)):
-            if elife[i] > 0:
-                ex[i] += evx[i] * dt
-                ey[i] += evy[i] * dt
-                elife[i] -= dt
+            ex[i] += evx[i] * dt
+            ey[i] += evy[i] * dt
+            elife[i] -= dt
 
-                distance = math.sqrt((player_x - ex[i]) ** 2 + (player_y - ey[i]) ** 2)
+            if elife[i] > 0:
+                distance = math.sqrt((player_x - ex[i])**2 + (player_y - ey[i])**2)
                 if distance < player_radius + 8:
                     game_over = True
 

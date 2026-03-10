@@ -1,12 +1,12 @@
 let state: Int = 0
 let score: Int = 0
 let timer: Float = 10.0
-let target_x: Float = rand_float(0.0, 780.0)
-let target_y: Float = rand_float(0.0, 580.0)
+let target_x: Float = 0.0
+let target_y: Float = 0.0
 
 fn update(dt: Float)
     if state == 1
-        timer -= dt
+        timer = timer - dt
         if timer <= 0.0
             state = 2
 
@@ -35,6 +35,6 @@ fn keypressed(k: String)
 fn mousepressed(mx: Float, my: Float, button: Int)
     if state == 1
         if mx >= target_x and mx <= target_x + 20.0 and my >= target_y and my <= target_y + 20.0
-            score += 1
+            score = score + 1
             target_x = rand_float(0.0, 780.0)
             target_y = rand_float(0.0, 580.0)

@@ -10,18 +10,19 @@ fn update(dt: Float)
     hit = false
 
     if key_down("right")
-        px = px + speed * dt
+        px += speed * dt
     if key_down("left")
-        px = px - speed * dt
+        px -= speed * dt
     if key_down("down")
-        py = py + speed * dt
+        py += speed * dt
     if key_down("up")
-        py = py - speed * dt
+        py -= speed * dt
 
     for i in range(0, len(enemy_xs))
         let ex = enemy_xs[i]
         let ey = enemy_ys[i]
-        if sqrt((px - ex)*(px - ex) + (py - ey)*(py - ey)) < 35.0
+        let distance = sqrt((px - ex) * (px - ex) + (py - ey) * (py - ey))
+        if distance < 35.0
             hit = true
 
 fn draw()

@@ -1,4 +1,3 @@
--- Position Display: 64x64 rect at center, moves with arrows, shows position
 let x: Float = 400.0
 let y: Float = 300.0
 let speed: Float = 100.0

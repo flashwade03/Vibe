@@ -1,4 +1,3 @@
-```lua
 local snake_xs = {400.0, 380.0, 360.0}
 local snake_ys = {300.0, 300.0, 300.0}
 local dir_x = 1.0
@@ -8,6 +7,22 @@ local move_timer = 0.15
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Snake")
+end
+
+function love.keypressed(key)
+    if key == "right" and dir_x ~= -1.0 then
+        dir_x = 1.0
+        dir_y = 0.0
+    elseif key == "left" and dir_x ~= 1.0 then
+        dir_x = -1.0
+        dir_y = 0.0
+    elseif key == "up" and dir_y ~= 1.0 then
+        dir_x = 0.0
+        dir_y = -1.0
+    elseif key == "down" and dir_y ~= -1.0 then
+        dir_x = 0.0
+        dir_y = 1.0
+    end
 end
 
 function love.update(dt)
@@ -41,8 +56,8 @@ function love.update(dt)
     end
 end
 
-function love.keypressed(key)
-    if key == "right" and dir_x ~= -1.0 then
-        dir_x = 1.0
-        dir_y = 0.0
-    elseif key == "left
+function love.draw()
+    for i = 1, #snake_xs do
+        love.graphics.rectangle("fill", snake_xs[i], snake_ys[i], 18, 18)
+    end
+end

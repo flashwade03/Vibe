@@ -7,17 +7,17 @@ fn update(dt: Float)
         orb_angles[i] = orb_angles[i] + orb_speeds[i] * dt
 
 fn draw()
-    draw_circle(400.0, 300.0, 20.0)
+    draw_circle(400.0, 300.0, 20.0)  -- Draw the sun
 
     for i in range(3)
         let x = 400.0 + cos(orb_angles[i]) * orb_radii[i]
         let y = 300.0 + sin(orb_angles[i]) * orb_radii[i]
-        draw_circle(x, y, 10.0)
+        draw_circle(x, y, 10.0)  -- Draw the orbiting body
 
         for j in range(36)
             let angle = float(j) * 0.1745
             let px = 400.0 + cos(angle) * orb_radii[i]
             let py = 300.0 + sin(angle) * orb_radii[i]
-            draw_circle(px, py, 1.0)
+            draw_circle(px, py, 1.0)  -- Draw the orbit path
 
     draw_text("Angle: " + str(orb_angles[0]), 10.0, 10.0)

@@ -1,10 +1,10 @@
 local player_x = 384
 local player_y = 550
 local player_speed = 200
+local bullet_speed = 300
 
 local bullet_xs = {}
 local bullet_ys = {}
-local bullet_speed = 300
 
 function love.load()
     love.window.setMode(800, 600)

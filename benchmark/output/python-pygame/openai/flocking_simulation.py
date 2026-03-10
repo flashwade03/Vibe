@@ -8,6 +8,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Boids Simulation")
 clock = pygame.time.Clock()
 
+# Boid data
 boid_xs = []
 boid_ys = []
 boid_vxs = []
@@ -29,7 +30,7 @@ def update(dt):
     center_y = sum(boid_ys) / 15
 
     for i in range(15):
-        # Cohesion: steer towards center of mass
+        # Cohesion: steer towards center
         boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
 
@@ -43,8 +44,8 @@ def update(dt):
                     boid_vxs[i] += (dx / distance) * 100.0 * dt
                     boid_vys[i] += (dy / distance) * 100.0 * dt
 
-        # Clamp speed
-        speed = math.sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
+        # Limit speed
+        speed = math.sqrt(boid_vxs[i] ** 2 + boid_vys[i] ** 2)
         if speed > 150.0:
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
             boid_vys[i] = (boid_vys[i] / speed) * 150.0
@@ -54,15 +55,8 @@ def update(dt):
         boid_ys[i] += boid_vys[i] * dt
 
         # Wrap around screen edges
-        if boid_xs[i] < 0:
-            boid_xs[i] += 800
-        elif boid_xs[i] > 800:
-            boid_xs[i] -= 800
-
-        if boid_ys[i] < 0:
-            boid_ys[i] += 600
-        elif boid_ys[i] > 600:
-            boid_ys[i] -= 600
+        boid_xs[i] %= 800
+        boid_ys[i] %= 600
 
 def draw():
     for i in range(15):

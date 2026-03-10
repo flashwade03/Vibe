@@ -1,10 +1,9 @@
-```python
 import pygame
 import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Shooter")
+pygame.display.set_caption("Shooter")
 clock = pygame.time.Clock()
 
 player_x = 384.0
@@ -33,4 +32,16 @@ while running:
         player_x += player_speed * dt
 
     for i in range(len(bullet_ys)):
-        bullet_ys[
+        bullet_ys[i] -= 300.0 * dt
+
+    screen.fill((0, 0, 0))
+
+    pygame.draw.rect(screen, (255, 255, 255), (int(player_x), int(player_y), 32, 32))
+
+    for i in range(len(bullet_xs)):
+        pygame.draw.rect(screen, (255, 255, 255), (int(bullet_xs[i] - 2), int(bullet_ys[i]), 4, 4))
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()

@@ -1,20 +1,19 @@
-```python
 import pygame
 import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Program")
+pygame.display.set_caption("Vibe")
 clock = pygame.time.Clock()
+
 font = pygame.font.Font(None, 36)
 
-def draw_text(text, x, y):
+def draw_text(surface, text, pos_x, pos_y):
     text_surface = font.render(text, True, (255, 255, 255))
-    screen.blit(text_surface, (x, y))
+    surface.blit(text_surface, (pos_x, pos_y))
 
 # Center of 800x600 for a 64x64 rectangle
-x = 368.0
-y = 268.0
+x, y = 368.0, 268.0
 speed = 100.0
 
 running = True
@@ -32,4 +31,17 @@ while running:
         x += speed * dt
     if keys[pygame.K_UP]:
         y -= speed * dt
-    if keys[pygame.K_DOWN
+    if keys[pygame.K_DOWN]:
+        y += speed * dt
+
+    screen.fill((0, 0, 0))
+    
+    pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 64, 64))
+    
+    pos_text = "x: " + str(x) + " y: " + str(y)
+    draw_text(screen, pos_text, 10, 10)
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()

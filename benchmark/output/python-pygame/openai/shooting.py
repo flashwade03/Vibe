@@ -6,14 +6,14 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Game")
 clock = pygame.time.Clock()
 
-# Player state
+# Player variables
 player_x, player_y = 384.0, 550.0
 player_speed = 200
 
-# Bullet state
-bullet_speed = 300
+# Bullet variables
 bullet_xs = []
 bullet_ys = []
+bullet_speed = 300
 
 running = True
 while running:
@@ -22,23 +22,26 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bullet_xs.append(player_x + 16)  # Center of the player
+                bullet_ys.append(player_y)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player_x -= player_speed * dt
     if keys[pygame.K_RIGHT]:
         player_x += player_speed * dt
-    if keys[pygame.K_SPACE]:
-        bullet_xs.append(player_x + 16)  # Center of the player
-        bullet_ys.append(player_y)
 
-    # Update bullets
+    # Update bullet positions
     for i in range(len(bullet_ys)):
         bullet_ys[i] -= bullet_speed * dt
 
     screen.fill((0, 0, 0))
+
     # Draw player
     pygame.draw.rect(screen, (255, 255, 255), (int(player_x), int(player_y), 32, 32))
+
     # Draw bullets
     for x, y in zip(bullet_xs, bullet_ys):
         pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 4, 4))

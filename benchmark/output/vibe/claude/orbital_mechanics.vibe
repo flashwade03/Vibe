@@ -1,4 +1,3 @@
--- Orbital Mechanics: 3 bodies orbiting a central point
 let orb_angles: List[Float] = [0.0, 2.094, 4.189]
 let orb_radii: List[Float] = [100.0, 160.0, 220.0]
 let orb_speeds: List[Float] = [1.5, 1.0, 0.6]
@@ -8,18 +7,14 @@ fn update(dt: Float)
         orb_angles[i] = orb_angles[i] + orb_speeds[i] * dt
 
 fn draw()
-    -- Draw sun at center
     draw_circle(400.0, 300.0, 20.0)
-    -- Draw orbits and bodies
     for i in range(0, 3)
-        -- Draw orbit path
         for j in range(0, 36)
-            let a: Float = float(j) * 0.1745
-            let px: Float = 400.0 + cos(a) * orb_radii[i]
-            let py: Float = 300.0 + sin(a) * orb_radii[i]
-            draw_circle(px, py, 1.0)
-        -- Draw orbiting body
-        let ox: Float = 400.0 + cos(orb_angles[i]) * orb_radii[i]
-        let oy: Float = 300.0 + sin(orb_angles[i]) * orb_radii[i]
-        draw_circle(ox, oy, 10.0)
+            let angle: Float = float(j) * 0.1745
+            let opx: Float = 400.0 + cos(angle) * orb_radii[i]
+            let opy: Float = 300.0 + sin(angle) * orb_radii[i]
+            draw_circle(opx, opy, 1.0)
+        let bx: Float = 400.0 + cos(orb_angles[i]) * orb_radii[i]
+        let by: Float = 300.0 + sin(orb_angles[i]) * orb_radii[i]
+        draw_circle(bx, by, 10.0)
     draw_text("Angle: " + str(orb_angles[0]), 10.0, 10.0)

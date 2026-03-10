@@ -1,4 +1,3 @@
-```python
 import pygame
 import sys
 import math
@@ -33,4 +32,18 @@ while running:
         for j in range(36):
             angle = float(j) * 0.1745
             px = 400.0 + math.cos(angle) * orb_radii[i]
-            py = 300.0 + math.sin(angle) * orb
+            py = 300.0 + math.sin(angle) * orb_radii[i]
+            pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), 1)
+
+    for i in range(3):
+        x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
+        y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
+        pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 10)
+
+    text = font.render("Angle: " + str(orb_angles[0]), True, (255, 255, 255))
+    screen.blit(text, (10, 10))
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()

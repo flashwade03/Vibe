@@ -17,7 +17,7 @@ end
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     if timer > 0 then
-        love.graphics.print(tostring(math.floor(timer)), 350, 280)
+        love.graphics.print("Time: " .. tostring(math.floor(timer)), 350, 280)
     else
         love.graphics.print("Time Up!", 330, 280)
     end

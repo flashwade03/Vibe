@@ -1,12 +1,12 @@
 local x = 400
 local y = 300
+local radius = 16
 local vx = 150
 local vy = 150
-local radius = 16
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Bouncing Ball")
+    love.window.setTitle("Vibe")
 end
 
 function love.update(dt)

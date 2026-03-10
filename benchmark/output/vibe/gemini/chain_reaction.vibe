@@ -3,8 +3,54 @@ let cy: List[Float] = []
 let cstate: List[Float] = []
 let cradius: List[Float] = []
 let ctimer: List[Float] = []
-let loaded: Bool = false
+let init: Bool = false
 
-fn load()
-    for i in range(0, 30)
-        cx = cx
+fn update(dt: Float)
+    if not init
+        for i in range(0, 30)
+            cx = cx + [rand_float(50.0, 750.0)]
+            cy = cy + [rand_float(50.0, 550.0)]
+            cstate = cstate + [0.0]
+            cradius = cradius + [15.0]
+            ctimer = ctimer + [0.0]
+        init = true
+
+    for i in range(0, len(cx))
+        if cstate[i] == 1.0
+            cradius[i] = cradius[i] + 80.0 * dt
+            ctimer[i] = ctimer[i] + dt
+            if ctimer[i] > 1.0
+                cstate[i] = 2.0
+            for j in range(0, len(cx))
+                if cstate[j] == 0.0
+                    let dx = cx[i] - cx[j]
+                    let dy = cy[i] - cy[j]
+                    let dist = sqrt(dx * dx + dy * dy)
+                    if dist < cradius[i] + 15.0
+                        cstate[j] = 1.0
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    let min_d: Float = 15.0
+    let best: Int = -1
+    for i in range(0, len(cx))
+        let dx = cx[i] - mx
+        let dy = cy[i] - my
+        let dist = sqrt(dx * dx + dy * dy)
+        if dist <= min_d
+            min_d = dist
+            best = i
+    if best >= 0
+        cstate[best] = 1.0
+
+fn draw()
+    let count: Int = 0
+    for i in range(0, len(cx))
+        if cstate[i] > 0.0
+            count = count + 1
+        if cstate[i] == 0.0
+            draw_circle(cx[i], cy[i], 15.0)
+        else if cstate[i] == 1.0
+            draw_circle(cx[i], cy[i], cradius[i])
+        else if cstate[i] == 2.0
+            draw_circle(cx[i], cy[i], 3.0)
+    draw_text("Exploded: " + str(count), 10.0, 10.0)

@@ -1,72 +1,45 @@
--- Breakout Game: paddle, bouncing ball, row of bricks
 let paddle_x: Float = 360.0
-let paddle_w: Float = 80.0
 let paddle_speed: Float = 300.0
-
-let ball_x: Float = 400.0
-let ball_y: Float = 400.0
-let ball_vx: Float = 200.0
-let ball_vy: Float = -200.0
-let ball_r: Float = 6.0
-
--- 8 bricks in a row
-let brick_xs: List[Float] = [5.0, 105.0, 205.0, 305.0, 405.0, 505.0, 605.0, 705.0]
+let bx: Float = 400.0
+let by: Float = 400.0
+let bvx: Float = 200.0
+let bvy: Float = -200.0
 let brick_alive: List[Float] = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-let brick_w: Float = 90.0
-let brick_h: Float = 20.0
-let brick_y: Float = 50.0
-
+let brick_xs: List[Float] = [5.0, 105.0, 205.0, 305.0, 405.0, 505.0, 605.0, 705.0]
 let score: Int = 0
 let game_over: Bool = false
 
 fn update(dt: Float)
     if game_over
         return
-    -- Move paddle
     if key_down("left")
         paddle_x = paddle_x - paddle_speed * dt
     if key_down("right")
         paddle_x = paddle_x + paddle_speed * dt
-    if paddle_x < 0.0
-        paddle_x = 0.0
-    if paddle_x > 800.0 - paddle_w
-        paddle_x = 800.0 - paddle_w
-    -- Move ball
-    ball_x = ball_x + ball_vx * dt
-    ball_y = ball_y + ball_vy * dt
-    -- Side wall bounce
-    if ball_x < ball_r or ball_x > 794.0
-        ball_vx = -ball_vx
-    -- Top wall bounce
-    if ball_y < ball_r
-        ball_vy = -ball_vy
-    -- Paddle collision
-    if ball_vy > 0.0
-        if ball_y + ball_r >= 570.0 and ball_y + ball_r <= 585.0
-            if ball_x >= paddle_x and ball_x <= paddle_x + paddle_w
-                ball_vy = -ball_vy
-    -- Ball falls below screen
-    if ball_y > 600.0
+    bx = bx + bvx * dt
+    by = by + bvy * dt
+    if bx < 6.0 or bx > 794.0
+        bvx = -bvx
+    if by < 6.0
+        bvy = -bvy
+    if by >= 564.0 and bx >= paddle_x and bx <= paddle_x + 80.0
+        bvy = -bvy
+        by = 564.0
+    if by > 600.0
         game_over = true
-    -- Brick collisions
-    for i in range(0, len(brick_xs))
+    for i in range(0, 8)
         if brick_alive[i] > 0.0
-            if ball_x >= brick_xs[i] and ball_x <= brick_xs[i] + brick_w
-                if ball_y >= brick_y and ball_y <= brick_y + brick_h
-                    brick_alive[i] = 0.0
-                    ball_vy = -ball_vy
-                    score = score + 1
+            if bx >= brick_xs[i] and bx <= brick_xs[i] + 90.0 and by >= 50.0 and by <= 70.0
+                brick_alive[i] = 0.0
+                bvy = -bvy
+                score = score + 1
 
 fn draw()
-    -- Paddle
-    draw_rect(paddle_x, 570.0, paddle_w, 12.0)
-    -- Ball
-    draw_circle(ball_x, ball_y, ball_r)
-    -- Bricks
-    for i in range(0, len(brick_xs))
+    draw_rect(paddle_x, 570.0, 80.0, 12.0)
+    draw_circle(bx, by, 6.0)
+    for i in range(0, 8)
         if brick_alive[i] > 0.0
-            draw_rect(brick_xs[i], brick_y, brick_w, brick_h)
-    -- Score
+            draw_rect(brick_xs[i], 50.0, 90.0, 20.0)
     draw_text("Score: " + str(score), 10.0, 10.0)
     if game_over
         draw_text("GAME OVER", 340.0, 280.0)

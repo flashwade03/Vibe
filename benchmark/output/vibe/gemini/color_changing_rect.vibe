@@ -3,14 +3,14 @@ let y: Float = 268.0
 let speed: Float = 100.0
 
 fn update(dt: Float)
-    if key_down("left")
-        x = x - speed * dt
     if key_down("right")
         x = x + speed * dt
-    if key_down("up")
-        y = y - speed * dt
+    if key_down("left")
+        x = x - speed * dt
     if key_down("down")
         y = y + speed * dt
+    if key_down("up")
+        y = y - speed * dt
 
 fn draw()
     draw_rect(x, y, 64.0, 64.0)

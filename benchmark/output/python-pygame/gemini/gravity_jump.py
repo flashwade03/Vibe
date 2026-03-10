@@ -41,6 +41,8 @@ while running:
         on_ground = True
 
     screen.fill((0, 0, 0))
+    
+    # Draw the player rectangle
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
     
     pygame.display.flip()

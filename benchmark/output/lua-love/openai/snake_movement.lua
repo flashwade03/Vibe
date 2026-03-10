@@ -22,8 +22,8 @@ function love.update(dt)
         if new_y < 0.0 then new_y = 580.0 end
 
         for i = #snake_xs, 2, -1 do
-            snake_xs[i] = snake_xs[i - 1]
-            snake_ys[i] = snake_ys[i - 1]
+            snake_xs[i] = snake_xs[i-1]
+            snake_ys[i] = snake_ys[i-1]
         end
 
         snake_xs[1] = new_x

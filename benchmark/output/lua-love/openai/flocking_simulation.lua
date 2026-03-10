@@ -21,14 +21,11 @@ end
 
 function love.update(dt)
     for i = 1, num_boids do
-        local center_x = 0
-        local center_y = 0
-
+        local center_x, center_y = 0, 0
         for j = 1, num_boids do
             center_x = center_x + boid_xs[j]
             center_y = center_y + boid_ys[j]
         end
-
         center_x = center_x / num_boids
         center_y = center_y / num_boids
 

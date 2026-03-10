@@ -6,7 +6,7 @@ function love.load()
 end
 
 function love.update(dt)
-    -- No continuous update logic needed
+    -- No update logic required for this specific task
 end
 
 function love.keypressed(key)

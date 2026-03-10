@@ -1,6 +1,6 @@
 let state: Int = 0
 let score: Int = 0
-let timer: Float = 0.0
+let timer: Float = 10.0
 let target_x: Float = 400.0
 let target_y: Float = 300.0
 
@@ -22,15 +22,14 @@ fn draw()
         draw_text("Press SPACE to Restart", 250.0, 300.0)
 
 fn keypressed(k: String)
-    if state == 0
-        if k == "space"
+    if k == "space"
+        if state == 0
             state = 1
             score = 0
             timer = 10.0
             target_x = rand_float(0.0, 780.0)
             target_y = rand_float(0.0, 580.0)
-    else if state == 2
-        if k == "space"
+        else if state == 2
             state = 0
 
 fn mousepressed(mx: Float, my: Float, button: Int)

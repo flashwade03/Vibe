@@ -3,21 +3,17 @@ let y: Float = 550.0
 let vy: Float = 0.0
 let on_ground: Bool = true
 
-const GRAVITY: Float = 500.0
-const SPEED: Float = 200.0
-const JUMP_VELOCITY: Float = -300.0
-
 fn update(dt: Float)
     if key_down("left")
-        x = x - SPEED * dt
+        x = x - 200.0 * dt
     if key_down("right")
-        x = x + SPEED * dt
+        x = x + 200.0 * dt
 
     if key_down("up") and on_ground
-        vy = JUMP_VELOCITY
+        vy = -300.0
         on_ground = false
 
-    vy = vy + GRAVITY * dt
+    vy = vy + 500.0 * dt
     y = y + vy * dt
 
     if y >= 550.0

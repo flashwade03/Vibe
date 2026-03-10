@@ -3,29 +3,18 @@ import sys
 import random
 import math
 
-def rand_float(min_val, max_val):
-    return random.uniform(min_val, max_val)
-
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Chain Reaction")
 clock = pygame.time.Clock()
 
 # Initialize circle data
-cx, cy = [], []
-cstate = []
-cradius = []
-ctimer = []
-
-def load():
-    for i in range(30):
-        cx.append(rand_float(50.0, 750.0))
-        cy.append(rand_float(50.0, 550.0))
-        cstate.append(0.0)
-        cradius.append(15.0)
-        ctimer.append(0.0)
-
-load()
+num_circles = 30
+cx = [random.uniform(50.0, 750.0) for _ in range(num_circles)]
+cy = [random.uniform(50.0, 550.0) for _ in range(num_circles)]
+cradius = [15.0 for _ in range(num_circles)]
+cstate = [0.0 for _ in range(num_circles)]
+ctimer = [0.0 for _ in range(num_circles)]
 
 running = True
 while running:
@@ -36,39 +25,37 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
-            for i in range(30):
+            for i in range(num_circles):
                 if cstate[i] == 0.0:
-                    dist = math.hypot(cx[i] - mx, cy[i] - my)
-                    if dist <= 15.0:
+                    distance = math.hypot(mx - cx[i], my - cy[i])
+                    if distance < 15.0:
                         cstate[i] = 1.0
                         break
 
     # Update logic
-    for i in range(30):
+    for i in range(num_circles):
         if cstate[i] == 1.0:
             cradius[i] += 80.0 * dt
             ctimer[i] += dt
             if ctimer[i] > 1.0:
                 cstate[i] = 2.0
-            for j in range(30):
+            for j in range(num_circles):
                 if cstate[j] == 0.0:
-                    dist = math.hypot(cx[i] - cx[j], cy[i] - cy[j])
-                    if dist < cradius[i] + 15.0:
+                    distance = math.hypot(cx[i] - cx[j], cy[i] - cy[j])
+                    if distance < cradius[i] + 15.0:
                         cstate[j] = 1.0
 
     # Draw logic
     screen.fill((0, 0, 0))
-    exploded_count = 0
-    for i in range(30):
+    for i in range(num_circles):
         if cstate[i] == 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(cx[i]), int(cy[i])), 15)
         elif cstate[i] == 1.0:
-            pygame.draw.circle(screen, (255, 255, 255), (int(cx[i]), int(cy[i])), int(cradius[i]))
+            pygame.draw.circle(screen, (255, 255, 255), (int(cx[i]), int(cy[i])), int(cradius[i])))
         elif cstate[i] == 2.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(cx[i]), int(cy[i])), 3)
-        if cstate[i] > 0.0:
-            exploded_count += 1
 
+    exploded_count = sum(1 for state in cstate if state > 0.0)
     font = pygame.font.Font(None, 36)
     text = font.render(f"Exploded: {exploded_count}", True, (255, 255, 255))
     screen.blit(text, (10, 10))

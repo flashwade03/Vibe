@@ -65,7 +65,23 @@ function detectCategory(
   }
 
   // Missing initializer: `let x: Type` without `= value`
-  if (error.includes("expected EQ, got NEWLINE")) {
+  if (error.includes("expected EQ, got NEWLINE") || error.includes("expected IDENT, got NEWLINE")) {
+    // Check if error is on or near the last line — likely truncated output
+    const lines = code.split("\n").filter(l => l.trim().length > 0);
+    const totalLines = lines.length;
+    if (totalLines > 0 && line >= totalLines - 1) {
+      // Error on last non-empty line → truncation
+      return "TRUNCATED_OUTPUT";
+    }
+    // Check if the last line looks incomplete (no closing statement)
+    const lastLine = lines[totalLines - 1];
+    if (lastLine && /^(let|const)\s+\w+[^=]*$/.test(lastLine.trim())) {
+      return "TRUNCATED_OUTPUT";
+    }
+    if (lastLine && /\.\s*$/.test(lastLine.trim())) {
+      return "TRUNCATED_OUTPUT";
+    }
+
     const codeLine = getLine(code, line);
     if (codeLine && /^\s*(let|const)\s+\w+/.test(codeLine) && !codeLine.includes("=")) {
       return "MISSING_INITIALIZER";
