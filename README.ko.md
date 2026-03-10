@@ -35,6 +35,20 @@ fn draw()
 - **게임 레디** — 입력, 드로잉, 게임 루프를 위한 내장 함수. `fn update(dt)`와 `fn draw()`가 엔진에 직접 매핑됩니다.
 - **Lua로 트랜스파일** — 생성된 코드가 LOVE 2D에서 수정 없이 실행됩니다.
 
+## LLM 벤치마크
+
+50개 게임 태스크 × 3개 언어 × 3개 LLM으로 벤치마크를 실행합니다.
+
+| 언어 | Claude | Gemini | OpenAI |
+|------|--------|--------|--------|
+| **Vibe** | **100% (50/50)** | **100% (50/50)** | 96% (48/50) |
+| Python-Pygame | - | 100% (50/50) | 100% (50/50) |
+| Lua-LOVE | - | 100% (50/50) | 100% (50/50) |
+
+Vibe는 가장 간결한 코드(평균 191-200 토큰 vs 220-237)와 가장 빠른 레이턴시를 기록합니다.
+
+[전체 벤치마크 결과](vibe-lang/benchmark/results.md)
+
 ## 빠른 시작
 
 ### 사전 요구사항
@@ -50,10 +64,10 @@ cd Vibe
 npm install
 
 # .vibe 파일을 트랜스파일하고 실행
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 
 # LOVE가 PATH에 없는 경우 (macOS)
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 open -a love build
 ```
 
@@ -63,7 +77,7 @@ open -a love build
 npx vitest run
 ```
 
-4개 스위트 67개 테스트: 렉서 (22), 파서 (22), 코드젠 (20), E2E (3).
+4개 스위트 76개 테스트: 렉서 (22), 파서 (24), 코드젠 (27), E2E (3).
 
 ## 언어 개요
 
@@ -114,7 +128,7 @@ if alive and not invincible
 
 ## 예제
 
-`examples/` 디렉토리에 점진적으로 복잡해지는 10개 프로그램이 있습니다:
+`vibe-lang/examples/` 디렉토리에 점진적으로 복잡해지는 10개 프로그램이 있습니다:
 
 | # | 파일 | 설명 |
 |---|------|------|
@@ -144,17 +158,14 @@ if alive and not invincible
 ## 프로젝트 구조
 
 ```
-src/
-  lexer/       — 토크나이저 (INDENT/DEDENT, 키워드, 연산자)
-  parser/      — 재귀 하강 파서 → AST
-  codegen/     — AST → Lua 코드 생성기
-  cli/         — CLI 진입점 (vibe run)
-  pipeline.ts  — 접착제: lex | parse | generate
-  e2e/         — E2E 테스트 및 픽스처
-design/        — 언어 및 파이프라인 설계 문서
-examples/      — Vibe 예제 프로그램 (.vibe)
-research/      — 언어 설계 리서치
-build/         — 생성된 Lua 출력 (gitignore)
+vibe-lang/               — Vibe 언어 (언어 관련 파일 전체)
+  src/                   — 트랜스파일러 (lexer, parser, codegen, feedback, cli)
+  grammar/               — PEG 문법 정의
+  examples/              — Vibe 예제 프로그램 (.vibe)
+  benchmark/             — LLM 벤치마크 (50 tasks × 3 languages × 3 LLMs)
+design/                  — 설계 문서
+research/                — 언어 설계 리서치
+build/                   — 생성된 Lua 출력 (gitignore)
 ```
 
 ## 로드맵

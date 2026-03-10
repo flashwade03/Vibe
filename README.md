@@ -35,6 +35,20 @@ fn draw()
 - **Game-ready** — Built-in functions for input, drawing, and game loops. `fn update(dt)` and `fn draw()` map directly to the engine.
 - **Transpiles to Lua** — Generated code runs unmodified on LOVE 2D.
 
+## LLM Benchmark
+
+Vibe is benchmarked against Python-Pygame and Lua-LOVE across 50 game tasks with 3 LLMs.
+
+| Language | Claude | Gemini | OpenAI |
+|----------|--------|--------|--------|
+| **Vibe** | **100% (50/50)** | **100% (50/50)** | 96% (48/50) |
+| Python-Pygame | - | 100% (50/50) | 100% (50/50) |
+| Lua-LOVE | - | 100% (50/50) | 100% (50/50) |
+
+Vibe generates the most concise code (avg 191-200 tokens vs 220-237) with the fastest latency.
+
+[Full benchmark results](vibe-lang/benchmark/results.md)
+
 ## Quick Start
 
 ### Prerequisites
@@ -50,10 +64,10 @@ cd Vibe
 npm install
 
 # Transpile and run a .vibe file
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 
 # Or if LOVE isn't in PATH (macOS)
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 open -a love build
 ```
 
@@ -63,7 +77,7 @@ open -a love build
 npx vitest run
 ```
 
-67 tests across 4 suites: Lexer (22), Parser (22), CodeGen (20), E2E (3).
+76 tests across 4 suites: Lexer (22), Parser (24), CodeGen (27), E2E (3).
 
 ## Language Overview
 
@@ -114,7 +128,7 @@ if alive and not invincible
 
 ## Examples
 
-The `examples/` directory contains 10 progressively complex programs:
+The `vibe-lang/examples/` directory contains 10 progressively complex programs:
 
 | # | File | Description |
 |---|------|-------------|
@@ -144,17 +158,14 @@ The transpiler is written in TypeScript with three independent modules:
 ## Project Structure
 
 ```
-src/
-  lexer/       — Tokenizer (INDENT/DEDENT, keywords, operators)
-  parser/      — Recursive descent parser → AST
-  codegen/     — AST → Lua code generator
-  cli/         — CLI entry point (vibe run)
-  pipeline.ts  — Glue: lex | parse | generate
-  e2e/         — End-to-end tests and fixtures
-design/        — Language and pipeline design documents
-examples/      — Vibe example programs (.vibe)
-research/      — Language design research
-build/         — Generated Lua output (gitignored)
+vibe-lang/               — Vibe language (all language-related files)
+  src/                   — Transpiler (lexer, parser, codegen, feedback, cli)
+  grammar/               — PEG grammar definitions
+  examples/              — Vibe example programs (.vibe)
+  benchmark/             — LLM benchmark (50 tasks × 3 languages × 3 LLMs)
+design/                  — Design documents
+research/                — Language design research
+build/                   — Generated Lua output (gitignored)
 ```
 
 ## Roadmap

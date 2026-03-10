@@ -35,6 +35,20 @@ fn draw()
 - **ゲーム対応** — 入力、描画、ゲームループのための組み込み関数。`fn update(dt)`と`fn draw()`がエンジンに直接マッピングされます。
 - **Luaにトランスパイル** — 生成されたコードはLOVE 2Dで修正なしに実行できます。
 
+## LLMベンチマーク
+
+50個のゲームタスク × 3言語 × 3 LLMでベンチマークを実行しています。
+
+| 言語 | Claude | Gemini | OpenAI |
+|------|--------|--------|--------|
+| **Vibe** | **100% (50/50)** | **100% (50/50)** | 96% (48/50) |
+| Python-Pygame | - | 100% (50/50) | 100% (50/50) |
+| Lua-LOVE | - | 100% (50/50) | 100% (50/50) |
+
+Vibeは最も簡潔なコード（平均191-200トークン vs 220-237）と最速のレイテンシーを記録しています。
+
+[ベンチマーク結果の詳細](vibe-lang/benchmark/results.md)
+
 ## クイックスタート
 
 ### 前提条件
@@ -50,10 +64,10 @@ cd Vibe
 npm install
 
 # .vibeファイルをトランスパイルして実行
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 
 # LOVEがPATHにない場合（macOS）
-npx tsx src/cli/cli.ts run examples/02_moving_player.vibe
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
 open -a love build
 ```
 
@@ -63,7 +77,7 @@ open -a love build
 npx vitest run
 ```
 
-4つのスイートで67テスト：レキサー（22）、パーサー（22）、コードジェン（20）、E2E（3）。
+4つのスイートで76テスト：レキサー（22）、パーサー（24）、コードジェン（27）、E2E（3）。
 
 ## 言語の概要
 
@@ -114,7 +128,7 @@ if alive and not invincible
 
 ## サンプル
 
-`examples/`ディレクトリに段階的に複雑になる10個のプログラムがあります：
+`vibe-lang/examples/`ディレクトリに段階的に複雑になる10個のプログラムがあります：
 
 | # | ファイル | 説明 |
 |---|----------|------|
@@ -144,17 +158,14 @@ if alive and not invincible
 ## プロジェクト構造
 
 ```
-src/
-  lexer/       — トークナイザー（INDENT/DEDENT、キーワード、演算子）
-  parser/      — 再帰下降パーサー → AST
-  codegen/     — AST → Luaコードジェネレーター
-  cli/         — CLIエントリーポイント（vibe run）
-  pipeline.ts  — グルー：lex | parse | generate
-  e2e/         — E2Eテストとフィクスチャ
-design/        — 言語とパイプラインの設計ドキュメント
-examples/      — Vibeサンプルプログラム（.vibe）
-research/      — 言語設計リサーチ
-build/         — 生成されたLua出力（gitignore）
+vibe-lang/               — Vibe言語（言語関連ファイル全体）
+  src/                   — トランスパイラ（lexer, parser, codegen, feedback, cli）
+  grammar/               — PEG文法定義
+  examples/              — Vibeサンプルプログラム（.vibe）
+  benchmark/             — LLMベンチマーク（50タスク × 3言語 × 3 LLM）
+design/                  — 設計ドキュメント
+research/                — 言語設計リサーチ
+build/                   — 生成されたLua出力（gitignore）
 ```
 
 ## ロードマップ
