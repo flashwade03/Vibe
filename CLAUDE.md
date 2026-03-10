@@ -29,7 +29,7 @@ vibe-lang/           — Vibe 언어 전체
   src/               — 트랜스파일러 소스 (TypeScript)
   grammar/           — PEG 문법 정의
   examples/          — Vibe 예제 코드 (.vibe)
-  benchmark/         — LLM 벤치마크 (50 tasks × 3 langs × 3 LLMs)
+  benchmark/         — LLM 벤치마크 (30 tasks × 3 langs × 3 LLMs)
 design/              — 설계 문서
 research/            — 리서치 문서
 build/               — 생성된 Lua 출력 (gitignore)
@@ -107,12 +107,44 @@ build/               — 생성된 Lua 출력 (gitignore)
 
 ### 4단계: 벤치마크 검증
 
-백그라운드 에이전트로 실행:
+모든 변경 후 반드시 벤치마크 실행. 결과는 `vibe-lang/benchmark/results.md`에 갱신.
+
+## 벤치마크 워크플로우
+
+### 구조
+
+- **30 tasks** × 3 languages (Vibe, Python-Pygame, Lua-LOVE) × 3 LLMs (Gemini, OpenAI, Claude)
+- 난이도 4단계: Easy(5) / Medium(9) / Hard(8) / Trap(8)
+- Trap 카테고리: Training Data Gravity를 의도적으로 유발하는 태스크
+
+### Gemini/OpenAI 벤치마크 (API 기반)
 
 ```
 Agent(prompt="npx tsx vibe-lang/benchmark/runner.ts를 실행하고 결과를 요약해줘. Vibe pass rate이 이전보다 떨어졌으면 원인 분석도 해줘.", run_in_background=true)
 ```
 
-- 모든 변경 후 반드시 벤치마크 실행
+runner.ts가 Gemini/OpenAI API를 호출하여 코드 생성 → 파서 검증 → 결과 기록.
+
+### Claude 벤치마크 (서브에이전트 기반)
+
+Claude는 API가 아닌 **서브에이전트**가 직접 Vibe 코드를 생성한다. 이유:
+- Claude = 공식 Vibe 코드 생성기이므로, 실제 사용 환경(Claude Code 세션)과 동일한 조건에서 테스트
+- 시스템 프롬프트 + CLAUDE.md 컨텍스트를 자연스럽게 활용
+
+실행 방법:
+```
+Agent(prompt="vibe-lang/benchmark/tasks.ts의 모든 태스크에 대해 Vibe 코드를 생성해줘.
+각 태스크마다:
+1. vibe-lang/benchmark/contexts/vibe-context.ts의 systemPrompt를 참고
+2. task.description을 읽고 Vibe 코드 생성
+3. 생성한 코드를 vibe-lang/benchmark/output/vibe/claude/{task_id}.vibe에 저장
+4. 파서로 검증: vibe-lang/src/parser를 import해서 파싱 성공 여부 확인
+5. 결과를 요약 (PASS/FAIL, 에러 메시지)", run_in_background=true)
+```
+
+### 벤치마크 결과 분석
+
+- 전체 pass rate 비교: Claude vs Gemini vs OpenAI
+- 난이도별 분석: Easy/Medium/Hard/Trap 카테고리 분리
+- 에러 패턴 분류: Training Data Gravity 유형 (중괄호, while, colon, dict 리터럴 등)
 - Vibe pass rate이 이전보다 떨어지면 원인 분석 후 수정
-- 결과는 `vibe-lang/benchmark/results.md`에 갱신

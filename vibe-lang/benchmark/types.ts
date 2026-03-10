@@ -4,12 +4,12 @@ export interface Task {
   id: string;
   name: string;
   description: string; // Natural language game task for LLM
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: "easy" | "medium" | "hard" | "trap";
   expectedBehaviors: string[]; // What the code should do
 }
 
 export type Language = "vibe" | "python-pygame" | "lua-love";
-export type LLMProvider = "gemini" | "openai";
+export type LLMProvider = "gemini" | "openai" | "claude";
 
 export interface LanguageContext {
   language: Language;

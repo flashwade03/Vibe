@@ -22,18 +22,37 @@ const languages: LanguageContext[] = [
   pythonPygameContext,
   luaLoveContext,
 ];
+// Claude benchmarks are run separately via subagents (not API).
+// See CLAUDE.md "벤치마크 워크플로우" section.
 const llms: LLMProvider[] = ["gemini", "openai"];
+
+function getAvailableLLMs(config: ReturnType<typeof loadConfig>): LLMProvider[] {
+  const available: LLMProvider[] = [];
+  if (config.geminiApiKey) available.push("gemini");
+  if (config.openaiApiKey) available.push("openai");
+  return available;
+}
 
 async function main() {
   const config = loadConfig();
   const results: GenerationResult[] = [];
+  const activeLLMs = getAvailableLLMs(config);
+
+  if (activeLLMs.length === 0) {
+    console.error("No API keys configured. Set at least one in damascus.local.md or env vars.");
+    process.exit(1);
+  }
 
   console.log("=== Vibe LLM Benchmark Runner ===");
   console.log(`Tasks: ${tasks.length}`);
   console.log(`Languages: ${languages.map((l) => l.language).join(", ")}`);
-  console.log(`LLMs: ${llms.join(", ")}`);
+  console.log(`LLMs: ${activeLLMs.join(", ")}`);
+  if (activeLLMs.length < llms.length) {
+    const skipped = llms.filter((l) => !activeLLMs.includes(l));
+    console.log(`Skipped (no API key): ${skipped.join(", ")}`);
+  }
   console.log(
-    `Total runs: ${tasks.length * languages.length * llms.length}`
+    `Total runs: ${tasks.length * languages.length * activeLLMs.length}`
   );
   console.log("");
 
@@ -41,7 +60,7 @@ async function main() {
     console.log(`\n--- Task: ${task.name} (${task.difficulty}) ---`);
 
     for (const langCtx of languages) {
-      for (const llm of llms) {
+      for (const llm of activeLLMs) {
         console.log(`  [${llm}] ${langCtx.language} — ${task.name}...`);
 
         try {

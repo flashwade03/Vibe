@@ -17,16 +17,18 @@ export function loadConfig(): BenchmarkConfig {
   if (!match) throw new Error("No YAML frontmatter found in damascus.local.md");
   const frontmatter = match[1];
 
-  const get = (key: string): string => {
+  const get = (key: string, envKey?: string, required = true): string => {
     const m = frontmatter.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
-    if (!m) throw new Error(`Missing config key: ${key}`);
-    return m[1].trim();
+    if (m) return m[1].trim();
+    if (envKey && process.env[envKey]) return process.env[envKey]!;
+    if (required) throw new Error(`Missing config key: ${key} (or env ${envKey})`);
+    return "";
   };
 
   return {
-    geminiApiKey: get("gemini_api_key"),
-    geminiModel: get("gemini_model"),
-    openaiApiKey: get("openai_api_key"),
-    openaiModel: get("openai_model"),
+    geminiApiKey: get("gemini_api_key", "GEMINI_API_KEY", false),
+    geminiModel: get("gemini_model", "GEMINI_MODEL", false) || "gemini-2.0-flash",
+    openaiApiKey: get("openai_api_key", "OPENAI_API_KEY", false),
+    openaiModel: get("openai_model", "OPENAI_MODEL", false) || "gpt-4o",
   };
 }
