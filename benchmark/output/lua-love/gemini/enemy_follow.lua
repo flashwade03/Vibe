@@ -26,14 +26,14 @@ function love.update(dt)
         player_y = player_y + player_speed * dt
     end
 
-    -- Enemy movement
+    -- Enemy follow logic
     local dx = player_x - enemy_x
     local dy = player_y - enemy_y
-    local dist = math.sqrt(dx * dx + dy * dy)
+    local distance = math.sqrt(dx * dx + dy * dy)
 
-    if dist > 1.0 then
-        local nx = dx / dist
-        local ny = dy / dist
+    if distance > 1.0 then
+        local nx = dx / distance
+        local ny = dy / distance
         enemy_x = enemy_x + nx * enemy_speed * dt
         enemy_y = enemy_y + ny * enemy_speed * dt
     end

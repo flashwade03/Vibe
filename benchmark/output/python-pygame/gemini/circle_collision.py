@@ -1,65 +1,21 @@
 import pygame
 import sys
 import math
-from typing import List
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Game")
+pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
+
+px, py = 400.0, 300.0
+player_radius = 20
+player_speed = 150.0
+
+enemy_xs = [100.0, 700.0, 200.0, 600.0, 400.0]
+enemy_ys = [100.0, 100.0, 400.0, 400.0, 500.0]
+enemy_radius = 15
+
 font = pygame.font.Font(None, 36)
-
-# Player state
-px: float = 400.0
-py: float = 300.0
-player_radius: int = 20
-player_speed: float = 150.0
-
-# Enemy state
-enemy_xs: List[float] = [100.0, 700.0, 200.0, 600.0, 400.0]
-enemy_ys: List[float] = [100.0, 100.0, 400.0, 400.0, 500.0]
-enemy_radius: int = 15
-
-hit: bool = False
-
-def update(dt: float):
-    global px, py, hit
-    
-    hit = False
-    
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        px -= player_speed * dt
-    if keys[pygame.K_RIGHT]:
-        px += player_speed * dt
-    if keys[pygame.K_UP]:
-        py -= player_speed * dt
-    if keys[pygame.K_DOWN]:
-        py += player_speed * dt
-        
-    for i in range(len(enemy_xs)):
-        ex = enemy_xs[i]
-        ey = enemy_ys[i]
-        distance = math.sqrt((px - ex) * (px - ex) + (py - ey) * (py - ey))
-        if distance < player_radius + enemy_radius:
-            hit = True
-
-def draw():
-    screen.fill((0, 0, 0))
-    
-    # Draw enemies
-    for i in range(len(enemy_xs)):
-        pygame.draw.circle(screen, (255, 0, 0), (int(enemy_xs[i]), int(enemy_ys[i])), enemy_radius)
-        
-    # Draw player
-    pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), player_radius)
-    
-    # Draw hit text
-    if hit:
-        text = font.render("Hit!", True, (255, 255, 255))
-        screen.blit(text, (10, 10))
-        
-    pygame.display.flip()
 
 running = True
 while running:
@@ -69,8 +25,37 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    update(dt)
-    draw()
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        px -= player_speed * dt
+    if keys[pygame.K_RIGHT]:
+        px += player_speed * dt
+    if keys[pygame.K_UP]:
+        py -= player_speed * dt
+    if keys[pygame.K_DOWN]:
+        py += player_speed * dt
+
+    hit = False
+    for i in range(len(enemy_xs)):
+        ex = enemy_xs[i]
+        ey = enemy_ys[i]
+        dist = math.sqrt((px - ex) * (px - ex) + (py - ey) * (py - ey))
+        if dist < player_radius + enemy_radius:
+            hit = True
+            break
+
+    screen.fill((0, 0, 0))
+
+    for i in range(len(enemy_xs)):
+        pygame.draw.circle(screen, (255, 255, 255), (int(enemy_xs[i]), int(enemy_ys[i])), enemy_radius)
+
+    pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), player_radius)
+
+    if hit:
+        text = font.render("Hit!", True, (255, 255, 255))
+        screen.blit(text, (10, 10))
+
+    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

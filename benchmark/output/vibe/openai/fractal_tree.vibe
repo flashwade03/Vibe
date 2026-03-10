@@ -1,0 +1,72 @@
+let seg_x1s: List[Float] = []
+let seg_y1s: List[Float] = []
+let seg_x2s: List[Float] = []
+let seg_y2s: List[Float] = []
+
+let q_xs: List[Float] = []
+let q_ys: List[Float] = []
+let q_angles: List[Float] = []
+let q_lens: List[Float] = []
+let q_depths: List[Float] = []
+
+let max_depth: Int = 7
+let branch_angle: Float = 0.5
+let built: Bool = false
+
+fn update(dt: Float)
+    if not built
+        q_xs = q_xs + [400.0]
+        q_ys = q_ys + [580.0]
+        q_angles = q_angles + [-1.5708]
+        q_lens = q_lens + [100.0]
+        q_depths = q_depths + [0.0]
+
+        let ptr: Int = 0
+        for iter in range(0, 500)
+            if ptr >= len(q_xs)
+                break
+
+            let sx: Float = q_xs[ptr]
+            let sy: Float = q_ys[ptr]
+            let sa: Float = q_angles[ptr]
+            let sl: Float = q_lens[ptr]
+            let sd: Float = q_depths[ptr]
+
+            let ex: Float = sx + cos(sa) * sl
+            let ey: Float = sy + sin(sa) * sl
+
+            seg_x1s = seg_x1s + [sx]
+            seg_y1s = seg_y1s + [sy]
+            seg_x2s = seg_x2s + [ex]
+            seg_y2s = seg_y2s + [ey]
+
+            if sd < float(max_depth)
+                let nl: Float = sl * 0.7
+                let nd: Float = sd + 1.0
+
+                q_xs = q_xs + [ex]
+                q_ys = q_ys + [ey]
+                q_angles = q_angles + [sa - branch_angle]
+                q_lens = q_lens + [nl]
+                q_depths = q_depths + [nd]
+
+                q_xs = q_xs + [ex]
+                q_ys = q_ys + [ey]
+                q_angles = q_angles + [sa + branch_angle]
+                q_lens = q_lens + [nl]
+                q_depths = q_depths + [nd]
+
+            ptr += 1
+
+        built = true
+
+fn draw()
+    for i in range(0, len(seg_x1s))
+        for j in range(0, 5)
+            let lt: Float = float(j) / 5.0
+            let lx: Float = seg_x1s[i] + (seg_x2s[i] - seg_x1s[i]) * lt
+            let ly: Float = seg_y1s[i] + (seg_y2s[i] - seg_y1s[i]) * lt
+            draw_circle(lx, ly, 1.0)
+
+    draw_text("Segments: " + str(len(seg_x1s)), 10.0, 10.0)
+    draw_text("Angle: " + str(branch_angle), 10.0, 30.0)

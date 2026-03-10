@@ -5,7 +5,7 @@ let cradius: List[Float] = []
 let ctimer: List[Float] = []
 
 fn load()
-    for i in range(30)
+    for i in range(0, 30)
         cx = cx + [rand_float(50.0, 750.0)]
         cy = cy + [rand_float(50.0, 550.0)]
         cstate = cstate + [0.0]
@@ -13,35 +13,43 @@ fn load()
         ctimer = ctimer + [0.0]
 
 fn mousepressed(mx: Float, my: Float, button: Int)
-    let min_dist: Float = 15.0
-    for i in range(30)
-        let dist: Float = sqrt((cx[i] - mx) * (cx[i] - mx) + (cy[i] - my) * (cy[i] - my))
-        if dist < min_dist and cstate[i] == 0.0
-            cstate[i] = 1.0
-            break
+    if button == 1
+        let closest_index: Int = -1
+        let closest_distance: Float = 15.0
+        for i in range(0, len(cx))
+            let dx: Float = cx[i] - mx
+            let dy: Float = cy[i] - my
+            let distance: Float = sqrt(dx * dx + dy * dy)
+            if distance < closest_distance
+                closest_distance = distance
+                closest_index = i
+        if closest_index != -1
+            cstate[closest_index] = 1.0
 
 fn update(dt: Float)
-    for i in range(30)
+    for i in range(0, len(cx))
         if cstate[i] == 1.0
             cradius[i] += 80.0 * dt
             ctimer[i] += dt
             if ctimer[i] > 1.0
                 cstate[i] = 2.0
-            for j in range(30)
+            for j in range(0, len(cx))
                 if cstate[j] == 0.0
-                    let dist: Float = sqrt((cx[i] - cx[j]) * (cx[i] - cx[j]) + (cy[i] - cy[j]) * (cy[i] - cy[j]))
-                    if dist < cradius[i] + 15.0
+                    let dx: Float = cx[i] - cx[j]
+                    let dy: Float = cy[i] - cy[j]
+                    let distance: Float = sqrt(dx * dx + dy * dy)
+                    if distance < cradius[i] + 15.0
                         cstate[j] = 1.0
 
 fn draw()
     let exploded_count: Int = 0
-    for i in range(30)
+    for i in range(0, len(cx))
         if cstate[i] == 0.0
             draw_circle(cx[i], cy[i], 15.0)
         else if cstate[i] == 1.0
             draw_circle(cx[i], cy[i], cradius[i])
-            exploded_count += 1
         else if cstate[i] == 2.0
             draw_circle(cx[i], cy[i], 3.0)
+        if cstate[i] > 0.0
             exploded_count += 1
     draw_text("Exploded: " + str(exploded_count), 10.0, 10.0)

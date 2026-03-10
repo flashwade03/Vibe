@@ -1,0 +1,14 @@
+let timer: Float = 0.0
+
+fn update(dt: Float)
+    timer = timer + dt
+
+fn draw()
+    for row in range(0, 4)
+        for col in range(0, 5)
+            let cx: Float = 100.0 + float(col) * 160.0
+            let cy: Float = 100.0 + float(row) * 150.0
+            let phase: Float = float(row * 5 + col) * 0.5
+            let radius: Float = 20.0 + 15.0 * sin(timer * 3.0 + phase)
+            draw_circle(cx, cy, radius)
+    draw_text("Time: " + str(int(timer)), 10.0, 10.0)

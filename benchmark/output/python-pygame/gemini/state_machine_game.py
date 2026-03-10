@@ -4,7 +4,7 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("3-State Target Clicker")
+pygame.display.set_caption("Target Clicker")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
@@ -32,7 +32,7 @@ while running:
                 elif state == 2:
                     state = 0
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if state == 1 and event.button == 1:
+            if state == 1:
                 mx, my = event.pos
                 if target_x <= mx <= target_x + 20.0 and target_y <= my <= target_y + 20.0:
                     score += 1
@@ -42,7 +42,6 @@ while running:
     if state == 1:
         timer -= dt
         if timer <= 0.0:
-            timer = 0.0
             state = 2
 
     screen.fill((0, 0, 0))
@@ -52,16 +51,15 @@ while running:
         screen.blit(text, (250.0, 280.0))
     elif state == 1:
         pygame.draw.rect(screen, (255, 255, 255), (int(target_x), int(target_y), 20, 20))
-        
-        score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         timer_text = font.render(f"Timer: {max(0.0, timer):.1f}", True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
         screen.blit(timer_text, (10, 40))
     elif state == 2:
-        gameover_text = font.render("Game Over! Score: " + str(score), True, (255, 255, 255))
-        restart_text = font.render("Press SPACE to Restart", True, (255, 255, 255))
-        screen.blit(gameover_text, (250.0, 260.0))
-        screen.blit(restart_text, (250.0, 300.0))
+        text1 = font.render(f"Game Over! Score: {score}", True, (255, 255, 255))
+        text2 = font.render("Press SPACE to Restart", True, (255, 255, 255))
+        screen.blit(text1, (250.0, 260.0))
+        screen.blit(text2, (250.0, 300.0))
 
     pygame.display.flip()
 

@@ -12,7 +12,7 @@ end
 function love.mousepressed(mx, my, button)
     if button == 1 then
         for i = 1, 10 do
-            local angle = love.math.random() * 6.283
+            local angle = love.math.random() * 2 * math.pi
             local speed = love.math.random(50, 200)
             local vx = math.cos(angle) * speed
             local vy = math.sin(angle) * speed

@@ -1,6 +1,7 @@
 local player_x = 384
 local player_y = 550
 local player_speed = 200
+
 local bullet_speed = 300
 local bullet_xs = {}
 local bullet_ys = {}
@@ -23,16 +24,17 @@ function love.update(dt)
     end
 end
 
-function love.draw()
-    love.graphics.rectangle("fill", player_x, player_y, 32, 32)
-    for i = 1, #bullet_xs do
-        love.graphics.rectangle("fill", bullet_xs[i], bullet_ys[i], 4, 4)
-    end
-end
-
 function love.keypressed(key)
     if key == "space" then
         table.insert(bullet_xs, player_x + 16)
         table.insert(bullet_ys, player_y)
+    end
+end
+
+function love.draw()
+    love.graphics.rectangle("fill", player_x, player_y, 32, 32)
+    
+    for i = 1, #bullet_xs do
+        love.graphics.rectangle("fill", bullet_xs[i], bullet_ys[i], 4, 4)
     end
 end

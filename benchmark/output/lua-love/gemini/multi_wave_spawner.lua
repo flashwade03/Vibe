@@ -23,7 +23,4 @@ function love.update(dt)
     if game_over then return end
 
     if love.keyboard.isDown("left") then
-        px = px - player_speed * dt
-    end
-    if love.keyboard.isDown("right") then
-        px = px +
+        px = px - player

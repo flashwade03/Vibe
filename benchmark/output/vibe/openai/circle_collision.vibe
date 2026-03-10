@@ -10,13 +10,13 @@ fn update(dt: Float)
     hit = false
 
     if key_down("right")
-        px += speed * dt
+        px = px + speed * dt
     if key_down("left")
-        px -= speed * dt
+        px = px - speed * dt
     if key_down("down")
-        py += speed * dt
+        py = py + speed * dt
     if key_down("up")
-        py -= speed * dt
+        py = py - speed * dt
 
     for i in range(0, len(enemy_xs))
         let ex = enemy_xs[i]
@@ -27,7 +27,9 @@ fn update(dt: Float)
 
 fn draw()
     draw_circle(px, py, 20.0)
+
     for i in range(0, len(enemy_xs))
         draw_circle(enemy_xs[i], enemy_ys[i], 15.0)
+
     if hit
         draw_text("Hit!", 10.0, 10.0)

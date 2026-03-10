@@ -4,17 +4,17 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe World with Minimap")
+pygame.display.set_caption("Vibe Game with Minimap")
 clock = pygame.time.Clock()
 
 player_x, player_y = 1000.0, 1000.0
 speed = 300
-
 item_xs = []
 item_ys = []
 
 def load():
-    for _ in range(20):
+    global item_xs, item_ys
+    for i in range(20):
         item_xs.append(random.uniform(0, 2000))
         item_ys.append(random.uniform(0, 2000))
 

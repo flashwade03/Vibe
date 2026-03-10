@@ -1,0 +1,53 @@
+let inv_items: List[Float] = []
+let held_item: Float = 0.0
+
+fn load()
+    for i in range(0, 20)
+        inv_items = inv_items + [0.0]
+
+fn keypressed(k: String)
+    let item_type: Float = 0.0
+    if k == "1"
+        item_type = 1.0
+    if k == "2"
+        item_type = 2.0
+    if k == "3"
+        item_type = 3.0
+    if item_type > 0.0
+        for i in range(0, 20)
+            if inv_items[i] == 0.0
+                inv_items[i] = item_type
+                break
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    let col: Int = int((mx - 200.0) / 80.0)
+    let row: Int = int((my - 100.0) / 80.0)
+    if col >= 0 and col < 5 and row >= 0 and row < 4
+        let idx: Int = row * 5 + col
+        if held_item == 0.0 and inv_items[idx] > 0.0
+            held_item = inv_items[idx]
+            inv_items[idx] = 0.0
+        else if held_item > 0.0 and inv_items[idx] == 0.0
+            inv_items[idx] = held_item
+            held_item = 0.0
+        else if held_item > 0.0 and inv_items[idx] > 0.0
+            let tmp: Float = inv_items[idx]
+            inv_items[idx] = held_item
+            held_item = tmp
+
+fn draw()
+    for row in range(0, 4)
+        for col in range(0, 5)
+            let x: Float = 200.0 + float(col) * 80.0
+            let y: Float = 100.0 + float(row) * 80.0
+            draw_rect(x, y, 80.0, 80.0)
+            let val: Float = inv_items[row * 5 + col]
+            if val == 1.0
+                draw_rect(x + 25.0, y + 20.0, 30.0, 8.0)
+                draw_rect(x + 37.0, y + 28.0, 6.0, 32.0)
+            if val == 2.0
+                draw_circle(x + 40.0, y + 40.0, 15.0)
+            if val == 3.0
+                draw_circle(x + 40.0, y + 40.0, 8.0)
+    draw_text("Held: " + str(int(held_item)), 10.0, 10.0)
+    draw_text("1-3: Add | Click: Pick/Place", 200.0, 540.0)

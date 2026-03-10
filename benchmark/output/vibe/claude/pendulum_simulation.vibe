@@ -1,0 +1,26 @@
+let angle: Float = 1.0
+let angular_vel: Float = 0.0
+let length: Float = 250.0
+let gravity: Float = 9.8
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    angular_vel = angular_vel + 0.5
+
+fn update(dt: Float)
+    let angular_acc: Float = (0.0 - gravity / length) * sin(angle)
+    angular_vel = angular_vel + angular_acc * dt
+    angular_vel = angular_vel * 0.999
+    angle = angle + angular_vel * dt
+
+fn draw()
+    let bob_x: Float = 400.0 + sin(angle) * length
+    let bob_y: Float = 100.0 + cos(angle) * length
+    draw_circle(400.0, 100.0, 5.0)
+    for i in range(0, 20)
+        let t: Float = float(i) / 20.0
+        let rx: Float = 400.0 + sin(angle) * length * t
+        let ry: Float = 100.0 + cos(angle) * length * t
+        draw_rect(rx, ry, 2.0, 2.0)
+    draw_circle(bob_x, bob_y, 15.0)
+    draw_text("Angle: " + str(angle), 10.0, 10.0)
+    draw_text("Click to push", 10.0, 30.0)

@@ -18,19 +18,19 @@ def rand_float(min_val, max_val):
     return random.uniform(min_val, max_val)
 
 def load():
-    for i in range(15):
+    for _ in range(15):
         boid_xs.append(rand_float(0.0, 800.0))
         boid_ys.append(rand_float(0.0, 600.0))
         boid_vxs.append(rand_float(-50.0, 50.0))
         boid_vys.append(rand_float(-50.0, 50.0))
 
 def update(dt):
-    # Calculate center of mass
+    # Compute center of mass
     center_x = sum(boid_xs) / 15
     center_y = sum(boid_ys) / 15
 
     for i in range(15):
-        # Cohesion: steer towards center
+        # Cohesion: steer towards center of mass
         boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
 
@@ -44,7 +44,7 @@ def update(dt):
                     boid_vxs[i] += (dx / distance) * 100.0 * dt
                     boid_vys[i] += (dy / distance) * 100.0 * dt
 
-        # Limit speed
+        # Clamp speed
         speed = math.sqrt(boid_vxs[i] ** 2 + boid_vys[i] ** 2)
         if speed > 150.0:
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
@@ -63,6 +63,7 @@ def draw():
         pygame.draw.rect(screen, (255, 255, 255), (int(boid_xs[i]), int(boid_ys[i]), 4, 4))
 
 load()
+
 running = True
 while running:
     dt = clock.tick(60) / 1000.0

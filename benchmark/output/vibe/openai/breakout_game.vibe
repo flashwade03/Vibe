@@ -9,9 +9,6 @@ let score: Int = 0
 let game_over: Bool = false
 
 fn update(dt: Float)
-    if game_over
-        return
-
     if key_down("right")
         paddle_x += paddle_speed * dt
     if key_down("left")
@@ -41,13 +38,10 @@ fn update(dt: Float)
 fn draw()
     draw_rect(paddle_x, 570.0, 80.0, 12.0)
     draw_circle(bx, by, 6.0)
-
     for i in range(0, len(brick_alive))
         if brick_alive[i] == 1.0
             let brick_x = float(i) * 100.0 + 5.0
             draw_rect(brick_x, 50.0, 90.0, 20.0)
-
     draw_text("Score: " + str(score), 10.0, 10.0)
-
     if game_over
         draw_text("GAME OVER", 350.0, 300.0)

@@ -1,9 +1,16 @@
-local px, py = 400, 300
-local pspeed = 250
+local playerX = 400
+local playerY = 300
+local playerSpeed = 250
+local playerRadius = 12
+
 local wave = 1
 local spawn_timer = 2.0
 local enemies_per_wave = 3
+
 local ex, ey, evx, evy, elife = {}, {}, {}, {}, {}
+local enemySize = 16
+local enemySpeedBase = 80
+
 local game_over = false
 
 function love.load()
@@ -16,16 +23,16 @@ function love.update(dt)
 
     -- Player movement
     if love.keyboard.isDown("left") then
-        px = px - pspeed * dt
+        playerX = playerX - playerSpeed * dt
     end
     if love.keyboard.isDown("right") then
-        px = px + pspeed * dt
+        playerX = playerX + playerSpeed * dt
     end
     if love.keyboard.isDown("up") then
-        py = py - pspeed * dt
+        playerY = playerY - playerSpeed * dt
     end
     if love.keyboard.isDown("down") then
-        py = py + pspeed * dt
+        playerY = playerY + playerSpeed * dt
     end
 
     -- Spawn enemies
@@ -48,9 +55,11 @@ function love.update(dt)
                 y = love.math.random() * 600
             end
 
-            local dx, dy = px - x, py - y
+            local dx = playerX - x
+            local dy = playerY - y
             local dist = math.sqrt(dx * dx + dy * dy)
-            local speed = 80 + wave * 20
+            local speed = enemySpeedBase + wave * 20
+
             table.insert(ex, x)
             table.insert(ey, y)
             table.insert(evx, (dx / dist) * speed)
@@ -71,8 +80,10 @@ function love.update(dt)
             elife[i] = elife[i] - dt
 
             -- Check collision with player
-            local dx, dy = px - ex[i], py - ey[i]
-            if math.sqrt(dx * dx + dy * dy) < 12 + 8 then
+            local dx = playerX - ex[i]
+            local dy = playerY - ey[i]
+            local distance = math.sqrt(dx * dx + dy * dy)
+            if distance < playerRadius + enemySize / 2 then
                 game_over = true
             end
         end
@@ -80,22 +91,18 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw player
     love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill", px, py, 12)
+    love.graphics.circle("fill", playerX, playerY, playerRadius)
 
-    -- Draw enemies
     for i = 1, #ex do
         if elife[i] > 0 then
-            love.graphics.rectangle("fill", ex[i] - 8, ey[i] - 8, 16, 16)
+            love.graphics.rectangle("fill", ex[i] - enemySize / 2, ey[i] - enemySize / 2, enemySize, enemySize)
         end
     end
 
-    -- Draw wave number
     love.graphics.print("Wave: " .. wave, 10, 10)
 
-    -- Draw game over
     if game_over then
-        love.graphics.printf("GAME OVER", 0, 300, 800, "center")
+        love.graphics.printf("GAME OVER", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end
 end

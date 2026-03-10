@@ -2,10 +2,11 @@ local player_x = 100
 local player_y = 400
 local player_vx = 0
 local player_vy = 0
-local player_speed = 250
 local gravity = 600.0
 local jump_velocity = -350.0
+local move_speed = 250.0
 local on_ground = false
+local prev_y = player_y
 
 local plat_xs = {50, 300, 500, 200, 450}
 local plat_ys = {450, 380, 300, 220, 150}
@@ -17,18 +18,18 @@ function love.load()
 end
 
 function love.update(dt)
-    local prev_y = player_y
+    prev_y = player_y
 
     -- Horizontal movement
     if love.keyboard.isDown("left") then
-        player_vx = -player_speed
+        player_vx = -move_speed
     elseif love.keyboard.isDown("right") then
-        player_vx = player_speed
+        player_vx = move_speed
     else
         player_vx = 0
     end
 
-    -- Jump
+    -- Jumping
     if love.keyboard.isDown("up") and on_ground then
         player_vy = jump_velocity
         on_ground = false
@@ -41,7 +42,7 @@ function love.update(dt)
     player_x = player_x + player_vx * dt
     player_y = player_y + player_vy * dt
 
-    -- Collision detection with platforms
+    -- Collision detection
     on_ground = false
     for i = 1, #plat_xs do
         if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and
@@ -54,7 +55,7 @@ function love.update(dt)
         end
     end
 
-    -- Check ground level
+    -- Ground check
     if player_y + 20 >= 580 then
         player_y = 580 - 20
         player_vy = 0

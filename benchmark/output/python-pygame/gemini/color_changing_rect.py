@@ -5,15 +5,15 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe")
 clock = pygame.time.Clock()
-
 font = pygame.font.Font(None, 36)
 
-def draw_text(surface, text, pos_x, pos_y):
+def draw_text(text, x, y):
     text_surface = font.render(text, True, (255, 255, 255))
-    surface.blit(text_surface, (pos_x, pos_y))
+    screen.blit(text_surface, (x, y))
 
 # Center of 800x600 for a 64x64 rectangle
-x, y = 368.0, 268.0
+x = 400.0 - 32.0
+y = 300.0 - 32.0
 speed = 100.0
 
 running = True
@@ -35,11 +35,11 @@ while running:
         y += speed * dt
 
     screen.fill((0, 0, 0))
-    
+
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 64, 64))
-    
-    pos_text = "x: " + str(x) + " y: " + str(y)
-    draw_text(screen, pos_text, 10, 10)
+
+    text_str = "x: " + str(x) + " y: " + str(y)
+    draw_text(text_str, 10, 10)
 
     pygame.display.flip()
 

@@ -4,10 +4,6 @@ local particle_vxs = {}
 local particle_vys = {}
 local particle_lifes = {}
 
-local function rand_float(min, max)
-    return min + love.math.random() * (max - min)
-end
-
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Particle Burst")
@@ -15,8 +11,8 @@ end
 
 function love.mousepressed(mx, my, button)
     for i = 1, 10 do
-        local angle = rand_float(0.0, 6.283)
-        local speed = rand_float(50.0, 200.0)
+        local angle = love.math.random() * 6.283
+        local speed = 50.0 + love.math.random() * 150.0
         local vx = math.cos(angle) * speed
         local vy = math.sin(angle) * speed
         

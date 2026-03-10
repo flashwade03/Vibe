@@ -1,0 +1,27 @@
+let full_text: String = "Welcome to the Vibe engine!"
+let text_len: Int = 27
+let char_index: Int = 0
+let char_timer: Float = 0.0
+let char_speed: Float = 0.08
+
+fn update(dt: Float)
+    if char_index < text_len
+        char_timer = char_timer + dt
+        if char_timer >= char_speed
+            char_timer = char_timer - char_speed
+            char_index = char_index + 1
+
+fn draw()
+    draw_text(full_text, 100.0, 280.0)
+    let cover_x: Float = 100.0 + float(char_index) * 10.0
+    draw_rect(cover_x, 270.0, 700.0, 30.0)
+    if sin(char_timer * 10.0) > 0.0
+        draw_rect(cover_x, 275.0, 2.0, 20.0)
+    draw_text("Chars: " + str(char_index) + "/" + str(text_len), 10.0, 10.0)
+    if char_index >= text_len
+        draw_text("Done!", 10.0, 30.0)
+
+fn keypressed(k: String)
+    if k == "space"
+        char_index = 0
+        char_timer = 0.0

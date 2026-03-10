@@ -8,13 +8,16 @@ fn update(dt: Float)
 
 fn draw()
     draw_circle(400.0, 300.0, 20.0)
+
     for i in range(0, 3)
         for j in range(0, 36)
             let angle: Float = float(j) * 0.1745
             let px: Float = 400.0 + cos(angle) * orb_radii[i]
             let py: Float = 300.0 + sin(angle) * orb_radii[i]
             draw_circle(px, py, 1.0)
+
         let x: Float = 400.0 + cos(orb_angles[i]) * orb_radii[i]
         let y: Float = 300.0 + sin(orb_angles[i]) * orb_radii[i]
         draw_circle(x, y, 10.0)
+
     draw_text("Angle: " + str(orb_angles[0]), 10.0, 10.0)

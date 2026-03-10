@@ -1,6 +1,6 @@
 let player_x: Float = 1000.0
 let player_y: Float = 1000.0
-let speed: Float = 300.0
+let player_speed: Float = 300.0
 let item_xs: List[Float] = []
 let item_ys: List[Float] = []
 
@@ -11,21 +11,13 @@ fn load()
 
 fn update(dt: Float)
     if key_down("right")
-        player_x = player_x + speed * dt
+        player_x = player_x + player_speed * dt
     if key_down("left")
-        player_x = player_x - speed * dt
+        player_x = player_x - player_speed * dt
     if key_down("down")
-        player_y = player_y + speed * dt
+        player_y = player_y + player_speed * dt
     if key_down("up")
-        player_y = player_y - speed * dt
-    if player_x < 0.0
-        player_x = 0.0
-    if player_x > 2000.0
-        player_x = 2000.0
-    if player_y < 0.0
-        player_y = 0.0
-    if player_y > 2000.0
-        player_y = 2000.0
+        player_y = player_y - player_speed * dt
 
 fn draw()
     for i in range(0, len(item_xs))
@@ -35,9 +27,9 @@ fn draw()
             draw_rect(draw_x, draw_y, 10.0, 10.0)
     draw_rect(400.0, 300.0, 16.0, 16.0)
     draw_rect(630.0, 10.0, 160.0, 120.0)
-    let mm_px: Float = 630.0 + (player_x / 2000.0) * 160.0
-    let mm_py: Float = 10.0 + (player_y / 2000.0) * 120.0
-    draw_rect(mm_px, mm_py, 4.0, 4.0)
+    let mp_x: Float = 630.0 + (player_x / 2000.0) * 160.0
+    let mp_y: Float = 10.0 + (player_y / 2000.0) * 120.0
+    draw_rect(mp_x, mp_y, 4.0, 4.0)
     for i in range(0, len(item_xs))
         let mx: Float = 630.0 + (item_xs[i] / 2000.0) * 160.0
         let my: Float = 10.0 + (item_ys[i] / 2000.0) * 120.0

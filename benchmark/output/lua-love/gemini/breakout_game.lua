@@ -1,3 +1,4 @@
+```lua
 local paddle_x = 360
 local paddle_y = 570
 local paddle_w = 80
@@ -8,7 +9,7 @@ local bx = 400
 local by = 400
 local vx = 200
 local vy = -200
-local ball_r = 6
+local br = 6
 
 local brick_alive = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}
 local brick_x_pos = {5, 105, 205, 305, 405, 505, 605, 705}
@@ -42,8 +43,10 @@ function love.update(dt)
         vy = -vy
     end
 
-    if by >= 564.0 and bx >= paddle_x and bx <= paddle_x + paddle_w then
-        vy = -math.abs(vy)
+    if by >= 564.0 and bx >= paddle_x and bx <= paddle_x + 80.0 then
+        if vy > 0 then
+            vy = -vy
+        end
     end
 
     if bx < 6.0 then
@@ -56,8 +59,8 @@ function love.update(dt)
 
     for i = 1, 8 do
         if brick_alive[i] == 1.0 then
-            local px = brick_x_pos[i]
-            if bx >= px and bx <= px + brick_w and by >= brick_y and by <= brick_y + brick_h then
+            local b_x = brick_x_pos[i]
+            if bx >= b_x and bx <= b_x + brick_w and by >= brick_y and by <= brick_y + brick_h then
                 brick_alive[i] = 0.0
                 vy = -vy
                 score = score + 1
@@ -74,17 +77,6 @@ end
 function love.draw()
     love.graphics.rectangle("fill", paddle_x, paddle_y, paddle_w, paddle_h)
     
-    love.graphics.circle("fill", bx, by, ball_r)
-    
-    for i = 1, 8 do
-        if brick_alive[i] == 1.0 then
-            love.graphics.rectangle("fill", brick_x_pos[i], brick_y, brick_w, brick_h)
-        end
-    end
-    
-    love.graphics.print("Score: " .. score, 10, 10)
-    
-    if game_over then
-        love.graphics.print("GAME OVER", 360, 300)
-    end
-end
+    love.graphics.circle("fill", bx, by, br)
+
+    for

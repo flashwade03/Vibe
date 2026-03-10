@@ -6,7 +6,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Snake Game")
 clock = pygame.time.Clock()
 
-# Snake initial state
+# Snake state variables
 snake_xs = [400.0, 380.0, 360.0]
 snake_ys = [300.0, 300.0, 300.0]
 dir_x, dir_y = 1.0, 0.0
@@ -36,7 +36,7 @@ while running:
         new_x = snake_xs[0] + dir_x * 20.0
         new_y = snake_ys[0] + dir_y * 20.0
 
-        # Wrap around
+        # Wrap positions
         if new_x >= 800.0:
             new_x = 0.0
         elif new_x < 0.0:
@@ -46,10 +46,11 @@ while running:
         elif new_y < 0.0:
             new_y = 580.0
 
-        # Move snake
+        # Shift segments
         for i in range(len(snake_xs) - 1, 0, -1):
             snake_xs[i] = snake_xs[i - 1]
             snake_ys[i] = snake_ys[i - 1]
+
         snake_xs[0] = new_x
         snake_ys[0] = new_y
 

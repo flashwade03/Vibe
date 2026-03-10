@@ -5,7 +5,7 @@ local boid_vys = {}
 local num_boids = 15
 
 function rand_float(min, max)
-    return min + (max - min) * love.math.random()
+    return min + math.random() * (max - min)
 end
 
 function love.load()
@@ -20,15 +20,18 @@ function love.load()
 end
 
 function love.update(dt)
-    for i = 1, num_boids do
-        local center_x, center_y = 0, 0
-        for j = 1, num_boids do
-            center_x = center_x + boid_xs[j]
-            center_y = center_y + boid_ys[j]
-        end
-        center_x = center_x / num_boids
-        center_y = center_y / num_boids
+    local center_x = 0
+    local center_y = 0
 
+    for i = 1, num_boids do
+        center_x = center_x + boid_xs[i]
+        center_y = center_y + boid_ys[i]
+    end
+
+    center_x = center_x / num_boids
+    center_y = center_y / num_boids
+
+    for i = 1, num_boids do
         -- Cohesion
         boid_vxs[i] = boid_vxs[i] + (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] = boid_vys[i] + (center_y - boid_ys[i]) * 0.5 * dt

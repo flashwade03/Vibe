@@ -1,0 +1,53 @@
+let heat: List[Float] = []
+let next_heat: List[Float] = []
+
+fn load()
+    for i in range(0, 192)
+        heat = heat + [0.0]
+        next_heat = next_heat + [0.0]
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    let col: Int = int(mx / 50.0)
+    let row: Int = int(my / 50.0)
+    if col >= 0 and col < 16 and row >= 0 and row < 12
+        heat[row * 16 + col] = 100.0
+
+fn update(dt: Float)
+    for row in range(0, 12)
+        for col in range(0, 16)
+            let idx: Int = row * 16 + col
+            let sum: Float = 0.0
+            let n: Int = 0
+            if row > 0
+                sum = sum + heat[(row - 1) * 16 + col]
+                n = n + 1
+            if row < 11
+                sum = sum + heat[(row + 1) * 16 + col]
+                n = n + 1
+            if col > 0
+                sum = sum + heat[row * 16 + col - 1]
+                n = n + 1
+            if col < 15
+                sum = sum + heat[row * 16 + col + 1]
+                n = n + 1
+            let avg: Float = sum / float(n)
+            next_heat[idx] = heat[idx] + (avg - heat[idx]) * 2.0 * dt
+            next_heat[idx] = next_heat[idx] * 0.998
+    for i in range(0, 192)
+        heat[i] = next_heat[i]
+
+fn draw()
+    let max_t: Float = 0.0
+    for row in range(0, 12)
+        for col in range(0, 16)
+            let temp: Float = heat[row * 16 + col]
+            if temp > max_t
+                max_t = temp
+            let size: Float = temp / 100.0 * 48.0
+            if size > 48.0
+                size = 48.0
+            if size > 1.0
+                let off: Float = (48.0 - size) / 2.0
+                draw_rect(float(col) * 50.0 + 1.0 + off, float(row) * 50.0 + 1.0 + off, size, size)
+    draw_text("Click to add heat", 10.0, 10.0)
+    draw_text("Max: " + str(int(max_t)), 10.0, 30.0)

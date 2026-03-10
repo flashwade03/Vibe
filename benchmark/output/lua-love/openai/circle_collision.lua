@@ -33,7 +33,7 @@ function love.update(dt)
     for i = 1, #enemy_xs do
         local ex = enemy_xs[i]
         local ey = enemy_ys[i]
-        local distance = math.sqrt((player_x - ex)^2 + (player_y - ey)^2)
+        local distance = math.sqrt((player_x - ex) * (player_x - ex) + (player_y - ey) * (player_y - ey))
         if distance < player_radius + enemy_radius then
             hit = true
         end

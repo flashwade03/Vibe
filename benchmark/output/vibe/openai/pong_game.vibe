@@ -1,0 +1,72 @@
+let p1_y: Float = 260.0
+let p2_y: Float = 260.0
+let ball_x: Float = 400.0
+let ball_y: Float = 300.0
+let ball_vx: Float = 250.0
+let ball_vy: Float = 150.0
+let score1: Int = 0
+let score2: Int = 0
+
+fn update(dt: Float)
+    -- Move left paddle
+    if key_down("w")
+        p1_y = p1_y - 300.0 * dt
+    if key_down("s")
+        p1_y = p1_y + 300.0 * dt
+    p1_y = max(0.0, min(520.0, p1_y))
+
+    -- Move right paddle
+    if key_down("up")
+        p2_y = p2_y - 300.0 * dt
+    if key_down("down")
+        p2_y = p2_y + 300.0 * dt
+    p2_y = max(0.0, min(520.0, p2_y))
+
+    -- Move ball
+    ball_x = ball_x + ball_vx * dt
+    ball_y = ball_y + ball_vy * dt
+
+    -- Ball collision with top and bottom
+    if ball_y < 8.0 or ball_y > 592.0
+        ball_vy = -ball_vy
+
+    -- Ball collision with left paddle
+    if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and ball_y >= p1_y and ball_y <= p1_y + 80.0
+        ball_vx = -ball_vx
+        ball_x = 50.0
+
+    -- Ball collision with right paddle
+    if ball_x + 8.0 >= 758.0 and ball_x < 770.0 and ball_y >= p2_y and ball_y <= p2_y + 80.0
+        ball_vx = -ball_vx
+        ball_x = 750.0
+
+    -- Ball out of bounds
+    if ball_x < 0.0
+        score2 = score2 + 1
+        ball_x = 400.0
+        ball_y = 300.0
+        ball_vx = 250.0
+        ball_vy = 150.0
+
+    if ball_x > 800.0
+        score1 = score1 + 1
+        ball_x = 400.0
+        ball_y = 300.0
+        ball_vx = -250.0
+        ball_vy = -150.0
+
+fn draw()
+    -- Draw paddles
+    draw_rect(30.0, p1_y, 12.0, 80.0)
+    draw_rect(758.0, p2_y, 12.0, 80.0)
+
+    -- Draw ball
+    draw_circle(ball_x, ball_y, 8.0)
+
+    -- Draw center line
+    for i in range(0, 30)
+        draw_rect(398.0, float(i) * 20.0, 4.0, 10.0)
+
+    -- Draw scores
+    draw_text(str(score1), 300.0, 20.0)
+    draw_text(str(score2), 480.0, 20.0)

@@ -9,25 +9,8 @@ function love.load()
     love.window.setTitle("Snake")
 end
 
-function love.keypressed(key)
-    if key == "right" and dir_x ~= -1.0 then
-        dir_x = 1.0
-        dir_y = 0.0
-    elseif key == "left" and dir_x ~= 1.0 then
-        dir_x = -1.0
-        dir_y = 0.0
-    elseif key == "up" and dir_y ~= 1.0 then
-        dir_x = 0.0
-        dir_y = -1.0
-    elseif key == "down" and dir_y ~= -1.0 then
-        dir_x = 0.0
-        dir_y = 1.0
-    end
-end
-
 function love.update(dt)
     move_timer = move_timer - dt
-    
     if move_timer <= 0 then
         move_timer = 0.15
         
@@ -53,6 +36,22 @@ function love.update(dt)
         
         snake_xs[1] = new_x
         snake_ys[1] = new_y
+    end
+end
+
+function love.keypressed(key)
+    if key == "right" and dir_x ~= -1.0 then
+        dir_x = 1.0
+        dir_y = 0.0
+    elseif key == "left" and dir_x ~= 1.0 then
+        dir_x = -1.0
+        dir_y = 0.0
+    elseif key == "up" and dir_y ~= 1.0 then
+        dir_x = 0.0
+        dir_y = -1.0
+    elseif key == "down" and dir_y ~= -1.0 then
+        dir_x = 0.0
+        dir_y = 1.0
     end
 end
 

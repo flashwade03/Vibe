@@ -10,8 +10,9 @@ x = 384.0
 y = 550.0
 vy = 0.0
 on_ground = True
-gravity = 500.0
+
 speed = 200.0
+gravity = 500.0
 
 running = True
 while running:
@@ -42,7 +43,6 @@ while running:
 
     screen.fill((0, 0, 0))
     
-    # Draw the player rectangle
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
     
     pygame.display.flip()

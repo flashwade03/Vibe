@@ -35,20 +35,17 @@ while running:
                 particle_vys.append(vy)
                 particle_lifes.append(2.0)
 
-    for i in range(len(particle_lifes) - 1, -1, -1):
+    keys = pygame.key.get_pressed()
+    
+    # Update logic
+    for i in range(len(particle_lifes)):
         particle_xs[i] += particle_vxs[i] * dt
         particle_ys[i] += particle_vys[i] * dt
         particle_lifes[i] -= dt
-        
-        if particle_lifes[i] <= 0.0:
-            particle_xs.pop(i)
-            particle_ys.pop(i)
-            particle_vxs.pop(i)
-            particle_vys.pop(i)
-            particle_lifes.pop(i)
 
     screen.fill((0, 0, 0))
     
+    # Draw logic
     for i in range(len(particle_lifes)):
         if particle_lifes[i] > 0.0:
             pygame.draw.rect(screen, (255, 255, 255), (int(particle_xs[i]), int(particle_ys[i]), 4, 4))

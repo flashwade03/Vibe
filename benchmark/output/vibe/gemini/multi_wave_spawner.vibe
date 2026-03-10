@@ -1,7 +1,6 @@
 let wave: Int = 1
 let spawn_timer: Float = 2.0
 let enemies_per_wave: Int = 3
-let game_over: Bool = false
 
 let px: Float = 400.0
 let py: Float = 300.0
@@ -13,9 +12,9 @@ let evx: List[Float] = []
 let evy: List[Float] = []
 let elife: List[Float] = []
 
-fn update(dt: Float)
-    if game_over
-        return
+let game_over: Bool = false
 
-    if key_down("left")
-        px = px - pspeed
+fn update(dt: Float)
+    if not game_over
+        if key_down("left")
+            px = px - pspeed

@@ -23,29 +23,35 @@ fn update(dt: Float)
     center_y /= num_boids
 
     for i in range(15)
+        let vx = boid_vxs[i]
+        let vy = boid_vys[i]
+
         -- Cohesion
-        boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
-        boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
+        vx += (center_x - boid_xs[i]) * 0.5 * dt
+        vy += (center_y - boid_ys[i]) * 0.5 * dt
 
         -- Separation
         for j in range(15)
             if i != j
-                let dx: Float = boid_xs[i] - boid_xs[j]
-                let dy: Float = boid_ys[i] - boid_ys[j]
-                let distance: Float = sqrt(dx * dx + dy * dy)
+                let dx = boid_xs[i] - boid_xs[j]
+                let dy = boid_ys[i] - boid_ys[j]
+                let distance = sqrt(dx * dx + dy * dy)
                 if distance < 30.0
-                    boid_vxs[i] += (dx / distance) * 100.0 * dt
-                    boid_vys[i] += (dy / distance) * 100.0 * dt
+                    vx += (dx / distance) * 100.0 * dt
+                    vy += (dy / distance) * 100.0 * dt
 
-        -- Speed clamping
-        let speed: Float = sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
+        -- Clamp speed
+        let speed = sqrt(vx * vx + vy * vy)
         if speed > 150.0
-            boid_vxs[i] = boid_vxs[i] / speed * 150.0
-            boid_vys[i] = boid_vys[i] / speed * 150.0
+            vx = vx / speed * 150.0
+            vy = vy / speed * 150.0
+
+        boid_vxs[i] = vx
+        boid_vys[i] = vy
 
         -- Update positions
-        boid_xs[i] += boid_vxs[i] * dt
-        boid_ys[i] += boid_vys[i] * dt
+        boid_xs[i] += vx * dt
+        boid_ys[i] += vy * dt
 
         -- Wrap around screen edges
         if boid_xs[i] < 0.0

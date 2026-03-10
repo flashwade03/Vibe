@@ -27,34 +27,35 @@ fn update(dt: Float)
 
     spawn_timer = spawn_timer - dt
     if spawn_timer <= 0.0
-        for _ in range(0, enemies_per_wave)
+        for i in range(0, enemies_per_wave)
             let edge = rand_float(0.0, 4.0)
-            let x: Float = 0.0
-            let y: Float = 0.0
-            if edge < 1.0
-                x = rand_float(0.0, 800.0)
-                y = 0.0
-            else if edge < 2.0
-                x = 800.0
-                y = rand_float(0.0, 600.0)
-            else if edge < 3.0
-                x = rand_float(0.0, 800.0)
-                y = 600.0
-            else
-                x = 0.0
-                y = rand_float(0.0, 600.0)
+            let ex_pos: Float
+            let ey_pos: Float
 
-            let dx = px - x
-            let dy = py - y
+            if edge < 1.0
+                ex_pos = rand_float(0.0, 800.0)
+                ey_pos = 0.0
+            else if edge < 2.0
+                ex_pos = 800.0
+                ey_pos = rand_float(0.0, 600.0)
+            else if edge < 3.0
+                ex_pos = rand_float(0.0, 800.0)
+                ey_pos = 600.0
+            else
+                ex_pos = 0.0
+                ey_pos = rand_float(0.0, 600.0)
+
+            let dx = px - ex_pos
+            let dy = py - ey_pos
             let dist = sqrt(dx * dx + dy * dy)
             let speed = 80.0 + wave * 20.0
-            let vx = (dx / dist) * speed
-            let vy = (dy / dist) * speed
+            let evx_val = (dx / dist) * speed
+            let evy_val = (dy / dist) * speed
 
-            ex = ex + [x]
-            ey = ey + [y]
-            evx = evx + [vx]
-            evy = evy + [vy]
+            ex = ex + [ex_pos]
+            ey = ey + [ey_pos]
+            evx = evx + [evx_val]
+            evy = evy + [evy_val]
             elife = elife + [1.0]
 
         wave = wave + 1
@@ -69,13 +70,12 @@ fn update(dt: Float)
 
             let dx = px - ex[i]
             let dy = py - ey[i]
-            let dist = sqrt(dx * dx + dy * dy)
-            if dist < 20.0
+            let distance = sqrt(dx * dx + dy * dy)
+            if distance < 20.0
                 game_over = true
 
 fn draw()
     draw_circle(px, py, 12.0)
-
     for i in range(0, len(ex))
         if elife[i] > 0.0
             draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)

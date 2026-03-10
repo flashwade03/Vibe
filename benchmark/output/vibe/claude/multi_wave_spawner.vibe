@@ -1,15 +1,15 @@
 let player_x: Float = 400.0
 let player_y: Float = 300.0
 let player_speed: Float = 250.0
-let wave: Int = 1
-let spawn_timer: Float = 2.0
-let enemies_per_wave: Int = 3
-let game_over: Bool = false
 let ex: List[Float] = []
 let ey: List[Float] = []
 let evx: List[Float] = []
 let evy: List[Float] = []
 let elife: List[Float] = []
+let wave: Int = 1
+let spawn_timer: Float = 2.0
+let enemies_per_wave: Int = 3
+let game_over: Bool = false
 
 fn update(dt: Float)
     if game_over
@@ -24,8 +24,7 @@ fn update(dt: Float)
         player_y = player_y - player_speed * dt
     spawn_timer = spawn_timer - dt
     if spawn_timer <= 0.0
-        let spd: Float = float(80 + wave * 20)
-        for j in range(0, enemies_per_wave)
+        for i in range(0, enemies_per_wave)
             let edge: Float = rand_float(0.0, 4.0)
             let sx: Float = 0.0
             let sy: Float = 0.0
@@ -47,6 +46,7 @@ fn update(dt: Float)
             if dist > 1.0
                 ddx = ddx / dist
                 ddy = ddy / dist
+            let spd: Float = float(80 + wave * 20)
             ex = ex + [sx]
             ey = ey + [sy]
             evx = evx + [ddx * spd]
@@ -54,14 +54,15 @@ fn update(dt: Float)
             elife = elife + [1.0]
         wave = wave + 1
         enemies_per_wave = 3 + wave
-        spawn_timer = 3.0 - float(wave) * 0.2
-        if spawn_timer < 0.5
-            spawn_timer = 0.5
+        let new_timer: Float = 3.0 - float(wave) * 0.2
+        if new_timer < 0.5
+            new_timer = 0.5
+        spawn_timer = new_timer
     for i in range(0, len(ex))
-        ex[i] = ex[i] + evx[i] * dt
-        ey[i] = ey[i] + evy[i] * dt
-        elife[i] = elife[i] - dt
         if elife[i] > 0.0
+            ex[i] = ex[i] + evx[i] * dt
+            ey[i] = ey[i] + evy[i] * dt
+            elife[i] = elife[i] - dt
             let cdx: Float = player_x - ex[i]
             let cdy: Float = player_y - ey[i]
             let cdist: Float = sqrt(cdx * cdx + cdy * cdy)

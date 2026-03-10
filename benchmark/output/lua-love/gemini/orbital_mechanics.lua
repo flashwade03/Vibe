@@ -14,26 +14,24 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.setColor(1, 1, 1)
-    
-    -- Draw the sun at the center
+    -- Draw the sun
     love.graphics.circle("fill", 400, 300, 20)
-    
+
     for i = 1, 3 do
-        -- Draw orbit paths (36 small dots)
+        -- Draw the orbit paths
         for j = 0, 35 do
             local angle = j * 0.1745
             local px = 400.0 + math.cos(angle) * orb_radii[i]
             local py = 300.0 + math.sin(angle) * orb_radii[i]
             love.graphics.circle("fill", px, py, 1.0)
         end
-        
-        -- Calculate and draw the orbiting body
+
+        -- Draw the orbiting body
         local x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
         local y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
         love.graphics.circle("fill", x, y, 10)
     end
-    
-    -- Show the current angle of the first body
+
+    -- Show the current angle of body 1 (index 0 in the prompt)
     love.graphics.print("Angle: " .. tostring(orb_angles[1]), 10, 10)
 end

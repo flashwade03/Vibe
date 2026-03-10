@@ -16,7 +16,6 @@ fn update(dt: Float)
             new_x = 0.0
         if new_x < 0.0
             new_x = 780.0
-
         if new_y >= 600.0
             new_y = 0.0
         if new_y < 0.0

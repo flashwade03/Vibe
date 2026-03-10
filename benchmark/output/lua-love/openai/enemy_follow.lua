@@ -8,7 +8,7 @@ local enemy_speed = 100
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Player and Enemy")
 end
 
 function love.update(dt)
@@ -40,11 +40,11 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw enemy in red
+    -- Draw enemy (red)
     love.graphics.setColor(1, 0, 0)
     love.graphics.rectangle("fill", enemy_x, enemy_y, 32, 32)
 
-    -- Draw player in blue
+    -- Draw player (blue)
     love.graphics.setColor(0, 0, 1)
     love.graphics.rectangle("fill", player_x, player_y, 32, 32)
 

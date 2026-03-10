@@ -2,17 +2,17 @@ let bx: Float = 400.0
 let by: Float = 300.0
 let vx: Float = 150.0
 let vy: Float = 150.0
-let radius: Float = 16.0
+const RADIUS: Float = 16.0
 
 fn update(dt: Float)
     bx = bx + vx * dt
     by = by + vy * dt
 
-    if bx - radius < 0.0 or bx + radius > 800.0
+    if bx < RADIUS or bx > 800.0 - RADIUS
         vx = -vx
 
-    if by - radius < 0.0 or by + radius > 600.0
+    if by < RADIUS or by > 600.0 - RADIUS
         vy = -vy
 
 fn draw()
-    draw_circle(bx, by, radius)
+    draw_circle(bx, by, RADIUS)

@@ -1,0 +1,62 @@
+let note_xs: List[Float] = []
+let note_ys: List[Float] = []
+let note_lanes: List[Float] = []
+let note_hit: List[Float] = []
+let spawn_timer: Float = 0.0
+let note_speed: Float = 200.0
+let score: Int = 0
+let misses: Int = 0
+let combo: Int = 0
+let flash_timer: Float = 0.0
+let flash_lane: Int = -1
+
+fn update(dt: Float)
+    spawn_timer = spawn_timer + dt
+    if spawn_timer >= 0.6
+        spawn_timer = 0.0
+        let lane: Int = int(rand_float(0.0, 3.99))
+        note_xs = note_xs + [250.0 + float(lane) * 100.0]
+        note_ys = note_ys + [-20.0]
+        note_lanes = note_lanes + [float(lane)]
+        note_hit = note_hit + [0.0]
+    for i in range(0, len(note_ys))
+        if note_hit[i] == 0.0
+            note_ys[i] = note_ys[i] + note_speed * dt
+            if note_ys[i] > 600.0
+                note_hit[i] = 2.0
+                misses = misses + 1
+                combo = 0
+    flash_timer = flash_timer - dt
+
+fn keypressed(k: String)
+    let press_lane: Int = -1
+    if k == "d"
+        press_lane = 0
+    if k == "f"
+        press_lane = 1
+    if k == "j"
+        press_lane = 2
+    if k == "k"
+        press_lane = 3
+    if press_lane >= 0
+        for i in range(0, len(note_ys))
+            if note_hit[i] == 0.0 and int(note_lanes[i]) == press_lane and note_ys[i] > 470.0 and note_ys[i] < 530.0
+                note_hit[i] = 1.0
+                score = score + 1
+                combo = combo + 1
+                flash_timer = 0.15
+                flash_lane = press_lane
+                break
+
+fn draw()
+    for lane in range(0, 4)
+        draw_rect(220.0 + float(lane) * 100.0, 495.0, 60.0, 10.0)
+    for i in range(0, len(note_xs))
+        if note_hit[i] == 0.0
+            draw_rect(note_xs[i] - 30.0, note_ys[i] - 10.0, 60.0, 20.0)
+    if flash_timer > 0.0
+        draw_rect(220.0 + float(flash_lane) * 100.0, 488.0, 60.0, 24.0)
+    draw_text("Score: " + str(score), 10.0, 10.0)
+    draw_text("Combo: " + str(combo), 10.0, 30.0)
+    draw_text("Miss: " + str(misses), 10.0, 50.0)
+    draw_text("D F J K", 340.0, 560.0)

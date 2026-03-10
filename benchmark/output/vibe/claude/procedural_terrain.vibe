@@ -1,0 +1,42 @@
+let heights: List[Float] = []
+let scroll_timer: Float = 0.0
+let scroll_speed: Float = 60.0
+
+fn load()
+    let h: Float = 300.0
+    for i in range(0, 80)
+        h = h + rand_float(-30.0, 30.0)
+        if h < 100.0
+            h = 100.0
+        if h > 500.0
+            h = 500.0
+        heights = heights + [h]
+
+fn update(dt: Float)
+    scroll_timer = scroll_timer + scroll_speed * dt
+    if scroll_timer >= 10.0
+        scroll_timer = scroll_timer - 10.0
+        for i in range(0, 79)
+            heights[i] = heights[i + 1]
+        let new_h: Float = heights[78] + rand_float(-30.0, 30.0)
+        if new_h < 100.0
+            new_h = 100.0
+        if new_h > 500.0
+            new_h = 500.0
+        heights[79] = new_h
+    if key_down("up")
+        scroll_speed = scroll_speed + 50.0 * dt
+    if key_down("down")
+        scroll_speed = scroll_speed - 50.0 * dt
+    if scroll_speed < 20.0
+        scroll_speed = 20.0
+    if scroll_speed > 200.0
+        scroll_speed = 200.0
+
+fn draw()
+    for i in range(0, 80)
+        draw_rect(float(i) * 10.0, heights[i], 10.0, 600.0 - heights[i])
+    let player_col: Int = 20
+    draw_rect(float(player_col) * 10.0 - 1.0, heights[player_col] - 14.0, 12.0, 14.0)
+    draw_text("Height: " + str(int(heights[20])), 10.0, 10.0)
+    draw_text("Speed: " + str(int(scroll_speed)), 10.0, 30.0)

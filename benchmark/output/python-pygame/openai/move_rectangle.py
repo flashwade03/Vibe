@@ -3,10 +3,10 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Rectangle")
+pygame.display.set_caption("Move Rectangle")
 clock = pygame.time.Clock()
 
-x, y = 400.0 - 16, 300.0 - 16  # Center the rectangle
+x, y = 384.0, 284.0  # Centered position for a 32x32 rectangle
 speed = 200
 
 running = True

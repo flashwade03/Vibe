@@ -21,10 +21,8 @@ fn update(dt: Float)
     let dist: Float = sqrt(dx * dx + dy * dy)
 
     if dist > 1.0
-        let nx: Float = dx / dist
-        let ny: Float = dy / dist
-        enemy_x = enemy_x + nx * enemy_speed * dt
-        enemy_y = enemy_y + ny * enemy_speed * dt
+        enemy_x = enemy_x + (dx / dist) * enemy_speed * dt
+        enemy_y = enemy_y + (dy / dist) * enemy_speed * dt
 
 fn draw()
     draw_rect(enemy_x, enemy_y, 32.0, 32.0, 0.0, 0.0)

@@ -2,8 +2,8 @@ local x = 384
 local y = 550
 local vy = 0.0
 local on_ground = true
-local gravity = 500.0
 local speed = 200.0
+local gravity = 500.0
 
 function love.load()
     love.window.setMode(800, 600)
@@ -18,11 +18,9 @@ function love.update(dt)
         x = x + speed * dt
     end
 
-    if love.keyboard.isDown("up") then
-        if on_ground then
-            vy = -300.0
-            on_ground = false
-        end
+    if love.keyboard.isDown("up") and on_ground then
+        vy = -300.0
+        on_ground = false
     end
 
     vy = vy + gravity * dt

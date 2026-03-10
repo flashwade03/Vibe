@@ -17,7 +17,7 @@ fn update(dt: Float)
     if key_down("up")
         player_y -= player_speed * dt
 
-    -- Enemy follows player
+    -- Enemy movement
     let dx: Float = player_x - enemy_x
     let dy: Float = player_y - enemy_y
     let distance: Float = sqrt(dx * dx + dy * dy)

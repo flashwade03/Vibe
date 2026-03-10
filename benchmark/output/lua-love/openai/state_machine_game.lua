@@ -8,12 +8,13 @@ function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("3-State Game")
     math.randomseed(os.time())
+    resetTarget()
 end
 
 function love.update(dt)
     if state == 1 then
         timer = timer - dt
-        if timer <= 0 then
+        if timer <= 0.0 then
             state = 2
         end
     end
@@ -38,8 +39,7 @@ function love.keypressed(key)
             state = 1
             score = 0
             timer = 10.0
-            target_x = love.math.random(0, 780)
-            target_y = love.math.random(0, 580)
+            resetTarget()
         end
     end
 end
@@ -48,8 +48,12 @@ function love.mousepressed(mx, my, button)
     if state == 1 and button == 1 then
         if mx >= target_x and mx <= target_x + 20 and my >= target_y and my <= target_y + 20 then
             score = score + 1
-            target_x = love.math.random(0, 780)
-            target_y = love.math.random(0, 580)
+            resetTarget()
         end
     end
+end
+
+function resetTarget()
+    target_x = love.math.random(0, 780)
+    target_y = love.math.random(0, 580)
 end

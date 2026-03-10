@@ -4,7 +4,7 @@ local speed = 200
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe")
+    love.window.setTitle("Vibe Program")
 end
 
 function love.update(dt)

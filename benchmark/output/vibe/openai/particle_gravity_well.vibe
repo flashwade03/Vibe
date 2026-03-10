@@ -1,0 +1,46 @@
+let px: List[Float] = []
+let py: List[Float] = []
+let pvx: List[Float] = []
+let pvy: List[Float] = []
+
+let well_x: Float = 400.0
+let well_y: Float = 300.0
+let well_strength: Float = 5000.0
+
+fn load()
+    for i in range(0, 50)
+        px = px + [rand_float(0.0, 800.0)]
+        py = py + [rand_float(0.0, 600.0)]
+        pvx = pvx + [rand_float(-30.0, 30.0)]
+        pvy = pvy + [rand_float(-30.0, 30.0)]
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    well_x = mx
+    well_y = my
+
+fn update(dt: Float)
+    for i in range(0, 50)
+        let dx: Float = well_x - px[i]
+        let dy: Float = well_y - py[i]
+        let dist: Float = sqrt(dx * dx + dy * dy)
+        if dist > 5.0
+            let force: Float = well_strength / (dist * dist)
+            pvx[i] += dx / dist * force * dt
+            pvy[i] += dy / dist * force * dt
+        px[i] += pvx[i] * dt
+        py[i] += pvy[i] * dt
+        if px[i] < 0.0
+            px[i] = 800.0
+        if px[i] > 800.0
+            px[i] = 0.0
+        if py[i] < 0.0
+            py[i] = 600.0
+        if py[i] > 600.0
+            py[i] = 0.0
+
+fn draw()
+    draw_circle(well_x, well_y, 8.0)
+    for i in range(0, 50)
+        draw_rect(px[i], py[i], 3.0, 3.0)
+    draw_text("Particles: 50", 10.0, 10.0)
+    draw_text("Click to move well", 10.0, 30.0)

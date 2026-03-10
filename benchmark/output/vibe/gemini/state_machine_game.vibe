@@ -22,14 +22,15 @@ fn draw()
         draw_text("Press SPACE to Restart", 250.0, 300.0)
 
 fn keypressed(k: String)
-    if k == "space"
-        if state == 0
+    if state == 0
+        if k == "space"
             state = 1
             score = 0
             timer = 10.0
             target_x = rand_float(0.0, 780.0)
             target_y = rand_float(0.0, 580.0)
-        else if state == 2
+    else if state == 2
+        if k == "space"
             state = 0
 
 fn mousepressed(mx: Float, my: Float, button: Int)

@@ -5,7 +5,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Wave Spawner")
+pygame.display.set_caption("Vibe Game")
 clock = pygame.time.Clock()
 
 # Player variables
@@ -15,11 +15,12 @@ player_radius = 12
 
 # Enemy variables
 ex, ey, evx, evy, elife = [], [], [], [], []
-
-# Game state variables
 wave = 1
 spawn_timer = 2.0
 enemies_per_wave = 3
+enemy_radius = 8
+
+# Game state
 game_over = False
 
 def rand_float(min_val, max_val):
@@ -27,28 +28,26 @@ def rand_float(min_val, max_val):
 
 def spawn_enemies():
     global wave, enemies_per_wave, spawn_timer
+    speed = 80 + wave * 20
     for _ in range(enemies_per_wave):
         edge = rand_float(0.0, 4.0)
         if 0 <= edge < 1:
-            ex.append(rand_float(0, 800))
-            ey.append(0)
+            x, y = rand_float(0, 800), 0
         elif 1 <= edge < 2:
-            ex.append(800)
-            ey.append(rand_float(0, 600))
+            x, y = 800, rand_float(0, 600)
         elif 2 <= edge < 3:
-            ex.append(rand_float(0, 800))
-            ey.append(600)
+            x, y = rand_float(0, 800), 600
         else:
-            ex.append(0)
-            ey.append(rand_float(0, 600))
+            x, y = 0, rand_float(0, 600)
 
-        direction_x = player_x - ex[-1]
-        direction_y = player_y - ey[-1]
-        length = math.sqrt(direction_x**2 + direction_y**2)
+        direction_x = player_x - x
+        direction_y = player_y - y
+        length = math.sqrt(direction_x ** 2 + direction_y ** 2)
         direction_x /= length
         direction_y /= length
 
-        speed = 80 + wave * 20
+        ex.append(x)
+        ey.append(y)
         evx.append(direction_x * speed)
         evy.append(direction_y * speed)
         elife.append(1.0)
@@ -81,13 +80,13 @@ while running:
             spawn_enemies()
 
         for i in range(len(ex)):
-            ex[i] += evx[i] * dt
-            ey[i] += evy[i] * dt
-            elife[i] -= dt
-
             if elife[i] > 0:
-                distance = math.sqrt((player_x - ex[i])**2 + (player_y - ey[i])**2)
-                if distance < player_radius + 8:
+                ex[i] += evx[i] * dt
+                ey[i] += evy[i] * dt
+                elife[i] -= dt
+
+                distance = math.sqrt((player_x - ex[i]) ** 2 + (player_y - ey[i]) ** 2)
+                if distance < player_radius + enemy_radius:
                     game_over = True
 
     screen.fill((0, 0, 0))

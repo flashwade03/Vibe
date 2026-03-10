@@ -25,7 +25,7 @@ function love.draw()
     elseif state == 1 then
         love.graphics.rectangle("fill", target_x, target_y, 20, 20)
         love.graphics.print("Score: " .. score, 10, 10)
-        love.graphics.print(string.format("Timer: %.1f", timer), 10, 30)
+        love.graphics.print("Timer: " .. string.format("%.1f", timer), 10, 30)
     elseif state == 2 then
         love.graphics.print("Game Over! Score: " .. score, 250, 260)
         love.graphics.print("Press SPACE to Restart", 250, 300)

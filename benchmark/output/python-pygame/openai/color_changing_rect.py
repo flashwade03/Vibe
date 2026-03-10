@@ -6,8 +6,9 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Program")
 clock = pygame.time.Clock()
 
-x, y = 368.0, 268.0
+x, y = 368.0, 268.0  # Centered position for 64x64 rectangle
 speed = 100
+
 font = pygame.font.Font(None, 36)
 
 running = True
@@ -30,8 +31,11 @@ while running:
 
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 64, 64))
-    text = font.render("x: " + str(round(x, 2)) + " y: " + str(round(y, 2)), True, (255, 255, 255))
+    
+    position_text = "x: " + str(x) + " y: " + str(y)
+    text = font.render(position_text, True, (255, 255, 255))
     screen.blit(text, (10, 10))
+    
     pygame.display.flip()
 
 pygame.quit()

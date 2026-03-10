@@ -11,6 +11,7 @@ snake_ys = [300.0, 300.0, 300.0]
 
 dir_x = 1.0
 dir_y = 0.0
+
 move_timer = 0.15
 
 running = True
@@ -52,8 +53,8 @@ while running:
             new_y = 580.0
             
         for i in range(len(snake_xs) - 1, 0, -1):
-            snake_xs[i] = snake_xs[i - 1]
-            snake_ys[i] = snake_ys[i - 1]
+            snake_xs[i] = snake_xs[i-1]
+            snake_ys[i] = snake_ys[i-1]
             
         snake_xs[0] = new_x
         snake_ys[0] = new_y
