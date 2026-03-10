@@ -25,11 +25,14 @@ enum struct and or not use yield trait has
 ## 디렉토리 구조
 
 ```
-src/           — 트랜스파일러 소스 (TypeScript)
-design/        — 설계 문서
-research/      — 리서치 문서
-examples/      — Vibe 예제 코드 (.vibe)
-build/         — 생성된 Lua 출력 (gitignore)
+vibe-lang/           — Vibe 언어 전체
+  src/               — 트랜스파일러 소스 (TypeScript)
+  grammar/           — PEG 문법 정의
+  examples/          — Vibe 예제 코드 (.vibe)
+  benchmark/         — LLM 벤치마크 (50 tasks × 3 langs × 3 LLMs)
+design/              — 설계 문서
+research/            — 리서치 문서
+build/               — 생성된 Lua 출력 (gitignore)
 ```
 
 ## 설계 문서
@@ -39,8 +42,8 @@ build/         — 생성된 Lua 출력 (gitignore)
 | 문서 | 참조 시점 |
 |------|----------|
 | `design/phase1-minimal-pipeline.md` | 파이프라인 구조, 스코프, 제약 조건 확인 시 |
-| `design/vibe-core-grammar.peg` | 파서 구현 시 문법 규칙 참조 |
-| `design/type-system-grammar.peg` | 타입 시스템 문법 참조 |
+| `vibe-lang/grammar/vibe-core-grammar.peg` | 파서 구현 시 문법 규칙 참조 |
+| `vibe-lang/grammar/type-system-grammar.peg` | 타입 시스템 문법 참조 |
 | `design/game-annotations.md` | 어노테이션 체계 참조 (v0 이후) |
 | `design/llm-code-generation-strategy.md` | LLM 코드 생성 전략, 5대 설계 원칙, 4-Layer Defense |
 | `design/error-feedback-loop.md` | Error-Feedback Loop 아키텍처, 재시도 전략 |
@@ -107,9 +110,9 @@ build/         — 생성된 Lua 출력 (gitignore)
 백그라운드 에이전트로 실행:
 
 ```
-Agent(prompt="npx tsx benchmark/runner.ts를 실행하고 결과를 요약해줘. Vibe pass rate이 이전보다 떨어졌으면 원인 분석도 해줘.", run_in_background=true)
+Agent(prompt="npx tsx vibe-lang/benchmark/runner.ts를 실행하고 결과를 요약해줘. Vibe pass rate이 이전보다 떨어졌으면 원인 분석도 해줘.", run_in_background=true)
 ```
 
 - 모든 변경 후 반드시 벤치마크 실행
 - Vibe pass rate이 이전보다 떨어지면 원인 분석 후 수정
-- 결과는 `benchmark/results.md`에 갱신
+- 결과는 `vibe-lang/benchmark/results.md`에 갱신
