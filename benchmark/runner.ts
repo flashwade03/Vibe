@@ -69,13 +69,13 @@ async function main() {
               compilesOk: retryResult.valid,
               errors: retryResult.valid ? [] : retryResult.errors.slice(-1),
               tokenCount,
-              latencyMs: 0,
+              latencyMs: retryResult.totalLatencyMs,
             });
 
             const status = retryResult.valid ? "PASS" : "FAIL";
             const retryInfo = retryResult.attempts > 1 ? ` [${retryResult.attempts} attempts]` : "";
             console.log(
-              `    -> ${status} (${tokenCount} tokens)${retryInfo}`
+              `    -> ${status} (${tokenCount} tokens, ${retryResult.totalLatencyMs}ms)${retryInfo}`
             );
             if (!retryResult.valid) {
               console.log(

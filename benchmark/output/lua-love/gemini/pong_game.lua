@@ -29,16 +29,16 @@ function love.update(dt)
     ball_y = ball_y + ball_vy * dt
 
     -- Bounce top/bottom
-    if ball_y < 8.0 then ball_vy = -ball_vy end
-    if ball_y > 592.0 then ball_vy = -ball_vy end
+    if ball_y < 8.0 then ball_vy = math.abs(ball_vy) end
+    if ball_y > 592.0 then ball_vy = -math.abs(ball_vy) end
 
     -- Paddle collisions
     if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and ball_y >= p1_y and ball_y <= p1_y + 80.0 then
-        ball_vx = -ball_vx
+        ball_vx = math.abs(ball_vx)
         ball_x = 50.0
     end
     if ball_x + 8.0 >= 758.0 and ball_x < 770.0 and ball_y >= p2_y and ball_y <= p2_y + 80.0 then
-        ball_vx = -ball_vx
+        ball_vx = -math.abs(ball_vx)
         ball_x = 750.0
     end
 

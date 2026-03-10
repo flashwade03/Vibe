@@ -1,4 +1,4 @@
-local state = 0 -- 0 = menu, 1 = playing, 2 = gameover
+local state = 0
 local score = 0
 local timer = 10.0
 local target_x = 0

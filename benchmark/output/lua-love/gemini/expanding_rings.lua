@@ -18,9 +18,16 @@ function love.mousepressed(mx, my, button)
 end
 
 function love.update(dt)
-    for i = 1, #ring_xs do
+    for i = #ring_xs, 1, -1 do
         ring_radii[i] = ring_radii[i] + 80.0 * dt
         ring_lifes[i] = ring_lifes[i] - dt
+        
+        if ring_lifes[i] <= 0 then
+            table.remove(ring_xs, i)
+            table.remove(ring_ys, i)
+            table.remove(ring_radii, i)
+            table.remove(ring_lifes, i)
+        end
     end
 end
 
@@ -30,8 +37,7 @@ function love.draw()
             love.graphics.circle("line", ring_xs[i], ring_ys[i], ring_radii[i])
         end
     end
-
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Rings: " .. #ring_xs, 10.0, 10.0)
-    love.graphics.print("Click to create rings", 280.0, 560.0)
+    
+    love.graphics.print("Rings: " .. #ring_xs, 10, 10)
+    love.graphics.print("Click to create rings", 280, 560)
 end

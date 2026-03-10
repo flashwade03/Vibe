@@ -35,18 +35,18 @@ function love.update(dt)
         on_ground = false
     end
     
-    -- Collision with platforms
+    -- Platform collisions
     on_ground = false
     if vy >= 0 then
         for i = 1, #plat_xs do
             if prev_y + 20 <= plat_ys[i] and py + 20 >= plat_ys[i] and 
                px + 20 > plat_xs[i] and px < plat_xs[i] + plat_ws[i] then
-                py = plat_ys[i] - 20.0
+                py = plat_ys[i] - 20
                 vy = 0
                 on_ground = true
             end
         end
-        -- Ground collision
+        -- Floor collision
         if py + 20 >= 580 then
             py = 580 - 20
             vy = 0
@@ -72,6 +72,6 @@ function love.draw()
         love.graphics.rectangle("fill", plat_xs[i], plat_ys[i], plat_ws[i], 12)
     end
     
-    -- Draw ground
+    -- Draw floor
     love.graphics.rectangle("fill", 0, 580, 800, 20)
 end

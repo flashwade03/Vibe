@@ -8,7 +8,6 @@ pygame.display.set_caption("Blinking Text")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
 
-# Game state variables
 timer = 0.0
 
 running = True
@@ -32,8 +31,8 @@ while running:
         screen.blit(text_surface, (300.0, 280.0))
     
     # Draw timer text
-    timer_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(timer_text, (10.0, 10.0))
+    timer_surface = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
+    screen.blit(timer_surface, (10.0, 10.0))
 
     pygame.display.flip()
 

@@ -4,11 +4,11 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Text Blinker")
+pygame.display.set_caption("Blinking Text")
 clock = pygame.time.Clock()
 
-font = pygame.font.Font(None, 36)
 timer = 0.0
+font = pygame.font.Font(None, 36)
 
 running = True
 while running:
@@ -27,8 +27,8 @@ while running:
         text = font.render("Hello Vibe!", True, (255, 255, 255))
         screen.blit(text, (300.0, 280.0))
 
-    time_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(time_text, (10.0, 10.0))
+    timer_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
+    screen.blit(timer_text, (10.0, 10.0))
 
     pygame.display.flip()
 

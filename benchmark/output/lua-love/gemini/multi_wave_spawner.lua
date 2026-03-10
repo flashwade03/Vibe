@@ -9,7 +9,7 @@ local ex, ey, evx, evy, elife = {}, {}, {}, {}, {}
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Wave Survival")
+    love.window.setTitle("Vibe Wave")
 end
 
 function love.update(dt)
@@ -32,11 +32,9 @@ function love.update(dt)
             else x, y = 0, love.math.random(0, 600) end
             
             local dx, dy = px - x, py - y
-            local len = math.sqrt(dx*dx + dy*dy)
-            table.insert(ex, x)
-            table.insert(ey, y)
-            table.insert(evx, (dx / len) * speed)
-            table.insert(evy, (dy / len) * speed)
+            local dist = math.sqrt(dx*dx + dy*dy)
+            table.insert(ex, x); table.insert(ey, y)
+            table.insert(evx, (dx/dist) * speed); table.insert(evy, (dy/dist) * speed)
             table.insert(elife, 1.0)
         end
         wave = wave + 1
@@ -55,6 +53,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", px, py, 12)
     
     for i = 1, #ex do

@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Engine")
+pygame.display.set_caption("Vibe Engine Text Reveal")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 32)
 
@@ -37,25 +37,25 @@ while running:
     # Draw logic
     screen.fill((0, 0, 0))
     
-    # Draw text
+    # Draw main text
     text_surface = font.render(full_text, True, (255, 255, 255))
-    screen.blit(text_surface, (100, 280))
+    screen.blit(text_surface, (100.0, 280.0))
     
     # Draw covering rectangle
-    cover_x = 100.0 + float(char_index) * 10.0
-    pygame.draw.rect(screen, (0, 0, 0), (int(cover_x), 270, 700, 30))
+    cover_x = 100.0 + float(char_index) * 14.5 # Adjusted multiplier for font width
+    pygame.draw.rect(screen, (0, 0, 0), (cover_x, 270.0, 700.0, 40.0))
     
     # Draw cursor
     if math.sin(char_timer * 10.0) > 0.0:
-        pygame.draw.rect(screen, (255, 255, 255), (int(cover_x), 275, 2, 20))
+        pygame.draw.rect(screen, (255, 255, 255), (cover_x, 275.0, 2.0, 20.0))
         
     # Display stats
     stats_text = font.render(f"Chars: {char_index}/{text_len}", True, (255, 255, 255))
-    screen.blit(stats_text, (10, 10))
+    screen.blit(stats_text, (10.0, 10.0))
     
     if char_index >= text_len:
         done_text = font.render("Done!", True, (255, 255, 255))
-        screen.blit(done_text, (10, 30))
+        screen.blit(done_text, (10.0, 30.0))
 
     pygame.display.flip()
 

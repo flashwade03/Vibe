@@ -46,7 +46,11 @@ function love.draw()
 
     -- Draw control points
     for i = 1, 4 do
-        if (i - 1) == selected then love.graphics.setColor(1, 0, 0) else love.graphics.setColor(0, 1, 0) end
+        if (i - 1) == selected then
+            love.graphics.setColor(1, 0, 0)
+        else
+            love.graphics.setColor(0, 1, 0)
+        end
         love.graphics.circle("fill", cp_xs[i], cp_ys[i], 8.0)
     end
 

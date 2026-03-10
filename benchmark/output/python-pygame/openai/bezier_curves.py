@@ -15,14 +15,10 @@ def draw_bezier_curve():
     for i in range(51):
         t = float(i) / 50.0
         u = 1.0 - t
-        bx = (u * u * u * cp_xs[0] +
-              3.0 * u * u * t * cp_xs[1] +
-              3.0 * u * t * t * cp_xs[2] +
-              t * t * t * cp_xs[3])
-        by = (u * u * u * cp_ys[0] +
-              3.0 * u * u * t * cp_ys[1] +
-              3.0 * u * t * t * cp_ys[2] +
-              t * t * t * cp_ys[3])
+        bx = (u * u * u * cp_xs[0] + 3.0 * u * u * t * cp_xs[1] +
+              3.0 * u * t * t * cp_xs[2] + t * t * t * cp_xs[3])
+        by = (u * u * u * cp_ys[0] + 3.0 * u * u * t * cp_ys[1] +
+              3.0 * u * t * t * cp_ys[2] + t * t * t * cp_ys[3])
         pygame.draw.circle(screen, (255, 255, 255), (int(bx), int(by)), 2)
 
 def draw_control_points():

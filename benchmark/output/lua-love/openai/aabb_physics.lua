@@ -14,10 +14,10 @@ function love.load()
 
     for i = 0, 5 do
         table.insert(box_xs, 80.0 + i * 110.0)
-        table.insert(box_ys, love.math.random(50, 200))
+        table.insert(box_ys, love.math.random(50.0, 200.0))
         table.insert(box_vys, 0.0)
-        table.insert(box_ws, love.math.random(30, 60))
-        table.insert(box_hs, love.math.random(30, 60))
+        table.insert(box_ws, love.math.random(30.0, 60.0))
+        table.insert(box_hs, love.math.random(30.0, 60.0))
     end
 end
 
@@ -52,10 +52,10 @@ function love.update(dt)
     end
 end
 
-function love.keypressed(key)
-    if key == "space" then
+function love.keypressed(k)
+    if k == "space" then
         for i = 1, 6 do
-            box_ys[i] = love.math.random(50, 200)
+            box_ys[i] = love.math.random(50.0, 200.0)
             box_vys[i] = 0.0
         end
     end

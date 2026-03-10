@@ -7,7 +7,7 @@ pygame.display.set_caption("Vibe Rectangle")
 clock = pygame.time.Clock()
 
 # Initial position at center (800/2 - 32/2, 600/2 - 32/2)
-rect_x, rect_y = 384.0, 284.0
+x, y = 384.0, 284.0
 speed = 200.0
 
 running = True
@@ -18,24 +18,23 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Movement logic using key states
     keys = pygame.key.get_pressed()
-    
-    # Movement logic using arrow keys
     if keys[pygame.K_LEFT]:
-        rect_x -= speed * dt
+        x -= speed * dt
     if keys[pygame.K_RIGHT]:
-        rect_x += speed * dt
+        x += speed * dt
     if keys[pygame.K_UP]:
-        rect_y -= speed * dt
+        y -= speed * dt
     if keys[pygame.K_DOWN]:
-        rect_y += speed * dt
+        y += speed * dt
 
-    # Clear screen
+    # Keep rectangle within screen bounds
+    x = max(0, min(x, 800 - 32))
+    y = max(0, min(y, 600 - 32))
+
     screen.fill((0, 0, 0))
-    
-    # Draw white rectangle
-    pygame.draw.rect(screen, (255, 255, 255), (int(rect_x), int(rect_y), 32, 32))
-    
+    pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
     pygame.display.flip()
 
 pygame.quit()

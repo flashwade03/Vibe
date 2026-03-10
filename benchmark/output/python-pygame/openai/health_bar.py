@@ -6,9 +6,12 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe Health Bar")
 clock = pygame.time.Clock()
 
+# Game state variables
 health = 100.0
 max_health = 100.0
 regen_rate = 5.0
+
+font = pygame.font.Font(None, 36)
 
 running = True
 while running:
@@ -23,31 +26,32 @@ while running:
                 if health < 0.0:
                     health = 0.0
 
+    # Update logic
     if health > 0.0 and health < max_health:
         health += regen_rate * dt
         if health > max_health:
             health = max_health
 
+    # Draw logic
     screen.fill((0, 0, 0))
 
     # Draw health bar background
-    pygame.draw.rect(screen, (255, 255, 255), (250.0, 50.0, 300.0, 30.0), 2)
+    pygame.draw.rect(screen, (255, 255, 255), (250, 50, 300, 30), 2)
 
     # Draw filled portion of health bar
     bar_width = (health / max_health) * 300.0
-    pygame.draw.rect(screen, (255, 255, 255), (250.0, 50.0, bar_width, 30.0))
+    pygame.draw.rect(screen, (255, 255, 255), (250, 50, bar_width, 30))
 
     # Display health text
-    font = pygame.font.Font(None, 36)
     health_text = font.render(f"HP: {int(health)} / 100", True, (255, 255, 255))
-    screen.blit(health_text, (250.0, 90.0))
+    screen.blit(health_text, (250, 90))
 
     # Draw player
-    pygame.draw.rect(screen, (255, 255, 255), (384.0, 300.0, 32, 32))
+    pygame.draw.rect(screen, (255, 255, 255), (384, 300, 32, 32))
 
-    # Display instructions
-    instructions = font.render("Press SPACE to take damage", True, (255, 255, 255))
-    screen.blit(instructions, (230.0, 550.0))
+    # Display instruction text
+    instruction_text = font.render("Press SPACE to take damage", True, (255, 255, 255))
+    screen.blit(instruction_text, (230, 550))
 
     pygame.display.flip()
 

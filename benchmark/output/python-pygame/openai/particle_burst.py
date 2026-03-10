@@ -19,7 +19,7 @@ def rand_float(min_val, max_val):
 
 def mousepressed(mx, my, button):
     for _ in range(10):
-        angle = rand_float(0.0, 6.283)
+        angle = rand_float(0.0, 6.283)  # 0 to 2*pi
         speed = rand_float(50.0, 200.0)
         vx = math.cos(angle) * speed
         vy = math.sin(angle) * speed
@@ -30,10 +30,16 @@ def mousepressed(mx, my, button):
         particle_lifes.append(2.0)
 
 def update(dt):
-    for i in range(len(particle_xs)):
+    for i in range(len(particle_xs) - 1, -1, -1):
         particle_xs[i] += particle_vxs[i] * dt
         particle_ys[i] += particle_vys[i] * dt
         particle_lifes[i] -= dt
+        if particle_lifes[i] <= 0.0:
+            del particle_xs[i]
+            del particle_ys[i]
+            del particle_vxs[i]
+            del particle_vys[i]
+            del particle_lifes[i]
 
 def draw():
     for i in range(len(particle_xs)):

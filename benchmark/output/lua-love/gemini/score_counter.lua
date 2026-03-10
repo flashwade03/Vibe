@@ -5,14 +5,14 @@ function love.load()
     love.window.setTitle("Score Clicker")
 end
 
-function love.update(dt)
-    -- Update logic
-end
-
 function love.keypressed(key)
     if key == "space" then
         score = score + 1
     end
+end
+
+function love.update(dt)
+    -- Update logic
 end
 
 function love.draw()

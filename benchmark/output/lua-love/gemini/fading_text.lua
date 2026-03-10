@@ -11,10 +11,10 @@ end
 
 function love.draw()
     local vis = math.sin(timer * 2.0)
-    
+
     if vis > 0.0 then
         love.graphics.print("Hello Vibe!", 300, 280)
     end
-    
+
     love.graphics.print("Time: " .. math.floor(timer), 10, 10)
 end

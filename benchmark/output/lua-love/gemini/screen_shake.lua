@@ -5,7 +5,7 @@ local shake_intensity = 0.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Screen Shake Effect")
+    love.window.setTitle("Screen Shake")
 end
 
 function love.keypressed(key)
@@ -28,7 +28,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Center rectangle
+    -- Main rectangle
     love.graphics.rectangle("fill", 368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0)
     
     -- Corner markers

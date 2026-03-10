@@ -20,14 +20,14 @@ end
 
 function love.update(dt)
     if not built then
-        q_xs = {400.0}
-        q_ys = {580.0}
-        q_angles = {-1.5708}
-        q_lens = {100.0}
-        q_depths = {0.0}
+        q_xs[#q_xs + 1] = 400.0
+        q_ys[#q_ys + 1] = 580.0
+        q_angles[#q_angles + 1] = -1.5708
+        q_lens[#q_lens + 1] = 100.0
+        q_depths[#q_depths + 1] = 0.0
 
         local ptr = 1
-        for iter = 1, 500 do
+        for _ = 1, 500 do
             if ptr > #q_xs then break end
 
             local sx = q_xs[ptr]
@@ -39,26 +39,26 @@ function love.update(dt)
             local ex = sx + math.cos(sa) * sl
             local ey = sy + math.sin(sa) * sl
 
-            table.insert(seg_x1s, sx)
-            table.insert(seg_y1s, sy)
-            table.insert(seg_x2s, ex)
-            table.insert(seg_y2s, ey)
+            seg_x1s[#seg_x1s + 1] = sx
+            seg_y1s[#seg_y1s + 1] = sy
+            seg_x2s[#seg_x2s + 1] = ex
+            seg_y2s[#seg_y2s + 1] = ey
 
             if sd < max_depth then
                 local nl = sl * 0.7
                 local nd = sd + 1.0
 
-                table.insert(q_xs, ex)
-                table.insert(q_ys, ey)
-                table.insert(q_angles, sa - branch_angle)
-                table.insert(q_lens, nl)
-                table.insert(q_depths, nd)
+                q_xs[#q_xs + 1] = ex
+                q_ys[#q_ys + 1] = ey
+                q_angles[#q_angles + 1] = sa - branch_angle
+                q_lens[#q_lens + 1] = nl
+                q_depths[#q_depths + 1] = nd
 
-                table.insert(q_xs, ex)
-                table.insert(q_ys, ey)
-                table.insert(q_angles, sa + branch_angle)
-                table.insert(q_lens, nl)
-                table.insert(q_depths, nd)
+                q_xs[#q_xs + 1] = ex
+                q_ys[#q_ys + 1] = ey
+                q_angles[#q_angles + 1] = sa + branch_angle
+                q_lens[#q_lens + 1] = nl
+                q_depths[#q_depths + 1] = nd
             end
 
             ptr = ptr + 1
@@ -78,6 +78,6 @@ function love.draw()
         end
     end
 
-    love.graphics.print("Segments: " .. tostring(#seg_x1s), 10, 10)
-    love.graphics.print("Angle: " .. tostring(branch_angle), 10, 30)
+    love.graphics.print("Segments: " .. #seg_x1s, 10, 10)
+    love.graphics.print("Angle: " .. branch_angle, 10, 30)
 end

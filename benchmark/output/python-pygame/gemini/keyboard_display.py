@@ -18,28 +18,25 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
-        # Key pressed logic
         if event.type == pygame.KEYDOWN:
+            # Update logic for keypressed
             last_key = pygame.key.name(event.key)
             key_count += 1
 
-    # Draw logic
     screen.fill((0, 0, 0))
-    
-    # Display text
-    text_last = font.render("Last Key: " + last_key, True, (255, 255, 255))
-    screen.blit(text_last, (250, 250))
-    
-    text_count = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
-    screen.blit(text_count, (250, 290))
-    
+
+    # Draw logic
+    text1 = font.render("Last Key: " + last_key, True, (255, 255, 255))
+    screen.blit(text1, (250, 250))
+
+    text2 = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
+    screen.blit(text2, (250, 290))
+
     # Decorative rectangle
     pygame.draw.rect(screen, (255, 255, 255), (300, 350, 200, 80), 2)
     
-    # Display key inside rectangle
-    text_inside = font.render(last_key, True, (255, 255, 255))
-    screen.blit(text_inside, (370, 380))
+    text3 = font.render(last_key, True, (255, 255, 255))
+    screen.blit(text3, (370, 380))
 
     pygame.display.flip()
 

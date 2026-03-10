@@ -25,12 +25,11 @@ end
 
 function love.update(dt)
     if love.keyboard.isDown("left") then
-        px = px - 250 * dt
+        px = math.max(0.0, px - 250.0 * dt)
     end
     if love.keyboard.isDown("right") then
-        px = px + 250 * dt
+        px = math.min(768.0, px + 250.0 * dt)
     end
-    px = math.max(0, math.min(px, 768))
 
     local reverse = false
     for i = 1, #inv_xs do
@@ -73,8 +72,8 @@ function love.update(dt)
     end
 end
 
-function love.keypressed(k)
-    if k == "space" then
+function love.keypressed(key)
+    if key == "space" then
         table.insert(bul_xs, px + 14.0)
         table.insert(bul_ys, 540.0)
         table.insert(bul_alive, 1.0)
@@ -96,7 +95,7 @@ function love.draw()
         end
     end
 
-    love.graphics.print("Score: " .. score, 10, 10)
+    love.graphics.print("Score: " .. score, 10.0, 10.0)
 
     local alive = 0
     for i = 1, #inv_alive do
@@ -106,6 +105,6 @@ function love.draw()
     end
 
     if alive == 0 then
-        love.graphics.print("YOU WIN!", 340, 280)
+        love.graphics.print("YOU WIN!", 340.0, 280.0)
     end
 end

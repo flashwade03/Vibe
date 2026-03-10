@@ -36,7 +36,7 @@ fn update(dt: Float)
                 let dx = boid_xs[i] - boid_xs[j]
                 let dy = boid_ys[i] - boid_ys[j]
                 let distance = sqrt(dx * dx + dy * dy)
-                if distance < 30.0
+                if distance < 30.0 and distance > 0.0
                     vx += (dx / distance) * 100.0 * dt
                     vy += (dy / distance) * 100.0 * dt
 
@@ -46,11 +46,10 @@ fn update(dt: Float)
             vx = vx / speed * 150.0
             vy = vy / speed * 150.0
 
-        -- Update velocity
         boid_vxs[i] = vx
         boid_vys[i] = vy
 
-        -- Update position
+        -- Update positions
         boid_xs[i] += vx * dt
         boid_ys[i] += vy * dt
 

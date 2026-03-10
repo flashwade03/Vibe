@@ -27,11 +27,12 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.MOUSEBUTTONDOWN and len(tow_xs) < 5:
-            mx, my = pygame.mouse.get_pos()
-            tow_xs.append(float(mx))
-            tow_ys.append(float(my))
-            tow_timers.append(0.0)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if len(tow_xs) < 5:
+                mx, my = pygame.mouse.get_pos()
+                tow_xs.append(float(mx))
+                tow_ys.append(float(my))
+                tow_timers.append(0.0)
 
     # Update logic
     spawn_timer -= dt
@@ -72,39 +73,34 @@ while running:
                 proj_txs.append(en_xs[best]); proj_tys.append(en_ys[best])
                 proj_alive.append(1.0)
 
-    for i in range(len(proj_xs)):
-        if proj_alive[i]:
-            dx, dy = proj_txs[i] - proj_xs[i], proj_tys[i] - proj_ys[i]
-            dist = math.sqrt(dx*dx + dy*dy)
-            if dist < 10:
-                proj_alive[i] = 0.0
-                for e in range(len(en_xs)):
-                    if en_hp[e] > 0.0 and math.sqrt((en_xs[e]-proj_txs[i])**2 + (en_ys[e]-proj_tys[i])**2) < 20:
-                        en_hp[e] -= 1.0
-                        if en_hp[e] <= 0: score += 10
+    for p in range(len(proj_alive)):
+        if proj_alive[p] > 0.5:
+            dx, dy = proj_txs[p] - proj_xs[p], proj_tys[p] - proj_ys[p]
+            d = math.sqrt(dx*dx + dy*dy)
+            if d < 10.0:
+                proj_alive[p] = 0.0
+                for i in range(len(en_xs)):
+                    if en_hp[i] > 0.0 and math.sqrt((proj_xs[p]-en_xs[i])**2 + (proj_ys[p]-en_ys[i])**2) < 20.0:
+                        en_hp[i] -= 1.0
+                        if en_hp[i] <= 0.0: score += 10
             else:
-                proj_xs[i] += (dx/dist) * 300 * dt
-                proj_ys[i] += (dy/dist) * 300 * dt
+                proj_xs[p] += (dx/d) * 300.0 * dt
+                proj_ys[p] += (dy/d) * 300.0 * dt
 
     # Draw logic
     screen.fill((0, 0, 0))
     for i in range(5):
-        start, end = (path_xs[i], path_ys[i]), (path_xs[i+1], path_ys[i+1])
-        for j in range(21):
-            pos = (start[0] + (end[0]-start[0])*j/20, start[1] + (end[1]-start[1])*j/20)
-            pygame.draw.circle(screen, (50, 50, 50), (int(pos[0]), int(pos[1])), 2)
-    
+        pygame.draw.line(screen, (100, 100, 100), (path_xs[i], path_ys[i]), (path_xs[i+1], path_ys[i+1]), 5)
     for i in range(len(en_xs)):
-        if en_hp[i] > 0: pygame.draw.circle(screen, (255, 0, 0), (int(en_xs[i]), int(en_ys[i])), 8)
-    for i in range(len(tow_xs)): pygame.draw.rect(screen, (0, 255, 0), (int(tow_xs[i]-10), int(tow_ys[i]-10), 20, 20))
-    for i in range(len(proj_xs)):
-        if proj_alive[i]: pygame.draw.rect(screen, (255, 255, 0), (int(proj_xs[i]-2), int(proj_ys[i]-2), 4, 4))
+        if en_hp[i] > 0.0: pygame.draw.circle(screen, (255, 0, 0), (int(en_xs[i]), int(en_ys[i])), 8)
+    for i in range(len(tow_xs)):
+        pygame.draw.rect(screen, (0, 255, 0), (int(tow_xs[i]-10), int(tow_ys[i]-10), 20, 20))
+    for i in range(len(proj_alive)):
+        if proj_alive[i] > 0.5: pygame.draw.rect(screen, (255, 255, 0), (int(proj_xs[i]-2), int(proj_ys[i]-2), 4, 4))
     
     screen.blit(font.render(f"Lives: {lives} Score: {score}", True, (255, 255, 255)), (10, 10))
     screen.blit(font.render(f"Click to place tower ({len(tow_xs)}/5)", True, (255, 255, 255)), (10, 30))
-    
     pygame.display.flip()
-    if lives <= 0: running = False
 
 pygame.quit()
 sys.exit()

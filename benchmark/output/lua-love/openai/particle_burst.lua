@@ -12,7 +12,7 @@ end
 function love.mousepressed(mx, my, button)
     if button == 1 then
         for i = 1, 10 do
-            local angle = love.math.random() * 2 * math.pi
+            local angle = love.math.random() * 6.283
             local speed = love.math.random(50, 200)
             local vx = math.cos(angle) * speed
             local vy = math.sin(angle) * speed
@@ -26,12 +26,11 @@ function love.mousepressed(mx, my, button)
 end
 
 function love.update(dt)
-    for i = #particle_lifes, 1, -1 do
+    for i = #particle_xs, 1, -1 do
+        particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
+        particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
         particle_lifes[i] = particle_lifes[i] - dt
-        if particle_lifes[i] > 0 then
-            particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
-            particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
-        else
+        if particle_lifes[i] <= 0 then
             table.remove(particle_xs, i)
             table.remove(particle_ys, i)
             table.remove(particle_vxs, i)
@@ -42,7 +41,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    for i = 1, #particle_lifes do
+    for i = 1, #particle_xs do
         if particle_lifes[i] > 0 then
             love.graphics.rectangle("fill", particle_xs[i], particle_ys[i], 4, 4)
         end

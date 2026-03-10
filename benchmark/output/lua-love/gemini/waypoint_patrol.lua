@@ -7,12 +7,12 @@ local patrol_speed = 120.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Patrol Game")
+    love.window.setTitle("Patrol Enemy")
 end
 
 function love.update(dt)
-    local target_x = wp_xs[current_wp + 1]
-    local target_y = wp_ys[current_wp + 1]
+    local target_x = wp_xs[current_wp]
+    local target_y = wp_ys[current_wp]
     
     local dx = target_x - patrol_x
     local dy = target_y - patrol_y
@@ -23,15 +23,15 @@ function love.update(dt)
         patrol_y = patrol_y + (dy / dist) * patrol_speed * dt
     else
         current_wp = current_wp + 1
-        if current_wp >= 4 then
-            current_wp = 0
+        if current_wp > 4 then
+            current_wp = 1
         end
     end
 end
 
 function love.draw()
     -- Draw waypoints
-    love.graphics.setColor(0.5, 0.5, 0.5)
+    love.graphics.setColor(0.3, 0.3, 0.3)
     for i = 1, 4 do
         love.graphics.rectangle("fill", wp_xs[i] - 4.0, wp_ys[i] - 4.0, 8, 8)
     end
@@ -42,5 +42,5 @@ function love.draw()
     
     -- Draw UI
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Waypoint: " .. current_wp, 10.0, 10.0)
+    love.graphics.print("Waypoint: " .. current_wp, 10, 10)
 end

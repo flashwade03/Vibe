@@ -58,10 +58,10 @@ fn update(dt: Float)
             i += 1
 
         wave += 1
+        enemies_per_wave = 3 + wave
         spawn_timer = 3.0 - float(wave) * 0.2
         if spawn_timer < 0.5
             spawn_timer = 0.5
-        enemies_per_wave = 3 + wave
 
     let j: Int = 0
     for j < len(ex)

@@ -14,7 +14,7 @@ max_depth = 7
 branch_angle = 0.5
 built = False
 
-# Seed
+# Seed the tree
 q_xs.append(400.0)
 q_ys.append(580.0)
 q_angles.append(-1.5708)
@@ -48,12 +48,11 @@ while running:
             if sd < float(max_depth):
                 nl = sl * 0.7
                 nd = sd + 1.0
-                for angle_mod in [-branch_angle, branch_angle]:
-                    q_xs.append(ex)
-                    q_ys.append(ey)
-                    q_angles.append(sa + angle_mod)
-                    q_lens.append(nl)
-                    q_depths.append(nd)
+                q_xs.extend([ex, ex])
+                q_ys.extend([ey, ey])
+                q_angles.extend([sa - branch_angle, sa + branch_angle])
+                q_lens.extend([nl, nl])
+                q_depths.extend([nd, nd])
             ptr += 1
         built = True
 

@@ -8,7 +8,6 @@ pygame.display.set_caption("Pulsing Circles Grid")
 clock = pygame.time.Clock()
 
 timer = 0.0
-font = pygame.font.Font(None, 36)
 
 running = True
 while running:
@@ -29,8 +28,9 @@ while running:
             radius = 20.0 + 15.0 * math.sin(timer * 3.0 + phase)
             pygame.draw.circle(screen, (255, 255, 255), (int(cx), int(cy)), int(radius))
 
-    time_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(time_text, (10.0, 10.0))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
+    screen.blit(text, (10.0, 10.0))
 
     pygame.display.flip()
 

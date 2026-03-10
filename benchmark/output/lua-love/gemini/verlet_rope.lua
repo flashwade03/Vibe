@@ -68,8 +68,8 @@ function love.draw()
     for i = 1, num_nodes - 1 do
         for j = 0, 4 do
             local lt = j / 5.0
-            local lx = node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt
-            local ly = node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt
+            local lx = node_xs[i] + (node_xs[i+1] - node_xs[i]) * lt
+            local ly = node_ys[i] + (node_ys[i+1] - node_ys[i]) * lt
             love.graphics.circle("fill", lx, ly, 2.0)
         end
     end

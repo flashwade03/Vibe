@@ -50,7 +50,7 @@ function love.keypressed(k)
 
     if press_lane >= 0 then
         for i = 1, #note_ys do
-            if note_hit[i] == 0.0 and note_lanes[i] == press_lane and note_ys[i] > 470.0 and note_ys[i] < 530.0 then
+            if note_hit[i] == 0.0 and math.floor(note_lanes[i]) == press_lane and note_ys[i] > 470.0 and note_ys[i] < 530.0 then
                 note_hit[i] = 1.0
                 score = score + 1
                 combo = combo + 1
@@ -74,9 +74,7 @@ function love.draw()
     end
 
     if flash_timer > 0.0 then
-        love.graphics.setColor(1, 1, 0)
         love.graphics.rectangle("fill", 220.0 + flash_lane * 100.0, 488.0, 60.0, 24.0)
-        love.graphics.setColor(1, 1, 1)
     end
 
     love.graphics.print("Score: " .. score, 10.0, 10.0)

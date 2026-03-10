@@ -21,7 +21,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # Handle jump on key down event
+        
+        # Jump logic on key down event
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and on_ground:
                 vy = jump_force
@@ -41,13 +42,12 @@ while running:
     # Ground collision
     if y >= 550:
         y = 550
-        vy = 0.0
+        vy = 0
         on_ground = True
 
     # Draw logic
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (int(x), int(y), 32, 32))
-    
     pygame.display.flip()
 
 pygame.quit()

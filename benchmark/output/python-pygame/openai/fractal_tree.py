@@ -7,9 +7,19 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Fractal Tree")
 clock = pygame.time.Clock()
 
-# Fractal tree state variables
-seg_x1s, seg_y1s, seg_x2s, seg_y2s = [], [], [], []
-q_xs, q_ys, q_angles, q_lens, q_depths = [], [], [], [], []
+# Line segments
+seg_x1s = []
+seg_y1s = []
+seg_x2s = []
+seg_y2s = []
+
+# Processing queue
+q_xs = []
+q_ys = []
+q_angles = []
+q_lens = []
+q_depths = []
+
 max_depth = 7
 branch_angle = 0.5
 built = False
@@ -17,10 +27,10 @@ built = False
 def update(dt):
     global built
     if not built:
-        # Seed the tree
+        # Seed
         q_xs.append(400.0)
         q_ys.append(580.0)
-        q_angles.append(-1.5708)  # -90 degrees in radians
+        q_angles.append(-1.5708)
         q_lens.append(100.0)
         q_depths.append(0.0)
 
@@ -72,10 +82,10 @@ def draw():
             pygame.draw.circle(screen, (255, 255, 255), (int(lx), int(ly)), 1)
 
     font = pygame.font.Font(None, 36)
-    text = font.render("Segments: " + str(len(seg_x1s)), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
-    text = font.render("Angle: " + str(branch_angle), True, (255, 255, 255))
-    screen.blit(text, (10, 30))
+    text_segments = font.render("Segments: " + str(len(seg_x1s)), True, (255, 255, 255))
+    screen.blit(text_segments, (10, 10))
+    text_angle = font.render("Angle: " + str(branch_angle), True, (255, 255, 255))
+    screen.blit(text_angle, (10, 30))
 
 running = True
 while running:

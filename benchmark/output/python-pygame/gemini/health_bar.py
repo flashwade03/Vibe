@@ -34,7 +34,7 @@ while running:
     # Draw logic
     screen.fill((0, 0, 0))
     
-    # Draw health bar background
+    # Draw bar background
     pygame.draw.rect(screen, (100, 100, 100), (250, 50, 300, 30))
     
     # Draw filled portion

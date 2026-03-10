@@ -20,6 +20,7 @@ function love.update(dt)
     
     if scroll_timer >= 10.0 then
         scroll_timer = scroll_timer - 10.0
+        
         for i = 1, 79 do
             heights[i] = heights[i + 1]
         end

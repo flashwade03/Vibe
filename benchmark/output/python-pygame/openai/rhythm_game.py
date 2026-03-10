@@ -11,7 +11,6 @@ note_xs = []
 note_ys = []
 note_lanes = []
 note_hit = []
-
 spawn_timer = 0.0
 note_speed = 200.0
 score = 0

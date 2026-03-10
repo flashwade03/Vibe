@@ -4,7 +4,7 @@ local orb_speeds = {1.5, 1.0, 0.6}
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Orbiting Bodies")
+    love.window.setTitle("Orbit Simulation")
 end
 
 function love.update(dt)
@@ -18,7 +18,7 @@ function love.draw()
     love.graphics.setColor(1, 1, 0)
     love.graphics.circle("fill", 400, 300, 20)
 
-    -- Draw orbiting bodies and their paths
+    -- Draw each orbiting body and its orbit path
     for i = 1, 3 do
         -- Draw orbit path
         love.graphics.setColor(0.5, 0.5, 0.5)
@@ -29,9 +29,11 @@ function love.draw()
             love.graphics.circle("fill", px, py, 1.0)
         end
 
-        -- Calculate and draw the orbiting body
+        -- Calculate position of the orbiting body
         local x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
         local y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
+
+        -- Draw the orbiting body
         love.graphics.setColor(1, 1, 1)
         love.graphics.circle("fill", x, y, 10)
     end

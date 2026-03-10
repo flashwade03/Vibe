@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Text Reveal")
+pygame.display.set_caption("Vibe Text Reveal")
 clock = pygame.time.Clock()
 
 full_text = "Welcome to the Vibe engine!"
@@ -12,7 +12,6 @@ text_len = 27
 char_index = 0
 char_timer = 0.0
 char_speed = 0.08
-
 font = pygame.font.Font(None, 36)
 
 running = True
@@ -35,27 +34,26 @@ while running:
 
     screen.fill((0, 0, 0))
     
-    # Draw revealed text
+    # Draw the text
     text_surface = font.render(full_text[:char_index], True, (255, 255, 255))
     screen.blit(text_surface, (100, 280))
     
-    # Draw covering rectangle
+    # Draw the covering rectangle
     cover_x = 100.0 + float(char_index) * 10.0
     pygame.draw.rect(screen, (0, 0, 0), (cover_x, 270.0, 700.0, 30.0))
     
-    # Draw cursor
+    # Draw the cursor
     if math.sin(char_timer * 10.0) > 0.0:
         pygame.draw.rect(screen, (255, 255, 255), (cover_x, 275.0, 2.0, 20.0))
     
-    # Draw character count
-    char_count_text = f"Chars: {char_index}/{text_len}"
-    char_count_surface = font.render(char_count_text, True, (255, 255, 255))
-    screen.blit(char_count_surface, (10.0, 10.0))
+    # Display character count
+    char_count_text = font.render(f"Chars: {char_index}/{text_len}", True, (255, 255, 255))
+    screen.blit(char_count_text, (10.0, 10.0))
     
-    # Draw "Done!" message
+    # Display "Done!" if complete
     if char_index >= text_len:
-        done_surface = font.render("Done!", True, (255, 255, 255))
-        screen.blit(done_surface, (10.0, 30.0))
+        done_text = font.render("Done!", True, (255, 255, 255))
+        screen.blit(done_text, (10.0, 30.0))
 
     pygame.display.flip()
 

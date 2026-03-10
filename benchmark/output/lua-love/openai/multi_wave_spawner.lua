@@ -60,10 +60,13 @@ function love.update(dt)
                 local dy = playerY - y
                 local dist = math.sqrt(dx * dx + dy * dy)
                 local speed = 80 + wave * 20
+                local vx = (dx / dist) * speed
+                local vy = (dy / dist) * speed
+
                 table.insert(ex, x)
                 table.insert(ey, y)
-                table.insert(evx, (dx / dist) * speed)
-                table.insert(evy, (dy / dist) * speed)
+                table.insert(evx, vx)
+                table.insert(evy, vy)
                 table.insert(elife, 1.0)
             end
 
@@ -81,7 +84,8 @@ function love.update(dt)
             -- Check collision with player
             local dx = playerX - ex[i]
             local dy = playerY - ey[i]
-            if math.sqrt(dx * dx + dy * dy) < playerRadius + 8 then
+            local distance = math.sqrt(dx * dx + dy * dy)
+            if distance < playerRadius + 8 then
                 game_over = true
             end
 
@@ -112,7 +116,7 @@ function love.draw()
     -- Draw wave number
     love.graphics.print("Wave: " .. wave, 10, 10)
 
-    -- Draw game over message
+    -- Draw game over
     if game_over then
         love.graphics.printf("GAME OVER", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end

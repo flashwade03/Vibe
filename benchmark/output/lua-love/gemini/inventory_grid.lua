@@ -1,5 +1,8 @@
 local inv_items = {}
 local held_item = 0.0
+local grid_x = 200.0
+local grid_y = 100.0
+local cell_size = 80.0
 
 function love.load()
     love.window.setMode(800, 600)
@@ -27,8 +30,8 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(mx, my, button)
-    local col = math.floor((mx - 200.0) / 80.0)
-    local row = math.floor((my - 100.0) / 80.0)
+    local col = math.floor((mx - grid_x) / cell_size)
+    local row = math.floor((my - grid_y) / cell_size)
 
     if col >= 0 and col < 5 and row >= 0 and row < 4 then
         local idx = row * 5 + col + 1
@@ -49,14 +52,14 @@ end
 function love.draw()
     for row = 0, 3 do
         for col = 0, 4 do
-            local x = 200.0 + col * 80.0
-            local y = 100.0 + row * 80.0
+            local x = grid_x + col * cell_size
+            local y = grid_y + row * cell_size
             
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("line", x, y, 80, 80)
+            love.graphics.rectangle("line", x, y, cell_size, cell_size)
             
             local val = inv_items[row * 5 + col + 1]
-            love.graphics.setColor(0.7, 0.7, 0.7)
+            love.graphics.setColor(0.8, 0.8, 0.8)
             if val == 1.0 then
                 love.graphics.rectangle("fill", x + 25, y + 20, 30, 8)
                 love.graphics.rectangle("fill", x + 37, y + 28, 6, 32)

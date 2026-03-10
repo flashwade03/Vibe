@@ -8,32 +8,28 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Gravity Well")
 clock = pygame.time.Clock()
 
-# Particle properties
-px = []
-py = []
-pvx = []
-pvy = []
+# Particle state variables
+px = [random.uniform(0.0, 800.0) for _ in range(50)]
+py = [random.uniform(0.0, 600.0) for _ in range(50)]
+pvx = [random.uniform(-30.0, 30.0) for _ in range(50)]
+pvy = [random.uniform(-30.0, 30.0) for _ in range(50)]
 
-# Gravity well properties
-well_x = 400.0
-well_y = 300.0
+# Gravity well variables
+well_x, well_y = 400.0, 300.0
 well_strength = 5000.0
 
-def load():
-    global px, py, pvx, pvy
-    for _ in range(50):
-        px.append(random.uniform(0.0, 800.0))
-        py.append(random.uniform(0.0, 600.0))
-        pvx.append(random.uniform(-30.0, 30.0))
-        pvy.append(random.uniform(-30.0, 30.0))
+running = True
+while running:
+    dt = clock.tick(60) / 1000.0
 
-def mousepressed(mx, my, button):
-    global well_x, well_y
-    well_x = mx
-    well_y = my
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mx, my = pygame.mouse.get_pos()
+            well_x, well_y = mx, my
 
-def update(dt):
-    global px, py, pvx, pvy
+    # Update particles
     for i in range(50):
         dx = well_x - px[i]
         dy = well_y - py[i]
@@ -46,41 +42,33 @@ def update(dt):
         px[i] += pvx[i] * dt
         py[i] += pvy[i] * dt
 
+        # Wrap around edges
         if px[i] < 0.0:
             px[i] = 800.0
-        if px[i] > 800.0:
+        elif px[i] > 800.0:
             px[i] = 0.0
         if py[i] < 0.0:
             py[i] = 600.0
-        if py[i] > 600.0:
+        elif py[i] > 600.0:
             py[i] = 0.0
 
-def draw():
     screen.fill((0, 0, 0))
+
+    # Draw gravity well
     pygame.draw.circle(screen, (255, 255, 255), (int(well_x), int(well_y)), 8)
+
+    # Draw particles
     for i in range(50):
         pygame.draw.rect(screen, (255, 255, 255), (int(px[i]), int(py[i]), 3, 3))
+
+    # Draw text
     font = pygame.font.Font(None, 36)
-    text = font.render("Particles: 50", True, (255, 255, 255))
-    screen.blit(text, (10, 10))
-    text = font.render("Click to move well", True, (255, 255, 255))
-    screen.blit(text, (10, 30))
+    text_particles = font.render("Particles: 50", True, (255, 255, 255))
+    screen.blit(text_particles, (10, 10))
+    text_click = font.render("Click to move well", True, (255, 255, 255))
+    screen.blit(text_click, (10, 30))
+
     pygame.display.flip()
-
-load()
-running = True
-while running:
-    dt = clock.tick(60) / 1000.0
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            mx, my = pygame.mouse.get_pos()
-            mousepressed(mx, my, event.button)
-
-    update(dt)
-    draw()
 
 pygame.quit()
 sys.exit()

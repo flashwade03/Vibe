@@ -13,18 +13,17 @@ fn load()
         ctimer = ctimer + [0.0]
 
 fn mousepressed(mx: Float, my: Float, button: Int)
-    if button == 1
-        let closest_index: Int = -1
-        let closest_distance: Float = 15.0
-        for i in range(0, len(cx))
-            let dx: Float = mx - cx[i]
-            let dy: Float = my - cy[i]
-            let distance: Float = sqrt(dx * dx + dy * dy)
-            if distance < closest_distance and cstate[i] == 0.0
-                closest_index = i
-                closest_distance = distance
-        if closest_index != -1
-            cstate[closest_index] = 1.0
+    let closest_index: Int = -1
+    let closest_distance: Float = 15.0
+    for i in range(0, len(cx))
+        let dx: Float = cx[i] - mx
+        let dy: Float = cy[i] - my
+        let distance: Float = sqrt(dx * dx + dy * dy)
+        if distance < closest_distance and cstate[i] == 0.0
+            closest_index = i
+            closest_distance = distance
+    if closest_index != -1
+        cstate[closest_index] = 1.0
 
 fn update(dt: Float)
     for i in range(0, len(cx))
@@ -48,8 +47,8 @@ fn draw()
             draw_circle(cx[i], cy[i], 15.0)
         else if cstate[i] == 1.0
             draw_circle(cx[i], cy[i], cradius[i])
-            exploded_count += 1
         else if cstate[i] == 2.0
             draw_circle(cx[i], cy[i], 3.0)
+        if cstate[i] > 0.0
             exploded_count += 1
     draw_text("Exploded: " + str(exploded_count), 10.0, 10.0)

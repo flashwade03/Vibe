@@ -23,12 +23,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
             col = int((mx - 40.0) / 80.0)
             row = int((my - 60.0) / 80.0)
-            
             if 0 <= col < 8 and 0 <= row < 6:
                 idx = row * 8 + col
                 if cells[idx] == 0.0:
@@ -38,7 +36,7 @@ while running:
 
     screen.fill((0, 0, 0))
 
-    # Draw grid and cells
+    # Draw logic
     count = 0
     for row in range(6):
         for col in range(8):
@@ -50,12 +48,13 @@ while running:
             
             idx = row * 8 + col
             if cells[idx] == 1.0:
-                pygame.draw.rect(screen, (255, 255, 255), (x + 4.0, y + 4.0, 72.0, 72.0))
                 count += 1
+                # Draw filled cell
+                pygame.draw.rect(screen, (255, 255, 255), (x + 4.0, y + 4.0, 72.0, 72.0))
 
     # Draw text
     text = font.render("Active: " + str(count), True, (255, 255, 255))
-    screen.blit(text, (10.0, 10.0))
+    screen.blit(text, (10, 10))
 
     pygame.display.flip()
 

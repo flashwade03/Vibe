@@ -15,6 +15,7 @@ ball_vx = 250.0
 ball_vy = 150.0
 score1 = 0
 score2 = 0
+speed = 300.0
 
 running = True
 while running:
@@ -26,24 +27,25 @@ while running:
 
     keys = pygame.key.get_pressed()
     
-    # Paddle movement
-    if keys[pygame.K_w]: p1_y -= 300 * dt
-    if keys[pygame.K_s]: p1_y += 300 * dt
-    if keys[pygame.K_UP]: p2_y -= 300 * dt
-    if keys[pygame.K_DOWN]: p2_y += 300 * dt
-    
+    # Paddle 1 movement
+    if keys[pygame.K_w]: p1_y -= speed * dt
+    if keys[pygame.K_s]: p1_y += speed * dt
     p1_y = max(0.0, min(520.0, p1_y))
+
+    # Paddle 2 movement
+    if keys[pygame.K_UP]: p2_y -= speed * dt
+    if keys[pygame.K_DOWN]: p2_y += speed * dt
     p2_y = max(0.0, min(520.0, p2_y))
 
     # Ball movement
     ball_x += ball_vx * dt
     ball_y += ball_vy * dt
 
-    # Bounce top/bottom
+    # Wall bounce
     if ball_y < 8.0 or ball_y > 592.0:
         ball_vy *= -1
 
-    # Paddle collisions
+    # Paddle collision
     if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and ball_y >= p1_y and ball_y <= p1_y + 80.0:
         ball_vx *= -1
         ball_x = 50.0
@@ -61,7 +63,7 @@ while running:
         ball_x, ball_y = 400.0, 300.0
         ball_vx, ball_vy = -250.0, -150.0
 
-    # Draw
+    # Drawing
     screen.fill((0, 0, 0))
     pygame.draw.rect(screen, (255, 255, 255), (30, int(p1_y), 12, 80))
     pygame.draw.rect(screen, (255, 255, 255), (758, int(p2_y), 12, 80))
@@ -69,7 +71,7 @@ while running:
     
     for i in range(0, 30):
         pygame.draw.rect(screen, (255, 255, 255), (398, i * 20, 4, 10))
-        
+    
     text1 = font.render(str(score1), True, (255, 255, 255))
     text2 = font.render(str(score2), True, (255, 255, 255))
     screen.blit(text1, (300, 20))

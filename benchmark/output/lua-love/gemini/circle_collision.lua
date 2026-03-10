@@ -1,4 +1,5 @@
-local px, py = 400, 300
+local px = 400
+local py = 300
 local speed = 150
 local hit = false
 
@@ -7,7 +8,7 @@ local enemy_ys = {100, 100, 400, 400, 500}
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Game")
+    love.window.setTitle("Vibe Collision")
 end
 
 function love.update(dt)
@@ -19,8 +20,10 @@ function love.update(dt)
     if love.keyboard.isDown("down") then py = py + speed * dt end
 
     for i = 1, #enemy_xs do
-        local ex, ey = enemy_xs[i], enemy_ys[i]
+        local ex = enemy_xs[i]
+        local ey = enemy_ys[i]
         local dist = math.sqrt((px - ex)^2 + (py - ey)^2)
+        
         if dist < (20 + 15) then
             hit = true
         end

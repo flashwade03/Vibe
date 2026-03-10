@@ -18,7 +18,7 @@ fn draw()
     -- Draw health bar background
     draw_rect(250.0, 50.0, 300.0, 30.0)
 
-    -- Calculate and draw health bar filled portion
+    -- Calculate and draw filled portion of health bar
     let bar_width: Float = (health / max_health) * 300.0
     draw_rect(250.0, 50.0, bar_width, 30.0)
 
@@ -28,5 +28,5 @@ fn draw()
     -- Draw player
     draw_rect(384.0, 300.0, 32.0, 32.0)
 
-    -- Display instructions
+    -- Display instruction text
     draw_text("Press SPACE to take damage", 230.0, 550.0)

@@ -23,8 +23,8 @@ fn update(dt: Float)
 
         let i = len(snake_xs) - 1
         for i > 0
-            snake_xs[i] = snake_xs[i-1]
-            snake_ys[i] = snake_ys[i-1]
+            snake_xs[i] = snake_xs[i - 1]
+            snake_ys[i] = snake_ys[i - 1]
             i -= 1
 
         snake_xs[0] = new_x

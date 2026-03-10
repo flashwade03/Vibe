@@ -7,7 +7,13 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Conway's Game of Life")
 clock = pygame.time.Clock()
 
-# Initialize game state
+# Constants
+GRID_WIDTH = 20
+GRID_HEIGHT = 15
+CELL_SIZE = 40
+GRID_SIZE = GRID_WIDTH * GRID_HEIGHT
+
+# Game state variables
 cells = []
 next_cells = []
 sim_timer = 0.0
@@ -16,7 +22,7 @@ paused = False
 
 def load():
     global cells, next_cells
-    for i in range(300):
+    for _ in range(GRID_SIZE):
         if random.random() > 0.7:
             cells.append(1.0)
         else:
@@ -35,27 +41,28 @@ def update(dt):
         if sim_timer >= 0.2:
             sim_timer = 0.0
             generation += 1
-            for row in range(15):
-                for col in range(20):
+            for row in range(GRID_HEIGHT):
+                for col in range(GRID_WIDTH):
                     count = 0
-                    if row > 0 and col > 0 and cells[(row - 1) * 20 + col - 1] == 1.0:
+                    # Check 8 neighbors
+                    if row > 0 and col > 0 and cells[(row - 1) * GRID_WIDTH + col - 1] == 1.0:
                         count += 1
-                    if row > 0 and cells[(row - 1) * 20 + col] == 1.0:
+                    if row > 0 and cells[(row - 1) * GRID_WIDTH + col] == 1.0:
                         count += 1
-                    if row > 0 and col < 19 and cells[(row - 1) * 20 + col + 1] == 1.0:
+                    if row > 0 and col < GRID_WIDTH - 1 and cells[(row - 1) * GRID_WIDTH + col + 1] == 1.0:
                         count += 1
-                    if col > 0 and cells[row * 20 + col - 1] == 1.0:
+                    if col > 0 and cells[row * GRID_WIDTH + col - 1] == 1.0:
                         count += 1
-                    if col < 19 and cells[row * 20 + col + 1] == 1.0:
+                    if col < GRID_WIDTH - 1 and cells[row * GRID_WIDTH + col + 1] == 1.0:
                         count += 1
-                    if row < 14 and col > 0 and cells[(row + 1) * 20 + col - 1] == 1.0:
+                    if row < GRID_HEIGHT - 1 and col > 0 and cells[(row + 1) * GRID_WIDTH + col - 1] == 1.0:
                         count += 1
-                    if row < 14 and cells[(row + 1) * 20 + col] == 1.0:
+                    if row < GRID_HEIGHT - 1 and cells[(row + 1) * GRID_WIDTH + col] == 1.0:
                         count += 1
-                    if row < 14 and col < 19 and cells[(row + 1) * 20 + col + 1] == 1.0:
+                    if row < GRID_HEIGHT - 1 and col < GRID_WIDTH - 1 and cells[(row + 1) * GRID_WIDTH + col + 1] == 1.0:
                         count += 1
 
-                    idx = row * 20 + col
+                    idx = row * GRID_WIDTH + col
                     if cells[idx] == 1.0:
                         if count == 2 or count == 3:
                             next_cells[idx] = 1.0
@@ -67,15 +74,16 @@ def update(dt):
                         else:
                             next_cells[idx] = 0.0
 
-            for i in range(300):
+            # Copy next_cells to cells
+            for i in range(GRID_SIZE):
                 cells[i] = next_cells[i]
 
 def draw():
     screen.fill((0, 0, 0))
-    for row in range(15):
-        for col in range(20):
-            if cells[row * 20 + col] == 1.0:
-                pygame.draw.rect(screen, (255, 255, 255), (col * 40, row * 40, 38, 38))
+    for row in range(GRID_HEIGHT):
+        for col in range(GRID_WIDTH):
+            if cells[row * GRID_WIDTH + col] == 1.0:
+                pygame.draw.rect(screen, (255, 255, 255), (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE - 2, CELL_SIZE - 2))
     font = pygame.font.Font(None, 36)
     text = font.render(f"Gen: {generation}", True, (255, 255, 255))
     screen.blit(text, (10, 10))

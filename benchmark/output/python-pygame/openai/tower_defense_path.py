@@ -12,22 +12,13 @@ path_xs = [0.0, 200.0, 200.0, 600.0, 600.0, 800.0]
 path_ys = [300.0, 300.0, 100.0, 100.0, 500.0, 500.0]
 
 # Enemies
-en_xs = []
-en_ys = []
-en_wp = []
-en_hp = []
+en_xs, en_ys, en_wp, en_hp = [], [], [], []
 
 # Towers
-tow_xs = []
-tow_ys = []
-tow_timers = []
+tow_xs, tow_ys, tow_timers = [], [], []
 
 # Projectiles
-proj_xs = []
-proj_ys = []
-proj_txs = []
-proj_tys = []
-proj_alive = []
+proj_xs, proj_ys, proj_txs, proj_tys, proj_alive = [], [], [], [], []
 
 # Game state variables
 spawn_timer = 2.0
@@ -51,7 +42,7 @@ def update(dt):
     for i in range(len(en_xs)):
         if en_hp[i] > 0.0:
             wi = int(en_wp[i])
-            if wi < len(path_xs):
+            if wi < 6:
                 dx = path_xs[wi] - en_xs[i]
                 dy = path_ys[wi] - en_ys[i]
                 d = math.sqrt(dx * dx + dy * dy)
@@ -60,7 +51,7 @@ def update(dt):
                     en_ys[i] += (dy / d) * enemy_speed * dt
                 else:
                     en_wp[i] += 1.0
-            if int(en_wp[i]) >= len(path_xs):
+            if int(en_wp[i]) >= 6:
                 en_hp[i] = 0.0
                 lives -= 1
 
@@ -91,8 +82,8 @@ def update(dt):
             dy = proj_tys[p] - proj_ys[p]
             d = math.sqrt(dx * dx + dy * dy)
             if d > 10.0:
-                proj_xs[p] += (dx / d) * 300.0 * dt
-                proj_ys[p] += (dy / d) * 300.0 * dt
+                proj_xs[p] += (dx / d) * 300 * dt
+                proj_ys[p] += (dy / d) * 300 * dt
             else:
                 proj_alive[p] = 0.0
                 for i in range(len(en_xs)):
@@ -102,6 +93,12 @@ def update(dt):
                             en_hp[i] -= 1.0
                             if en_hp[i] <= 0.0:
                                 score += 1
+
+def mousepressed(pos):
+    if len(tow_xs) < 5:
+        tow_xs.append(pos[0])
+        tow_ys.append(pos[1])
+        tow_timers.append(0.0)
 
 def draw():
     screen.fill((0, 0, 0))
@@ -129,7 +126,7 @@ def draw():
     text = font.render(f"Lives: {lives} Score: {score}", True, (255, 255, 255))
     screen.blit(text, (10, 10))
     text = font.render(f"Click to place tower ({len(tow_xs)}/5)", True, (255, 255, 255))
-    screen.blit(text, (10, 40))
+    screen.blit(text, (10, 30))
 
 running = True
 while running:
@@ -139,11 +136,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if len(tow_xs) < 5:
-                mx, my = pygame.mouse.get_pos()
-                tow_xs.append(mx)
-                tow_ys.append(my)
-                tow_timers.append(0.0)
+            mousepressed(pygame.mouse.get_pos())
 
     update(dt)
     draw()

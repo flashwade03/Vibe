@@ -13,7 +13,48 @@ let blife: List[Float] = []
 
 fn update(dt: Float)
     if not hit
-        -- Move player
+        survived_time += dt
+        spawn_timer -= dt
+
+        if spawn_timer <= 0.0
+            spawn_timer = 0.3
+            let edge = int(rand_float(0.0, 4.0))
+            let spawn_x: Float = 0.0
+            let spawn_y: Float = 0.0
+
+            if edge == 0
+                spawn_x = rand_float(0.0, 800.0)
+                spawn_y = 0.0
+            else if edge == 1
+                spawn_x = 800.0
+                spawn_y = rand_float(0.0, 600.0)
+            else if edge == 2
+                spawn_x = rand_float(0.0, 800.0)
+                spawn_y = 600.0
+            else if edge == 3
+                spawn_x = 0.0
+                spawn_y = rand_float(0.0, 600.0)
+
+            let dx = player_x - spawn_x
+            let dy = player_y - spawn_y
+            let length = sqrt(dx * dx + dy * dy)
+            dx = dx / length * 250.0
+            dy = dy / length * 250.0
+
+            bx = bx + [spawn_x]
+            by = by + [spawn_y]
+            bvx = bvx + [dx]
+            bvy = bvy + [dy]
+            blife = blife + [4.0]
+
+        for i in range(0, len(bx))
+            bx[i] += bvx[i] * dt
+            by[i] += bvy[i] * dt
+            blife[i] -= dt
+
+            if sqrt((player_x - bx[i]) * (player_x - bx[i]) + (player_y - by[i]) * (player_y - by[i])) < 13.0 and blife[i] > 0.0
+                hit = true
+
         if key_down("right")
             player_x += player_speed * dt
         if key_down("left")
@@ -22,57 +63,6 @@ fn update(dt: Float)
             player_y += player_speed * dt
         if key_down("up")
             player_y -= player_speed * dt
-
-        -- Update spawn timer
-        spawn_timer -= dt
-        if spawn_timer <= 0.0
-            spawn_bullet()
-            spawn_timer = 0.3
-
-        -- Move bullets and check collision
-        for i in range(0, len(bx))
-            bx[i] += bvx[i] * dt
-            by[i] += bvy[i] * dt
-            blife[i] -= dt
-
-            -- Check collision
-            let dx = player_x - bx[i]
-            let dy = player_y - by[i]
-            if sqrt(dx * dx + dy * dy) < 13.0 and blife[i] > 0.0
-                hit = true
-
-        -- Update survived time
-        survived_time += dt
-
-fn spawn_bullet()
-    let edge = int(rand_float(0.0, 4.0))
-    let spawn_x: Float = 0.0
-    let spawn_y: Float = 0.0
-
-    if edge == 0
-        spawn_x = rand_float(0.0, 800.0)
-        spawn_y = 0.0
-    else if edge == 1
-        spawn_x = 800.0
-        spawn_y = rand_float(0.0, 600.0)
-    else if edge == 2
-        spawn_x = rand_float(0.0, 800.0)
-        spawn_y = 600.0
-    else if edge == 3
-        spawn_x = 0.0
-        spawn_y = rand_float(0.0, 600.0)
-
-    let dx = player_x - spawn_x
-    let dy = player_y - spawn_y
-    let length = sqrt(dx * dx + dy * dy)
-    let norm_dx = dx / length
-    let norm_dy = dy / length
-
-    bx = bx + [spawn_x]
-    by = by + [spawn_y]
-    bvx = bvx + [norm_dx * 250.0]
-    bvy = bvy + [norm_dy * 250.0]
-    blife = blife + [4.0]
 
 fn draw()
     if not hit

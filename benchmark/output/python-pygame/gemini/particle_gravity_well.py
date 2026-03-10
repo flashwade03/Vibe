@@ -29,8 +29,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mx, my = pygame.mouse.get_pos()
-            well_x, well_y = float(mx), float(my)
+            well_x, well_y = pygame.mouse.get_pos()
 
     # Update logic
     for i in range(num_particles):
@@ -48,9 +47,9 @@ while running:
         
         # Wrap around
         if px[i] < 0.0: px[i] = 800.0
-        elif px[i] > 800.0: px[i] = 0.0
+        if px[i] > 800.0: px[i] = 0.0
         if py[i] < 0.0: py[i] = 600.0
-        elif py[i] > 600.0: py[i] = 0.0
+        if py[i] > 600.0: py[i] = 0.0
 
     # Draw logic
     screen.fill((0, 0, 0))
@@ -62,7 +61,7 @@ while running:
     for i in range(num_particles):
         pygame.draw.rect(screen, (255, 255, 255), (int(px[i]), int(py[i]), 3, 3))
         
-    # Draw text
+    # Draw UI
     text1 = font.render("Particles: 50", True, (255, 255, 255))
     text2 = font.render("Click to move well", True, (255, 255, 255))
     screen.blit(text1, (10, 10))

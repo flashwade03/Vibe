@@ -27,7 +27,7 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    -- Draw bar background
+    -- Draw background bar
     love.graphics.setColor(0.3, 0.3, 0.3)
     love.graphics.rectangle("fill", 250.0, 50.0, 300.0, 30.0)
     

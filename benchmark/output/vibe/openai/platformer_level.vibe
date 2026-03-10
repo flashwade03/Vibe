@@ -24,11 +24,12 @@ fn update(dt: Float)
         player_vy = jump_velocity
         on_ground = false
 
-    player_vy = player_vy + gravity * dt
-    player_x = player_x + player_vx * dt
-    player_y = player_y + player_vy * dt
+    player_x += player_vx * dt
+    player_y += player_vy * dt
+    player_vy += gravity * dt
 
     on_ground = false
+
     for i in range(0, len(plat_xs))
         if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and player_y + 20 >= plat_ys[i] and player_x + 20 > plat_xs[i] and player_x < plat_xs[i] + plat_ws[i]
             player_y = plat_ys[i] - 20.0

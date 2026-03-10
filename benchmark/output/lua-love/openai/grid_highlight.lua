@@ -9,16 +9,14 @@ function love.load()
 end
 
 function love.mousepressed(mx, my, button)
-    if button == 1 then
-        local col = math.floor((mx - 40.0) / 80.0)
-        local row = math.floor((my - 60.0) / 80.0)
-        if col >= 0 and col < 8 and row >= 0 and row < 6 then
-            local idx = row * 8 + col
-            if cells[idx] == 0.0 then
-                cells[idx] = 1.0
-            else
-                cells[idx] = 0.0
-            end
+    local col = math.floor((mx - 40.0) / 80.0)
+    local row = math.floor((my - 60.0) / 80.0)
+    if col >= 0 and col < 8 and row >= 0 and row < 6 then
+        local idx = row * 8 + col
+        if cells[idx] == 0.0 then
+            cells[idx] = 1.0
+        else
+            cells[idx] = 0.0
         end
     end
 end

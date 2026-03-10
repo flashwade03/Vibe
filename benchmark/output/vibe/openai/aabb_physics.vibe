@@ -47,6 +47,8 @@ fn keypressed(k: String)
 fn draw()
     for i in range(0, 6)
         draw_rect(box_xs[i], box_ys[i], box_ws[i], box_hs[i])
+
     for j in range(0, 3)
         draw_rect(plat_xs[j], plat_ys[j], plat_ws[j], 15.0)
+
     draw_text("Space: Reset", 10.0, 10.0)

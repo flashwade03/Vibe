@@ -1,3 +1,4 @@
+-- State variables
 local ship_x = 400.0
 local ship_y = 300.0
 local ship_angle = -1.5708
@@ -51,20 +52,20 @@ function love.update(dt)
         ship_x = ship_x + ship_vx * dt
         ship_y = ship_y + ship_vy * dt
 
-        if ship_x > 800 then ship_x = 0 end
-        if ship_x < 0 then ship_x = 800 end
-        if ship_y > 600 then ship_y = 0 end
-        if ship_y < 0 then ship_y = 600 end
+        if ship_x > 800.0 then ship_x = 0.0 end
+        if ship_x < 0.0 then ship_x = 800.0 end
+        if ship_y > 600.0 then ship_y = 0.0 end
+        if ship_y < 0.0 then ship_y = 600.0 end
 
-        for i = #ax, 1, -1 do
+        for i = 1, #ax do
             if aalive[i] == 1.0 then
                 ax[i] = ax[i] + avx[i] * dt
                 ay[i] = ay[i] + avy[i] * dt
 
-                if ax[i] > 800 then ax[i] = 0 end
-                if ax[i] < 0 then ax[i] = 800 end
-                if ay[i] > 600 then ay[i] = 0 end
-                if ay[i] < 0 then ay[i] = 600 end
+                if ax[i] > 800.0 then ax[i] = 0.0 end
+                if ax[i] < 0.0 then ax[i] = 800.0 end
+                if ay[i] > 600.0 then ay[i] = 0.0 end
+                if ay[i] < 0.0 then ay[i] = 600.0 end
 
                 local sdx = ship_x - ax[i]
                 local sdy = ship_y - ay[i]
@@ -80,8 +81,8 @@ function love.update(dt)
                 by[j] = by[j] + bvy[j] * dt
                 blife[j] = blife[j] - dt
 
-                for i = #ax, 1, -1 do
-                    if blife[j] > 0.0 and aalive[i] == 1.0 then
+                for i = 1, #ax do
+                    if aalive[i] == 1.0 then
                         local ddx = bx[j] - ax[i]
                         local ddy = by[j] - ay[i]
                         if math.sqrt(ddx * ddx + ddy * ddy) < asize[i] then
@@ -91,6 +92,12 @@ function love.update(dt)
                         end
                     end
                 end
+            else
+                table.remove(bx, j)
+                table.remove(by, j)
+                table.remove(bvx, j)
+                table.remove(bvy, j)
+                table.remove(blife, j)
             end
         end
     end
@@ -109,7 +116,6 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", ship_x, ship_y, 8.0)
     love.graphics.circle("fill", ship_x + math.cos(ship_angle) * 15.0, ship_y + math.sin(ship_angle) * 15.0, 3.0)
 
@@ -125,7 +131,7 @@ function love.draw()
         end
     end
 
-    love.graphics.print("Score: " .. score, 10, 10)
+    love.graphics.print("Score: " .. tostring(score), 10, 10)
 
     if game_over then
         love.graphics.print("GAME OVER", 340, 280)

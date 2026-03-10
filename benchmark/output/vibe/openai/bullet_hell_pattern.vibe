@@ -3,9 +3,11 @@ let bul_ys: List[Float] = []
 let bul_vxs: List[Float] = []
 let bul_vys: List[Float] = []
 let bul_lifes: List[Float] = []
+
 let emit_angle: Float = 0.0
 let emit_timer: Float = 0.0
 let game_over: Bool = false
+
 let px: Float = 400.0
 let py: Float = 500.0
 
@@ -46,6 +48,7 @@ fn draw()
     draw_circle(px, py, 8.0)
     if game_over
         draw_text("GAME OVER", 340.0, 300.0)
+
     let alive: Int = 0
     for i in range(0, len(bul_lifes))
         if bul_lifes[i] > 0.0

@@ -4,11 +4,11 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Spring Mass System")
+pygame.display.set_caption("Spring Mass Simulation")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
+# State variables
 mass_xs = []
 mass_ys = []
 mass_vxs = []
@@ -44,7 +44,6 @@ while running:
     mass_vxs[0] = 0.0
     mass_vys[0] = 0.0
 
-    # Spring physics
     for i in range(4):
         dx = mass_xs[i + 1] - mass_xs[i]
         dy = mass_ys[i + 1] - mass_ys[i]
@@ -53,15 +52,12 @@ while running:
             force = (dist - rest_length) * spring_k
             fx = (dx / dist) * force
             fy = (dy / dist) * force
-            
             if i > 0:
                 mass_vxs[i] += fx * dt
                 mass_vys[i] += fy * dt
-            
             mass_vxs[i + 1] -= fx * dt
             mass_vys[i + 1] -= fy * dt
 
-    # Integration
     for i in range(1, 5):
         mass_vys[i] += 200.0 * dt
         mass_xs[i] += mass_vxs[i] * dt
@@ -79,7 +75,7 @@ while running:
             sx = mass_xs[i] + (mass_xs[i+1] - mass_xs[i]) * lt
             sy = mass_ys[i] + (mass_ys[i+1] - mass_ys[i]) * lt
             pygame.draw.circle(screen, (255, 255, 255), (int(sx), int(sy)), 2)
-
+            
     # Draw masses
     for i in range(5):
         pygame.draw.circle(screen, (255, 255, 255), (int(mass_xs[i]), int(mass_ys[i])), 10)

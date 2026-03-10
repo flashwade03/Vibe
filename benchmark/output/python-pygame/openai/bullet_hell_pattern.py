@@ -27,10 +27,9 @@ def update(dt):
     if not game_over:
         emit_angle += 2.5 * dt
         emit_timer += dt
-
         if emit_timer >= 0.05:
             emit_timer = 0.0
-            for k in range(0, 3):
+            for k in range(3):
                 angle = emit_angle + float(k) * 2.094
                 bul_xs.append(400.0)
                 bul_ys.append(200.0)
@@ -48,7 +47,6 @@ def update(dt):
         bul_xs[i] += bul_vxs[i] * dt
         bul_ys[i] += bul_vys[i] * dt
         bul_lifes[i] -= dt
-
         if bul_lifes[i] > 0.0:
             ddx = px - bul_xs[i]
             ddy = py - bul_ys[i]
@@ -58,20 +56,16 @@ def update(dt):
 def draw():
     screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (255, 255, 255), (400, 200), 12)
-
     for i in range(len(bul_xs)):
         if bul_lifes[i] > 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(bul_xs[i]), int(bul_ys[i])), 3)
-
     pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), 8)
-
     if game_over:
         text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(text, (340, 300))
-
     alive = sum(1 for life in bul_lifes if life > 0.0)
-    bullet_text = font.render(f"Bullets: {alive}", True, (255, 255, 255))
-    screen.blit(bullet_text, (10, 10))
+    text = font.render(f"Bullets: {alive}", True, (255, 255, 255))
+    screen.blit(text, (10, 10))
 
 running = True
 while running:

@@ -31,11 +31,7 @@ function love.update(dt)
         end
 
         for j = 1, 3 do
-            if box_vys[i] >= 0.0 and 
-               box_xs[i] + box_ws[i] > plat_xs[j] and 
-               box_xs[i] < plat_xs[j] + plat_ws[j] and 
-               box_ys[i] + box_hs[i] >= plat_ys[j] and 
-               box_ys[i] + box_hs[i] <= plat_ys[j] + 20.0 then
+            if box_vys[i] >= 0.0 and box_xs[i] + box_ws[i] > plat_xs[j] and box_xs[i] < plat_xs[j] + plat_ws[j] and box_ys[i] + box_hs[i] >= plat_ys[j] and box_ys[i] + box_hs[i] <= plat_ys[j] + 20.0 then
                 box_ys[i] = plat_ys[j] - box_hs[i]
                 box_vys[i] = 0.0
             end
@@ -44,11 +40,7 @@ function love.update(dt)
 
     for i = 1, 6 do
         for j = 1, 6 do
-            if j > i and 
-               box_xs[i] < box_xs[j] + box_ws[j] and 
-               box_xs[i] + box_ws[i] > box_xs[j] and 
-               box_ys[i] < box_ys[j] + box_hs[j] and 
-               box_ys[i] + box_hs[i] > box_ys[j] then
+            if j > i and box_xs[i] < box_xs[j] + box_ws[j] and box_xs[i] + box_ws[i] > box_xs[j] and box_ys[i] < box_ys[j] + box_hs[j] and box_ys[i] + box_hs[i] > box_ys[j] then
                 local ov = (box_xs[i] + box_ws[i]) - box_xs[j]
                 if ov > 0.0 then
                     box_xs[i] = box_xs[i] - ov * 0.5

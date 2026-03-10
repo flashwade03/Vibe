@@ -21,20 +21,23 @@ while running:
             mx, my = pygame.mouse.get_pos()
             target_x, target_y = mx, my
 
-    # Interpolate towards the target
+    # Update circle position
     cx += (target_x - cx) * 3.0 * dt
     cy += (target_y - cy) * 3.0 * dt
 
     screen.fill((0, 0, 0))
+    
     # Draw the circle
     pygame.draw.circle(screen, (255, 255, 255), (int(cx), int(cy)), 20)
+    
     # Draw the target marker
     pygame.draw.circle(screen, (255, 255, 255), (int(target_x), int(target_y)), 4)
-    # Draw the text
+    
+    # Draw the instruction text
     font = pygame.font.Font(None, 36)
     text = font.render("Click to move", True, (255, 255, 255))
     screen.blit(text, (10, 10))
-
+    
     pygame.display.flip()
 
 pygame.quit()

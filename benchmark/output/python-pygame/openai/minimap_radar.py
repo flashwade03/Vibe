@@ -7,17 +7,24 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Vibe World with Minimap")
 clock = pygame.time.Clock()
 
+# World and player setup
+world_width, world_height = 2000, 2000
 player_x, player_y = 1000.0, 1000.0
-speed = 300
-item_xs, item_ys = [], []
+player_speed = 300
+player_size = 16
+
+# Item setup
+item_xs = []
+item_ys = []
 
 def load():
-    global item_xs, item_ys
     for _ in range(20):
-        item_xs.append(random.uniform(0, 2000))
-        item_ys.append(random.uniform(0, 2000))
+        item_xs.append(random.uniform(0, world_width))
+        item_ys.append(random.uniform(0, world_height))
 
 load()
+
+font = pygame.font.Font(None, 36)
 
 running = True
 while running:
@@ -29,13 +36,17 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        player_x -= speed * dt
+        player_x -= player_speed * dt
     if keys[pygame.K_RIGHT]:
-        player_x += speed * dt
+        player_x += player_speed * dt
     if keys[pygame.K_UP]:
-        player_y -= speed * dt
+        player_y -= player_speed * dt
     if keys[pygame.K_DOWN]:
-        player_y += speed * dt
+        player_y += player_speed * dt
+
+    # Clamp player position to world bounds
+    player_x = max(0, min(world_width, player_x))
+    player_y = max(0, min(world_height, player_y))
 
     screen.fill((0, 0, 0))
 
@@ -47,7 +58,7 @@ while running:
             pygame.draw.rect(screen, (255, 255, 255), (draw_x, draw_y, 10, 10))
 
     # Draw player in main view
-    pygame.draw.rect(screen, (255, 255, 255), (400, 300, 16, 16))
+    pygame.draw.rect(screen, (255, 255, 255), (400, 300, player_size, player_size))
 
     # Draw minimap
     pygame.draw.rect(screen, (50, 50, 50), (630, 10, 160, 120))
@@ -55,14 +66,13 @@ while running:
         minimap_x = 630.0 + (item_xs[i] / 2000.0) * 160.0
         minimap_y = 10.0 + (item_ys[i] / 2000.0) * 120.0
         pygame.draw.rect(screen, (255, 255, 255), (minimap_x, minimap_y, 2, 2))
-    minimap_player_x = 630.0 + (player_x / 2000.0) * 160.0
-    minimap_player_y = 10.0 + (player_y / 2000.0) * 120.0
-    pygame.draw.rect(screen, (255, 0, 0), (minimap_player_x, minimap_player_y, 4, 4))
+    player_minimap_x = 630.0 + (player_x / 2000.0) * 160.0
+    player_minimap_y = 10.0 + (player_y / 2000.0) * 120.0
+    pygame.draw.rect(screen, (255, 0, 0), (player_minimap_x, player_minimap_y, 4, 4))
 
     # Display player position
-    font = pygame.font.Font(None, 36)
-    text = font.render("Pos: " + str(int(player_x)) + ", " + str(int(player_y)), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+    pos_text = font.render(f"Pos: {int(player_x)}, {int(player_y)}", True, (255, 255, 255))
+    screen.blit(pos_text, (10, 10))
 
     pygame.display.flip()
 

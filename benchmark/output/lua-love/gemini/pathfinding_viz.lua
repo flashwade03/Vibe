@@ -88,7 +88,7 @@ function love.draw()
             elseif grid[idx] == 5.0 then love.graphics.circle("fill", x + 25, y + 25, 15) end
         end
     end
-    love.graphics.print("Click: walls | Space: BFS", 10, 570)
-    if found then love.graphics.print("Path found!", 300, 570)
-    elseif not bfs_running and q_ptr > 1 and not found then love.graphics.print("No path", 300, 570) end
+    love.graphics.print("Click: walls | Space: BFS", 10, 580)
+    if found then love.graphics.print("Path found!", 300, 580)
+    elseif not bfs_running and q_ptr > 1 and not found then love.graphics.print("No path", 300, 580) end
 end

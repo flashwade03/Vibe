@@ -13,14 +13,13 @@ inv_ys = []
 inv_alive = []
 inv_dir = 1.0
 inv_speed = 40.0
-
 px = 384.0
 bul_xs = []
 bul_ys = []
 bul_alive = []
 score = 0
 
-# Initialize
+# Load invaders
 for row in range(0, 3):
     for col in range(0, 6):
         inv_xs.append(150.0 + float(col) * 80.0)
@@ -75,10 +74,12 @@ while running:
     for j in range(len(bul_xs)):
         if bul_alive[j] == 1.0:
             for i in range(len(inv_xs)):
-                if inv_alive[i] == 1.0 and bul_xs[j] >= inv_xs[i] and bul_xs[j] <= inv_xs[i] + 30.0 and bul_ys[j] >= inv_ys[i] and bul_ys[j] <= inv_ys[i] + 20.0:
-                    inv_alive[i] = 0.0
-                    bul_alive[j] = 0.0
-                    score += 1
+                if inv_alive[i] == 1.0:
+                    if (bul_xs[j] >= inv_xs[i] and bul_xs[j] <= inv_xs[i] + 30.0 and 
+                        bul_ys[j] >= inv_ys[i] and bul_ys[j] <= inv_ys[i] + 20.0):
+                        inv_alive[i] = 0.0
+                        bul_alive[j] = 0.0
+                        score += 1
 
     # Draw logic
     screen.fill((0, 0, 0))

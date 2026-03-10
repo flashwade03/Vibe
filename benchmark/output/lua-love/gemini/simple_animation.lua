@@ -8,7 +8,6 @@ end
 
 function love.update(dt)
     frame_timer = frame_timer + dt
-    
     if frame_timer >= 0.25 then
         frame_timer = frame_timer - 0.25
         frame = frame + 1

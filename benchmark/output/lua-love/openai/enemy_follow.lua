@@ -8,7 +8,7 @@ local enemy_speed = 100
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Game")
+    love.window.setTitle("Vibe Program")
 end
 
 function love.update(dt)

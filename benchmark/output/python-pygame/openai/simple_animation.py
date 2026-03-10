@@ -17,6 +17,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Update logic
     frame_timer += dt
     if frame_timer >= 0.25:
         frame_timer -= 0.25
@@ -24,6 +25,7 @@ while running:
         if frame >= 4:
             frame = 0
 
+    # Draw logic
     screen.fill((0, 0, 0))
 
     if frame == 0:

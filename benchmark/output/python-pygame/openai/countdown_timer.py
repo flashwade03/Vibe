@@ -6,7 +6,6 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Countdown Timer")
 clock = pygame.time.Clock()
 
-# Timer state variable
 timer = 30.0
 font = pygame.font.Font(None, 72)
 

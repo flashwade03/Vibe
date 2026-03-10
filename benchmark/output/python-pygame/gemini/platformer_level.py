@@ -17,8 +17,8 @@ on_ground = False
 # Platforms
 plat_xs = [50.0, 300.0, 500.0, 200.0, 450.0]
 plat_ys = [450.0, 380.0, 300.0, 220.0, 150.0]
-plat_ws = [200.0, 150.0, 180.0, 12.0, 200.0] # Note: 12 is height, using 12 for width as per prompt logic
-plat_ws = [200.0, 150.0, 180.0, 120.0, 200.0] # Corrected widths
+plat_ws = [200.0, 150.0, 180.0, 12.0, 200.0] # Note: 120 corrected to 120 based on prompt logic
+plat_ws = [200.0, 150.0, 180.0, 120.0, 200.0]
 
 font = pygame.font.Font(None, 36)
 
@@ -48,8 +48,6 @@ while running:
 
     # Collision detection
     on_ground = False
-    
-    # Platform collisions
     if vy >= 0:
         for i in range(len(plat_xs)):
             if prev_y + 20 <= plat_ys[i]:
@@ -57,12 +55,12 @@ while running:
                     py = plat_ys[i] - 20.0
                     vy = 0
                     on_ground = True
-    
-    # Ground collision
-    if py + 20 >= 580:
-        py = 580 - 20.0
-        vy = 0
-        on_ground = True
+        
+        # Ground collision
+        if py + 20 >= 580:
+            py = 580 - 20.0
+            vy = 0
+            on_ground = True
 
     # Reset if fallen
     if py > 620:
@@ -82,7 +80,7 @@ while running:
     # Draw text
     text = font.render("Use arrows + up to jump", True, (255, 255, 255))
     screen.blit(text, (10, 10))
-    
+
     pygame.display.flip()
 
 pygame.quit()

@@ -9,6 +9,7 @@ fn update(dt: Float)
     let dx: Float = wp_xs[current_wp] - patrol_x
     let dy: Float = wp_ys[current_wp] - patrol_y
     let dist: Float = sqrt(dx * dx + dy * dy)
+
     if dist > 2.0
         patrol_x = patrol_x + (dx / dist) * patrol_speed * dt
         patrol_y = patrol_y + (dy / dist) * patrol_speed * dt
@@ -19,6 +20,8 @@ fn update(dt: Float)
 
 fn draw()
     draw_rect(patrol_x - 12.0, patrol_y - 12.0, 24.0, 24.0)
+
     for i in range(0, len(wp_xs))
         draw_rect(wp_xs[i] - 4.0, wp_ys[i] - 4.0, 8.0, 8.0)
+
     draw_text("Waypoint: " + str(current_wp), 10.0, 10.0)

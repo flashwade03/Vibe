@@ -43,7 +43,7 @@ fn update(dt: Float)
             found = true
             let p: Int = int(parent[191])
             for iter in range(0, 192)
-                if p <= 0 or p == 0
+                if p <= 0
                     break
                 grid[p] = 3.0
                 p = int(parent[p])
@@ -73,16 +73,16 @@ fn draw()
             let y: Float = float(row) * 50.0
             if grid[idx] == 1.0
                 draw_rect(x, y, 50.0, 50.0)
-            if grid[idx] == 2.0
+            else if grid[idx] == 2.0
                 draw_rect(x + 15.0, y + 15.0, 20.0, 20.0)
-            if grid[idx] == 3.0
+            else if grid[idx] == 3.0
                 draw_rect(x + 5.0, y + 5.0, 40.0, 40.0)
-            if grid[idx] == 4.0
+            else if grid[idx] == 4.0
                 draw_circle(x + 25.0, y + 25.0, 15.0)
-            if grid[idx] == 5.0
+            else if grid[idx] == 5.0
                 draw_circle(x + 25.0, y + 25.0, 15.0)
     draw_text("Click: walls | Space: BFS", 10.0, 10.0)
     if found
         draw_text("Path found!", 300.0, 10.0)
-    if not bfs_running and not found and q_ptr > 0
+    else if not bfs_running and q_ptr > 0
         draw_text("No path", 300.0, 10.0)

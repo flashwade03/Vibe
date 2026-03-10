@@ -32,7 +32,7 @@ while running:
             running = False
 
     if not game_over:
-        # Update Emitter
+        # Emitter logic
         emit_angle += 2.5 * dt
         emit_timer += dt
         if emit_timer >= 0.05:
@@ -45,55 +45,47 @@ while running:
                 bul_vys.append(math.sin(angle) * 120.0)
                 bul_lifes.append(5.0)
 
-        # Move Player
+        # Player movement
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             px -= p_speed * dt
         if keys[pygame.K_RIGHT]:
             px += p_speed * dt
 
-        # Update Bullets
-        new_xs, new_ys, new_vxs, new_vys, new_lifes = [], [], [], [], []
+        # Update bullets
         for i in range(len(bul_xs)):
             bul_xs[i] += bul_vxs[i] * dt
             bul_ys[i] += bul_vys[i] * dt
             bul_lifes[i] -= dt
             
             if bul_lifes[i] > 0.0:
-                # Collision detection
                 ddx = px - bul_xs[i]
                 ddy = py - bul_ys[i]
                 if math.sqrt(ddx * ddx + ddy * ddy) < 11.0:
                     game_over = True
-                
-                new_xs.append(bul_xs[i])
-                new_ys.append(bul_ys[i])
-                new_vxs.append(bul_vxs[i])
-                new_vys.append(bul_vys[i])
-                new_lifes.append(bul_lifes[i])
-        
-        bul_xs, bul_ys, bul_vxs, bul_vys, bul_lifes = new_xs, new_ys, new_vxs, new_vys, new_lifes
 
-    # Draw
+    # Draw logic
     screen.fill((0, 0, 0))
     
-    # Emitter
+    # Draw emitter
     pygame.draw.circle(screen, (255, 255, 255), (400, 200), 12)
     
-    # Bullets
+    # Draw bullets
     for i in range(len(bul_xs)):
-        pygame.draw.circle(screen, (255, 255, 255), (int(bul_xs[i]), int(bul_ys[i])), 3)
-    
-    # Player
+        if bul_lifes[i] > 0.0:
+            pygame.draw.circle(screen, (255, 255, 255), (int(bul_xs[i]), int(bul_ys[i])), 3)
+            
+    # Draw player
     pygame.draw.circle(screen, (255, 255, 255), (int(px), int(py)), 8)
     
     # UI
     if game_over:
         text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(text, (340, 300))
-    
-    alive_text = font.render("Bullets: " + str(len(bul_lifes)), True, (255, 255, 255))
-    screen.blit(alive_text, (10, 10))
+        
+    alive = sum(1 for life in bul_lifes if life > 0.0)
+    ui_text = font.render("Bullets: " + str(alive), True, (255, 255, 255))
+    screen.blit(ui_text, (10, 10))
 
     pygame.display.flip()
 

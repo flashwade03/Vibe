@@ -32,16 +32,16 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if key == "right" and not (dir_x == -1.0 and dir_y == 0.0) then
+    if key == "right" and dir_x ~= -1.0 then
         dir_x = 1.0
         dir_y = 0.0
-    elseif key == "left" and not (dir_x == 1.0 and dir_y == 0.0) then
+    elseif key == "left" and dir_x ~= 1.0 then
         dir_x = -1.0
         dir_y = 0.0
-    elseif key == "up" and not (dir_x == 0.0 and dir_y == 1.0) then
+    elseif key == "up" and dir_y ~= 1.0 then
         dir_x = 0.0
         dir_y = -1.0
-    elseif key == "down" and not (dir_x == 0.0 and dir_y == -1.0) then
+    elseif key == "down" and dir_y ~= -1.0 then
         dir_x = 0.0
         dir_y = 1.0
     end

@@ -49,7 +49,7 @@ function love.update(dt)
             boid_vys[i] = (boid_vys[i] / speed) * 150.0
         end
 
-        -- Update position
+        -- Update positions
         boid_xs[i] = boid_xs[i] + boid_vxs[i] * dt
         boid_ys[i] = boid_ys[i] + boid_vys[i] * dt
 

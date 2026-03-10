@@ -18,6 +18,34 @@ hit = False
 
 font = pygame.font.Font(None, 36)
 
+def spawn_bullet():
+    edge = random.uniform(0.0, 4.0)
+    if edge < 1.0:  # Top edge
+        spawn_x = random.uniform(0.0, 800.0)
+        spawn_y = 0.0
+    elif edge < 2.0:  # Right edge
+        spawn_x = 800.0
+        spawn_y = random.uniform(0.0, 600.0)
+    elif edge < 3.0:  # Bottom edge
+        spawn_x = random.uniform(0.0, 800.0)
+        spawn_y = 600.0
+    else:  # Left edge
+        spawn_x = 0.0
+        spawn_y = random.uniform(0.0, 600.0)
+
+    dx = player_x - spawn_x
+    dy = player_y - spawn_y
+    distance = math.sqrt(dx * dx + dy * dy)
+    dx /= distance
+    dy /= distance
+    speed = 250.0
+
+    bx.append(spawn_x)
+    by.append(spawn_y)
+    bvx.append(dx * speed)
+    bvy.append(dy * speed)
+    blife.append(4.0)
+
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -26,69 +54,46 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player_x -= player_speed * dt
+    if keys[pygame.K_RIGHT]:
+        player_x += player_speed * dt
+    if keys[pygame.K_UP]:
+        player_y -= player_speed * dt
+    if keys[pygame.K_DOWN]:
+        player_y += player_speed * dt
+
+    spawn_timer -= dt
+    if spawn_timer <= 0.0:
+        spawn_bullet()
+        spawn_timer = 0.3
+
+    for i in range(len(bx)):
+        bx[i] += bvx[i] * dt
+        by[i] += bvy[i] * dt
+        blife[i] -= dt
+
     if not hit:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player_x -= player_speed * dt
-        if keys[pygame.K_RIGHT]:
-            player_x += player_speed * dt
-        if keys[pygame.K_UP]:
-            player_y -= player_speed * dt
-        if keys[pygame.K_DOWN]:
-            player_y += player_speed * dt
-
-        spawn_timer -= dt
-        if spawn_timer <= 0:
-            spawn_timer = 0.3
-            edge = random.uniform(0.0, 4.0)
-            if edge < 1.0:  # Top edge
-                spawn_x = random.uniform(0, 800)
-                spawn_y = 0
-            elif edge < 2.0:  # Right edge
-                spawn_x = 800
-                spawn_y = random.uniform(0, 600)
-            elif edge < 3.0:  # Bottom edge
-                spawn_x = random.uniform(0, 800)
-                spawn_y = 600
-            else:  # Left edge
-                spawn_x = 0
-                spawn_y = random.uniform(0, 600)
-
-            dx = player_x - spawn_x
-            dy = player_y - spawn_y
-            dist = math.sqrt(dx * dx + dy * dy)
-            dx /= dist
-            dy /= dist
-            speed = 250.0
-
-            bx.append(spawn_x)
-            by.append(spawn_y)
-            bvx.append(dx * speed)
-            bvy.append(dy * speed)
-            blife.append(4.0)
-
-        for i in range(len(bx)):
-            bx[i] += bvx[i] * dt
-            by[i] += bvy[i] * dt
-            blife[i] -= dt
-            if blife[i] > 0.0:
-                if math.sqrt((player_x - bx[i])**2 + (player_y - by[i])**2) < 13.0:
-                    hit = True
-
         survived_time += dt
+        for i in range(len(bx)):
+            if blife[i] > 0.0:
+                if math.sqrt((player_x - bx[i]) ** 2 + (player_y - by[i]) ** 2) < 13.0:
+                    hit = True
+                    break
 
     screen.fill((0, 0, 0))
 
-    if not hit:
+    if hit:
+        text = font.render(f"HIT! Time: {int(survived_time)}", True, (255, 255, 255))
+        screen.blit(text, (400 - text.get_width() // 2, 300 - text.get_height() // 2))
+    else:
         pygame.draw.circle(screen, (255, 255, 255), (int(player_x), int(player_y)), 10)
         for i in range(len(bx)):
             if blife[i] > 0.0:
-                pygame.draw.rect(screen, (255, 255, 255), (int(bx[i]) - 3, int(by[i]) - 3, 6, 6))
-        text = font.render("Time: " + str(int(survived_time)), True, (255, 255, 255))
+                pygame.draw.rect(screen, (255, 255, 255), (int(bx[i]), int(by[i]), 6, 6))
+        text = font.render(f"Time: {int(survived_time)}", True, (255, 255, 255))
         screen.blit(text, (10, 10))
-    else:
-        text = font.render("HIT! Time: " + str(int(survived_time)), True, (255, 255, 255))
-        screen.blit(text, (400 - text.get_width() // 2, 300 - text.get_height() // 2))
 
     pygame.display.flip()
 

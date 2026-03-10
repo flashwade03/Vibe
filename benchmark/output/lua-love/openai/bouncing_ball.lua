@@ -13,19 +13,11 @@ function love.update(dt)
     x = x + vx * dt
     y = y + vy * dt
 
-    if x - radius < 0 then
-        x = radius
-        vx = -vx
-    elseif x + radius > love.graphics.getWidth() then
-        x = love.graphics.getWidth() - radius
+    if x - radius < 0 or x + radius > love.graphics.getWidth() then
         vx = -vx
     end
 
-    if y - radius < 0 then
-        y = radius
-        vy = -vy
-    elseif y + radius > love.graphics.getHeight() then
-        y = love.graphics.getHeight() - radius
+    if y - radius < 0 or y + radius > love.graphics.getHeight() then
         vy = -vy
     end
 end

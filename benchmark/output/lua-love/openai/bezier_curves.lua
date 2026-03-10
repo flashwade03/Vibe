@@ -36,7 +36,7 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    -- Draw Bezier curve
+    -- Draw the Bezier curve
     for i = 0, 50 do
         local t = i / 50.0
         local u = 1.0 - t
@@ -61,6 +61,6 @@ function love.draw()
     end
 
     -- Draw text
-    love.graphics.print("Point: " .. tostring(selected + 1), 10.0, 10.0)
-    love.graphics.print("Keys 1-4 select, arrows move", 10.0, 30.0)
+    love.graphics.print("Point: " .. tostring(selected + 1), 10, 10)
+    love.graphics.print("Keys 1-4 select, arrows move", 10, 30)
 end

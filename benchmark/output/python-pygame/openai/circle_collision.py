@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 # Player state
 player_x, player_y = 400.0, 300.0
 player_radius = 20
-speed = 150
+player_speed = 150
 
 # Enemy positions
 enemy_radius = 15
@@ -32,13 +32,13 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        player_x -= speed * dt
+        player_x -= player_speed * dt
     if keys[pygame.K_RIGHT]:
-        player_x += speed * dt
+        player_x += player_speed * dt
     if keys[pygame.K_UP]:
-        player_y -= speed * dt
+        player_y -= player_speed * dt
     if keys[pygame.K_DOWN]:
-        player_y += speed * dt
+        player_y += player_speed * dt
 
     # Reset hit state
     hit = False
@@ -59,7 +59,7 @@ while running:
     for ex, ey in zip(enemy_xs, enemy_ys):
         pygame.draw.circle(screen, (255, 255, 255), (int(ex), int(ey)), enemy_radius)
 
-    # Draw hit text if collision occurred
+    # Draw hit text
     if hit:
         text = font.render("Hit!", True, (255, 255, 255))
         screen.blit(text, (10, 10))

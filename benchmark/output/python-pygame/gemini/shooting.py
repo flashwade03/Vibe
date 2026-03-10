@@ -11,38 +11,37 @@ player_x = 384.0
 player_y = 550.0
 player_speed = 200.0
 
-# Bullet state (Parallel lists)
+# Bullet state
 bullet_xs = []
 bullet_ys = []
 bullet_speed = 300.0
 
-# Track spacebar state to prevent rapid-fire on hold
-space_pressed = False
+# Cooldown for shooting
+last_shot_time = 0
+shoot_delay = 0.25
 
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
+    current_time = pygame.time.get_ticks() / 1000.0
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    # Input handling
     keys = pygame.key.get_pressed()
-    
-    # Player movement
     if keys[pygame.K_LEFT] and player_x > 0:
         player_x -= player_speed * dt
     if keys[pygame.K_RIGHT] and player_x < 768:
         player_x += player_speed * dt
-
+    
     # Shooting logic
     if keys[pygame.K_SPACE]:
-        if not space_pressed:
+        if current_time - last_shot_time > shoot_delay:
             bullet_xs.append(player_x + 14) # Center of 32px rect
             bullet_ys.append(player_y)
-            space_pressed = True
-    else:
-        space_pressed = False
+            last_shot_time = current_time
 
     # Update bullets
     for i in range(len(bullet_ys)):

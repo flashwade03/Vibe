@@ -24,6 +24,7 @@ export interface RetryResult {
   attempts: number;
   errors: string[];
   retryPrompts: string[];
+  totalLatencyMs: number;
 }
 
 export interface LLMCaller {
@@ -49,10 +50,13 @@ export async function generateWithRetry(
 ): Promise<RetryResult> {
   const errors: string[] = [];
   const retryPrompts: string[] = [];
+  let totalLatencyMs = 0;
 
   // Initial generation
   let temperature = config.temperatures[0] ?? 0.2;
+  let start = Date.now();
   let rawCode = await callLLM(systemPrompt, taskDescription, temperature);
+  totalLatencyMs += Date.now() - start;
   let code = preprocess(rawCode);
 
   let validation = validateVibeCode(code);
@@ -65,6 +69,7 @@ export async function generateWithRetry(
       attempts: 1,
       errors: [],
       retryPrompts: [],
+      totalLatencyMs,
     };
   }
 
@@ -79,7 +84,9 @@ export async function generateWithRetry(
     retryPrompts.push(retryPrompt);
 
     temperature = config.temperatures[attempt] ?? 0.2;
+    start = Date.now();
     rawCode = await callLLM(systemPrompt, retryPrompt, temperature);
+    totalLatencyMs += Date.now() - start;
     code = preprocess(rawCode);
 
     validation = validateVibeCode(code);
@@ -92,6 +99,7 @@ export async function generateWithRetry(
         attempts: attempt + 1,
         errors,
         retryPrompts,
+        totalLatencyMs,
       };
     }
   }
@@ -104,6 +112,7 @@ export async function generateWithRetry(
     attempts: config.maxRetries + 1,
     errors,
     retryPrompts,
+    totalLatencyMs,
   };
 }
 

@@ -51,7 +51,8 @@ while running:
     # Draw Grid
     for row in range(4):
         for col in range(5):
-            x, y = 200.0 + col * 80.0, 100.0 + row * 80.0
+            x = 200.0 + float(col) * 80.0
+            y = 100.0 + float(row) * 80.0
             pygame.draw.rect(screen, (255, 255, 255), (x, y, 80, 80), 2)
             
             val = inv_items[row * 5 + col]
@@ -59,7 +60,7 @@ while running:
                 pygame.draw.rect(screen, (200, 200, 200), (x + 25, y + 20, 30, 8))
                 pygame.draw.rect(screen, (200, 200, 200), (x + 37, y + 28, 6, 32))
             elif val == 2.0: # Shield
-                pygame.draw.circle(screen, (100, 100, 255), (int(x + 40), int(y + 40)), 15, 2)
+                pygame.draw.circle(screen, (100, 100, 255), (int(x + 40), int(y + 40)), 15)
             elif val == 3.0: # Potion
                 pygame.draw.circle(screen, (255, 50, 50), (int(x + 40), int(y + 40)), 8)
 

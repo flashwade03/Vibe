@@ -56,7 +56,7 @@ while running:
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
             boid_vys[i] = (boid_vys[i] / speed) * 150.0
 
-        # Update position
+        # Update positions
         boid_xs[i] += boid_vxs[i] * dt
         boid_ys[i] += boid_vys[i] * dt
 

@@ -4,11 +4,10 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Game")
+pygame.display.set_caption("Target Clicker")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
 state = 0  # 0=menu, 1=playing, 2=gameover
 score = 0
 timer = 10.0
@@ -39,18 +38,16 @@ while running:
                 target_x = random.uniform(0.0, 780.0)
                 target_y = random.uniform(0.0, 580.0)
 
-    # Update logic
     if state == 1:
         timer -= dt
         if timer <= 0.0:
             state = 2
 
-    # Draw logic
     screen.fill((0, 0, 0))
-    
+
     if state == 0:
         text = font.render("Press SPACE to Start", True, (255, 255, 255))
-        screen.blit(text, (250.0, 280.0))
+        screen.blit(text, (250, 280))
     
     elif state == 1:
         pygame.draw.rect(screen, (255, 255, 255), (int(target_x), int(target_y), 20, 20))
@@ -62,8 +59,8 @@ while running:
     elif state == 2:
         text1 = font.render(f"Game Over! Score: {score}", True, (255, 255, 255))
         text2 = font.render("Press SPACE to Restart", True, (255, 255, 255))
-        screen.blit(text1, (250.0, 260.0))
-        screen.blit(text2, (250.0, 300.0))
+        screen.blit(text1, (250, 260))
+        screen.blit(text2, (250, 300))
 
     pygame.display.flip()
 

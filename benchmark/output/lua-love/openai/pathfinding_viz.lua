@@ -12,8 +12,8 @@ function love.load()
         grid[i] = 0.0
         parent[i] = -1.0
     end
-    grid[0] = 4.0 -- Start
-    grid[191] = 5.0 -- End
+    grid[0] = 4.0
+    grid[191] = 5.0
 end
 
 function love.mousepressed(mx, my, button)
@@ -78,23 +78,25 @@ function love.draw()
     for row = 0, 11 do
         for col = 0, 15 do
             local idx = row * 16 + col
-            local x = col * 50.0
-            local y = row * 50.0
+            local x = col * 50
+            local y = row * 50
             if grid[idx] == 1.0 then
-                love.graphics.rectangle("fill", x, y, 50.0, 50.0)
+                love.graphics.rectangle("fill", x, y, 50, 50)
             elseif grid[idx] == 2.0 then
-                love.graphics.rectangle("fill", x + 15.0, y + 15.0, 20.0, 20.0)
+                love.graphics.rectangle("fill", x + 15, y + 15, 20, 20)
             elseif grid[idx] == 3.0 then
-                love.graphics.rectangle("fill", x + 5.0, y + 5.0, 40.0, 40.0)
-            elseif grid[idx] == 4.0 or grid[idx] == 5.0 then
-                love.graphics.circle("fill", x + 25.0, y + 25.0, 15.0)
+                love.graphics.rectangle("fill", x + 5, y + 5, 40, 40)
+            elseif grid[idx] == 4.0 then
+                love.graphics.circle("fill", x + 25, y + 25, 15)
+            elseif grid[idx] == 5.0 then
+                love.graphics.circle("fill", x + 25, y + 25, 15)
             end
         end
     end
-    love.graphics.print("Click: walls | Space: BFS", 10.0, 10.0)
+    love.graphics.print("Click: walls | Space: BFS", 10, 10)
     if found then
-        love.graphics.print("Path found!", 300.0, 10.0)
+        love.graphics.print("Path found!", 300, 10)
     elseif not bfs_running and not found and q_ptr > 0 then
-        love.graphics.print("No path", 300.0, 10.0)
+        love.graphics.print("No path", 300, 10)
     end
 end

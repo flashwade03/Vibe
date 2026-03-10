@@ -35,7 +35,7 @@ function love.draw()
     -- Draw bob
     love.graphics.circle("fill", bob_x, bob_y, 15.0)
 
-    -- UI
+    -- Display text
     love.graphics.print("Angle: " .. tostring(angle), 10, 10)
     love.graphics.print("Click to push", 10, 30)
 end

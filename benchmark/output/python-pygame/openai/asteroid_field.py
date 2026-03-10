@@ -21,6 +21,9 @@ score = 0.0
 
 font = pygame.font.Font(None, 36)
 
+def clamp(value, min_value, max_value):
+    return max(min_value, min(value, max_value))
+
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -36,7 +39,7 @@ while running:
         if keys[pygame.K_DOWN]:
             player_y += player_speed * dt
 
-        player_y = max(0.0, min(576.0, player_y))
+        player_y = clamp(player_y, 0.0, 576.0)
 
         spawn_timer += dt
         if spawn_timer >= 0.4:

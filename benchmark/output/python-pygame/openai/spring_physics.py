@@ -7,18 +7,14 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Mass-Spring System")
 clock = pygame.time.Clock()
 
-# Constants
-rest_length = 100.0
-spring_k = 150.0
-damping = 0.95
-gravity = 200.0
-anchor_speed = 200.0
-
-# Mass properties
+# Mass and spring properties
 mass_xs = []
 mass_ys = []
 mass_vxs = []
 mass_vys = []
+rest_length = 100.0
+spring_k = 150.0
+damping = 0.95
 
 def load():
     global mass_xs, mass_ys, mass_vxs, mass_vys
@@ -31,13 +27,13 @@ def load():
 def update(dt):
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        mass_xs[0] -= anchor_speed * dt
+        mass_xs[0] -= 200.0 * dt
     if keys[pygame.K_RIGHT]:
-        mass_xs[0] += anchor_speed * dt
+        mass_xs[0] += 200.0 * dt
     if keys[pygame.K_UP]:
-        mass_ys[0] -= anchor_speed * dt
+        mass_ys[0] -= 200.0 * dt
     if keys[pygame.K_DOWN]:
-        mass_ys[0] += anchor_speed * dt
+        mass_ys[0] += 200.0 * dt
 
     mass_vxs[0] = 0.0
     mass_vys[0] = 0.0
@@ -57,7 +53,7 @@ def update(dt):
             mass_vys[i + 1] -= fy * dt
 
     for i in range(1, 5):
-        mass_vys[i] += gravity * dt
+        mass_vys[i] += 200.0 * dt
         mass_xs[i] += mass_vxs[i] * dt
         mass_ys[i] += mass_vys[i] * dt
         mass_vxs[i] *= damping
@@ -76,19 +72,17 @@ def draw():
     font = pygame.font.Font(None, 36)
     text = font.render("Arrows move anchor", True, (255, 255, 255))
     screen.blit(text, (10, 10))
+    pygame.display.flip()
 
 load()
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
     update(dt)
     draw()
-    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

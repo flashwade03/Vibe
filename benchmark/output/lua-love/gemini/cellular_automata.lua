@@ -35,14 +35,14 @@ function love.update(dt)
                 for col = 0, 19 do
                     local count = 0
                     
-                    if row > 0 and col > 0 and cells[(row - 1) * 20 + (col - 1) + 1] == 1.0 then count = count + 1 end
+                    if row > 0 and col > 0 and cells[(row - 1) * 20 + col - 1 + 1] == 1.0 then count = count + 1 end
                     if row > 0 and cells[(row - 1) * 20 + col + 1] == 1.0 then count = count + 1 end
-                    if row > 0 and col < 19 and cells[(row - 1) * 20 + (col + 1) + 1] == 1.0 then count = count + 1 end
-                    if col > 0 and cells[row * 20 + (col - 1) + 1] == 1.0 then count = count + 1 end
-                    if col < 19 and cells[row * 20 + (col + 1) + 1] == 1.0 then count = count + 1 end
-                    if row < 14 and col > 0 and cells[(row + 1) * 20 + (col - 1) + 1] == 1.0 then count = count + 1 end
+                    if row > 0 and col < 19 and cells[(row - 1) * 20 + col + 1 + 1] == 1.0 then count = count + 1 end
+                    if col > 0 and cells[row * 20 + col - 1 + 1] == 1.0 then count = count + 1 end
+                    if col < 19 and cells[row * 20 + col + 1 + 1] == 1.0 then count = count + 1 end
+                    if row < 14 and col > 0 and cells[(row + 1) * 20 + col - 1 + 1] == 1.0 then count = count + 1 end
                     if row < 14 and cells[(row + 1) * 20 + col + 1] == 1.0 then count = count + 1 end
-                    if row < 14 and col < 19 and cells[(row + 1) * 20 + (col + 1) + 1] == 1.0 then count = count + 1 end
+                    if row < 14 and col < 19 and cells[(row + 1) * 20 + col + 1 + 1] == 1.0 then count = count + 1 end
                     
                     local idx = row * 20 + col + 1
                     if cells[idx] == 1.0 then

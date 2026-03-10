@@ -40,19 +40,23 @@ while running:
     new_xs, new_ys, new_vxs, new_vys, new_lifes = [], [], [], [], []
     for i in range(len(particle_lifes)):
         if particle_lifes[i] > 0:
-            new_xs.append(particle_xs[i] + particle_vxs[i] * dt)
-            new_ys.append(particle_ys[i] + particle_vys[i] * dt)
-            new_vxs.append(particle_vxs[i])
-            new_vys.append(particle_vys[i])
-            new_lifes.append(particle_lifes[i] - dt)
+            particle_xs[i] += particle_vxs[i] * dt
+            particle_ys[i] += particle_vys[i] * dt
+            particle_lifes[i] -= dt
+            
+            if particle_lifes[i] > 0:
+                new_xs.append(particle_xs[i])
+                new_ys.append(particle_ys[i])
+                new_vxs.append(particle_vxs[i])
+                new_vys.append(particle_vys[i])
+                new_lifes.append(particle_lifes[i])
     
     particle_xs, particle_ys, particle_vxs, particle_vys, particle_lifes = new_xs, new_ys, new_vxs, new_vys, new_lifes
 
     # Draw logic
     screen.fill((0, 0, 0))
     for i in range(len(particle_lifes)):
-        if particle_lifes[i] > 0:
-            pygame.draw.rect(screen, (255, 255, 255), (int(particle_xs[i]), int(particle_ys[i]), 4, 4))
+        pygame.draw.rect(screen, (255, 255, 255), (int(particle_xs[i]), int(particle_ys[i]), 4, 4))
     
     pygame.display.flip()
 

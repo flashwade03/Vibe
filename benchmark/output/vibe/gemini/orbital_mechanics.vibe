@@ -7,10 +7,10 @@ fn update(dt: Float)
         orb_angles[i] = orb_angles[i] + orb_speeds[i] * dt
 
 fn draw()
-    -- Draw sun
+    -- Draw Sun
     draw_circle(400.0, 300.0, 20.0)
 
-    -- Draw orbits and bodies
+    -- Draw Orbits and Bodies
     for i in range(0, 3)
         -- Draw orbit path
         for j in range(0, 36)

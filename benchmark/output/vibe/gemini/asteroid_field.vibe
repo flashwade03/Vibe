@@ -29,6 +29,7 @@ fn update(dt: Float)
 
         for i in range(0, len(ast_xs))
             ast_xs[i] -= scroll_speed * dt
+
             if ast_xs[i] < player_x + 24.0 and ast_xs[i] + ast_sizes[i] > player_x and ast_ys[i] < player_y + 24.0 and ast_ys[i] + ast_sizes[i] > player_y
                 game_over = true
 
@@ -36,6 +37,7 @@ fn update(dt: Float)
 
 fn draw()
     draw_rect(player_x, player_y, 24.0, 24.0)
+
     for i in range(0, len(ast_xs))
         draw_rect(ast_xs[i], ast_ys[i], ast_sizes[i], ast_sizes[i])
 

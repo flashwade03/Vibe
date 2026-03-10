@@ -33,7 +33,6 @@ while running:
         scroll_timer -= 10.0
         for i in range(79):
             heights[i] = heights[i + 1]
-        
         new_h = heights[78] + random.uniform(-30.0, 30.0)
         new_h = max(100.0, min(500.0, new_h))
         heights[79] = new_h
@@ -50,10 +49,10 @@ while running:
     screen.fill((0, 0, 0))
     
     for i in range(80):
-        pygame.draw.rect(screen, (255, 255, 255), (i * 10.0, heights[i], 10.0, 600.0 - heights[i]))
+        pygame.draw.rect(screen, (255, 255, 255), (i * 10, int(heights[i]), 10, 600 - int(heights[i])))
     
     player_col = 20
-    pygame.draw.rect(screen, (255, 0, 0), (player_col * 10.0 - 1.0, heights[player_col] - 14.0, 12.0, 14.0))
+    pygame.draw.rect(screen, (255, 0, 0), (player_col * 10 - 1, int(heights[player_col]) - 14, 12, 14))
     
     text_h = font.render("Height: " + str(int(heights[player_col])), True, (255, 255, 255))
     text_s = font.render("Speed: " + str(int(scroll_speed)), True, (255, 255, 255))

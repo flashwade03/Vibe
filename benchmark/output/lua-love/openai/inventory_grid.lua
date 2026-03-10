@@ -19,10 +19,12 @@ function love.keypressed(k)
         item_type = 3.0
     end
 
-    for i = 1, 20 do
-        if inv_items[i] == 0.0 then
-            inv_items[i] = item_type
-            break
+    if item_type > 0.0 then
+        for i = 1, 20 do
+            if inv_items[i] == 0.0 then
+                inv_items[i] = item_type
+                break
+            end
         end
     end
 end
@@ -30,6 +32,7 @@ end
 function love.mousepressed(mx, my, button)
     local col = math.floor((mx - 200.0) / 80.0)
     local row = math.floor((my - 100.0) / 80.0)
+
     if col >= 0 and col < 5 and row >= 0 and row < 4 then
         local idx = row * 5 + col + 1
         if held_item == 0.0 and inv_items[idx] > 0.0 then
@@ -63,6 +66,6 @@ function love.draw()
             end
         end
     end
-    love.graphics.print("Held: " .. tostring(math.floor(held_item)), 10.0, 10.0)
+    love.graphics.print("Held: " .. tostring(held_item), 10.0, 10.0)
     love.graphics.print("1-3: Add | Click: Pick/Place", 200.0, 540.0)
 end

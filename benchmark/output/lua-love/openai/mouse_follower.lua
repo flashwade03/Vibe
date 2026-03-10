@@ -5,7 +5,7 @@ local cy = 300.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Circle Follower")
+    love.window.setTitle("Vibe Circle Follow")
 end
 
 function love.update(dt)

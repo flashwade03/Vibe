@@ -52,9 +52,7 @@ function love.update(dt)
     if reverse then
         inv_dir = -inv_dir
         for i = 1, #inv_ys do
-            if inv_alive[i] == 1.0 then
-                inv_ys[i] = inv_ys[i] + 20.0
-            end
+            if inv_alive[i] == 1.0 then inv_ys[i] = inv_ys[i] + 20.0 end
         end
     end
 

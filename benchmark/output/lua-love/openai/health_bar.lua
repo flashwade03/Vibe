@@ -28,22 +28,22 @@ end
 function love.draw()
     -- Draw health bar background
     love.graphics.setColor(0.5, 0.5, 0.5)
-    love.graphics.rectangle("fill", 250.0, 50.0, 300.0, 30.0)
-
+    love.graphics.rectangle("fill", 250, 50, 300, 30)
+    
     -- Draw health bar filled portion
-    local bar_width = (health / max_health) * 300.0
-    love.graphics.setColor(0.0, 1.0, 0.0)
-    love.graphics.rectangle("fill", 250.0, 50.0, bar_width, 30.0)
-
+    local bar_width = (health / max_health) * 300
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.rectangle("fill", 250, 50, bar_width, 30)
+    
     -- Reset color to white
     love.graphics.setColor(1, 1, 1)
-
+    
     -- Display health text
-    love.graphics.print("HP: " .. tostring(math.floor(health)) .. " / 100", 250.0, 90.0)
-
+    love.graphics.print("HP: " .. tostring(math.floor(health)) .. " / 100", 250, 90)
+    
     -- Draw player rectangle
-    love.graphics.rectangle("fill", 384.0, 300.0, 32.0, 32.0)
-
-    -- Display instructions
-    love.graphics.print("Press SPACE to take damage", 230.0, 550.0)
+    love.graphics.rectangle("fill", 384, 300, 32, 32)
+    
+    -- Display instruction text
+    love.graphics.print("Press SPACE to take damage", 230, 550)
 end

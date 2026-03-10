@@ -1,15 +1,15 @@
-local player_x = 1000
-local player_y = 1000
-local speed = 300
+local player_x = 1000.0
+local player_y = 1000.0
+local speed = 300.0
 local item_xs = {}
 local item_ys = {}
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Game with Minimap")
+    love.window.setTitle("Large World with Minimap")
     for i = 1, 20 do
-        item_xs[i] = love.math.random() * 2000
-        item_ys[i] = love.math.random() * 2000
+        item_xs[i] = love.math.random() * 2000.0
+        item_ys[i] = love.math.random() * 2000.0
     end
 end
 
@@ -42,7 +42,9 @@ function love.draw()
     love.graphics.rectangle("fill", 400, 300, 16, 16)
 
     -- Draw minimap background
-    love.graphics.rectangle("line", 630, 10, 160, 120)
+    love.graphics.setColor(0.5, 0.5, 0.5)
+    love.graphics.rectangle("fill", 630, 10, 160, 120)
+    love.graphics.setColor(1, 1, 1)
 
     -- Draw items on minimap
     for i = 1, 20 do

@@ -20,8 +20,10 @@ fn update(dt: Float)
 
 fn draw()
     draw_rect(368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0)
+
     draw_rect(50.0 + shake_x, 50.0 + shake_y, 16.0, 16.0)
     draw_rect(734.0 + shake_x, 50.0 + shake_y, 16.0, 16.0)
     draw_rect(50.0 + shake_x, 534.0 + shake_y, 16.0, 16.0)
     draw_rect(734.0 + shake_x, 534.0 + shake_y, 16.0, 16.0)
+
     draw_text("Press SPACE to shake", 280.0 + shake_x, 550.0 + shake_y)

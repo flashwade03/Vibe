@@ -2,7 +2,6 @@ let note_xs: List[Float] = []
 let note_ys: List[Float] = []
 let note_lanes: List[Float] = []
 let note_hit: List[Float] = []
-
 let spawn_timer: Float = 0.0
 let note_speed: Float = 200.0
 let score: Int = 0

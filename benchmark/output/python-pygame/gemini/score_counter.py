@@ -22,10 +22,11 @@ while running:
             if event.key == pygame.K_SPACE:
                 score += 1
 
-    # Rendering the score
-    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
-
+    # Rendering
     screen.fill((0, 0, 0))
+    
+    # Draw score
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
     
     pygame.display.flip()

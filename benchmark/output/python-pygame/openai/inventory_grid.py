@@ -6,7 +6,6 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Inventory Management")
 clock = pygame.time.Clock()
 
-# Initialize inventory and held item
 inv_items = [0.0 for _ in range(20)]
 held_item = 0.0
 
@@ -62,8 +61,8 @@ while running:
 
     for row in range(4):
         for col in range(5):
-            x = 200.0 + col * 80.0
-            y = 100.0 + row * 80.0
+            x = 200.0 + float(col) * 80.0
+            y = 100.0 + float(row) * 80.0
             draw_rect(x, y, 80.0, 80.0)
             val = inv_items[row * 5 + col]
             if val == 1.0:

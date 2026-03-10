@@ -40,7 +40,6 @@ def update(dt):
         heat[i] = next_heat[i]
 
 def draw():
-    screen.fill((0, 0, 0))
     max_t = 0.0
     for row in range(12):
         for col in range(16):
@@ -55,10 +54,9 @@ def draw():
                 pygame.draw.rect(screen, (255, 255, 255), (col * 50.0 + 1.0 + off, row * 50.0 + 1.0 + off, size, size))
     font = pygame.font.Font(None, 36)
     text = font.render("Click to add heat", True, (255, 255, 255))
-    screen.blit(text, (10.0, 10.0))
+    screen.blit(text, (10, 10))
     text = font.render("Max: " + str(int(max_t)), True, (255, 255, 255))
-    screen.blit(text, (10.0, 30.0))
-    pygame.display.flip()
+    screen.blit(text, (10, 30))
 
 running = True
 while running:
@@ -72,7 +70,10 @@ while running:
             mousepressed(mx, my, event.button)
 
     update(dt)
+
+    screen.fill((0, 0, 0))
     draw()
+    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

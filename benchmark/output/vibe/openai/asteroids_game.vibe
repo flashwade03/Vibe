@@ -52,16 +52,17 @@ fn update(dt: Float)
             ship_y = 600.0
 
         for i in range(0, len(ax))
-            ax[i] += avx[i] * dt
-            ay[i] += avy[i] * dt
-            if ax[i] > 800.0
-                ax[i] = 0.0
-            if ax[i] < 0.0
-                ax[i] = 800.0
-            if ay[i] > 600.0
-                ay[i] = 0.0
-            if ay[i] < 0.0
-                ay[i] = 600.0
+            if aalive[i] == 1.0
+                ax[i] += avx[i] * dt
+                ay[i] += avy[i] * dt
+                if ax[i] > 800.0
+                    ax[i] = 0.0
+                if ax[i] < 0.0
+                    ax[i] = 800.0
+                if ay[i] > 600.0
+                    ay[i] = 0.0
+                if ay[i] < 0.0
+                    ay[i] = 600.0
 
         for j in range(0, len(bx))
             if blife[j] > 0.0
@@ -76,14 +77,15 @@ fn update(dt: Float)
                 if sqrt(sdx*sdx + sdy*sdy) < asize[i] + 8.0
                     game_over = true
 
-                for j in range(0, len(bx))
-                    if blife[j] > 0.0
-                        let ddx: Float = bx[j] - ax[i]
-                        let ddy: Float = by[j] - ay[i]
-                        if sqrt(ddx*ddx + ddy*ddy) < asize[i]
-                            aalive[i] = 0.0
-                            blife[j] = 0.0
-                            score += 1
+        for i in range(0, len(ax))
+            for j in range(0, len(bx))
+                if blife[j] > 0.0 and aalive[i] == 1.0
+                    let ddx: Float = bx[j] - ax[i]
+                    let ddy: Float = by[j] - ay[i]
+                    if sqrt(ddx*ddx + ddy*ddy) < asize[i]
+                        aalive[i] = 0.0
+                        blife[j] = 0.0
+                        score += 1
 
 fn keypressed(k: String)
     if k == "space" and not game_over

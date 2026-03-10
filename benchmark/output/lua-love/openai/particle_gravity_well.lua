@@ -37,16 +37,16 @@ function love.update(dt)
         px[i] = px[i] + pvx[i] * dt
         py[i] = py[i] + pvy[i] * dt
 
-        if px[i] < 0 then px[i] = 800 end
-        if px[i] > 800 then px[i] = 0 end
-        if py[i] < 0 then py[i] = 600 end
-        if py[i] > 600 then py[i] = 0 end
+        if px[i] < 0.0 then px[i] = 800.0 end
+        if px[i] > 800.0 then px[i] = 0.0 end
+        if py[i] < 0.0 then py[i] = 600.0 end
+        if py[i] > 600.0 then py[i] = 0.0 end
     end
 end
 
 function love.draw()
     love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill", well_x, well_y, 8)
+    love.graphics.circle("fill", well_x, well_y, 8.0)
     for i = 1, 50 do
         love.graphics.rectangle("fill", px[i], py[i], 3, 3)
     end

@@ -8,7 +8,6 @@ pygame.display.set_caption("Screen Shake Effect")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
-# Game state variables
 shake_x = 0.0
 shake_y = 0.0
 shake_timer = 0.0
@@ -38,17 +37,17 @@ while running:
         shake_x = 0.0
         shake_y = 0.0
 
-    # Draw logic
     screen.fill((0, 0, 0))
-    
+
+    # Draw logic
     # Main rect
-    pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0))
+    pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64, 64))
     
     # Corner markers
-    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 50.0 + shake_y, 16.0, 16.0))
-    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 50.0 + shake_y, 16.0, 16.0))
-    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
-    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
+    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 50.0 + shake_y, 16, 16))
+    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 50.0 + shake_y, 16, 16))
+    pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 534.0 + shake_y, 16, 16))
+    pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 534.0 + shake_y, 16, 16))
     
     # Text
     text = font.render("Press SPACE to shake", True, (255, 255, 255))

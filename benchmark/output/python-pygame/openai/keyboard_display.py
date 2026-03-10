@@ -8,7 +8,6 @@ clock = pygame.time.Clock()
 
 last_key = "none"
 key_count = 0
-
 font = pygame.font.Font(None, 36)
 
 def keypressed(k):
@@ -27,16 +26,14 @@ while running:
             keypressed(pygame.key.name(event.key))
 
     screen.fill((0, 0, 0))
+    text_last_key = font.render("Last Key: " + last_key, True, (255, 255, 255))
+    text_key_count = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
+    text_in_box = font.render(last_key, True, (255, 255, 255))
 
-    last_key_text = font.render("Last Key: " + last_key, True, (255, 255, 255))
-    screen.blit(last_key_text, (250.0, 250.0))
-
-    total_presses_text = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
-    screen.blit(total_presses_text, (250.0, 290.0))
-
-    pygame.draw.rect(screen, (255, 255, 255), (300.0, 350.0, 200.0, 80.0), 2)
-    key_in_box_text = font.render(last_key, True, (255, 255, 255))
-    screen.blit(key_in_box_text, (370.0, 380.0))
+    screen.blit(text_last_key, (250, 250))
+    screen.blit(text_key_count, (250, 290))
+    pygame.draw.rect(screen, (255, 255, 255), (300, 350, 200, 80), 2)
+    screen.blit(text_in_box, (370, 380))
 
     pygame.display.flip()
 

@@ -49,13 +49,13 @@ while running:
         # Brick collisions
         for i in range(8):
             if brick_alive[i] == 1.0:
-                bx_start = 5 + (i * 100)
-                if bx_start <= ball_x <= bx_start + 90 and 50 <= ball_y <= 70:
+                bx = 5 + (i * 100)
+                if bx <= ball_x <= bx + 90 and 50 <= ball_y <= 70:
                     brick_alive[i] = 0.0
                     ball_vy *= -1
                     score += 1
 
-        # Game Over check
+        # Game over check
         if ball_y > 600:
             game_over = True
 
@@ -73,13 +73,13 @@ while running:
         if brick_alive[i] == 1.0:
             pygame.draw.rect(screen, (255, 255, 255), (5 + (i * 100), 50, 90, 20))
             
-    # Draw score
-    text = font.render(f"Score: {score}", True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+    # Draw UI
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
     
     if game_over:
-        over_text = font.render("GAME OVER", True, (255, 255, 255))
-        screen.blit(over_text, (330, 300))
+        go_text = font.render("GAME OVER", True, (255, 255, 255))
+        screen.blit(go_text, (340, 300))
 
     pygame.display.flip()
 

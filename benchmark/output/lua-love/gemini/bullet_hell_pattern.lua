@@ -36,10 +36,10 @@ function love.update(dt)
         end
 
         if love.keyboard.isDown("left") then
-            px = px - p_speed * dt
+            px = math.max(p_radius, px - p_speed * dt)
         end
         if love.keyboard.isDown("right") then
-            px = px + p_speed * dt
+            px = math.min(800 - p_radius, px + p_speed * dt)
         end
 
         for i = #bul_xs, 1, -1 do
@@ -50,7 +50,7 @@ function love.update(dt)
             if bul_lifes[i] > 0.0 then
                 local ddx = px - bul_xs[i]
                 local ddy = py - bul_ys[i]
-                if math.sqrt(ddx * ddx + ddy * ddy) < 11.0 then
+                if math.sqrt(ddx * ddx + ddy * ddy) < (p_radius + 3.0) then
                     game_over = true
                 end
             end
