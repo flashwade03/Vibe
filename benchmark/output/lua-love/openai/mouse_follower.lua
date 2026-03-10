@@ -1,25 +1,28 @@
-let target_x: Float = 400.0
-let target_y: Float = 300.0
-let cx: Float = 400.0
-let cy: Float = 300.0
+local target_x = 400.0
+local target_y = 300.0
+local cx = 400.0
+local cy = 300.0
 
-fn load() {
-    set_window_size(800, 600)
-    set_window_title("Circle Follower")
-}
+function love.load()
+    love.window.setMode(800, 600)
+    love.window.setTitle("Circle Follower")
+end
 
-fn update(dt: Float) {
+function love.update(dt)
     cx = cx + (target_x - cx) * 3.0 * dt
     cy = cy + (target_y - cy) * 3.0 * dt
-}
+end
 
-fn draw() {
-    draw_circle(cx, cy, 20.0)
-    draw_circle(target_x, target_y, 4.0)
-    draw_text("Click to move", 10.0, 10.0)
-}
+function love.mousepressed(mx, my, button)
+    if button == 1 then
+        target_x = mx
+        target_y = my
+    end
+end
 
-fn mousepressed(mx: Float, my: Float, button: Int) {
-    target_x = mx
-    target_y = my
-}
+function love.draw()
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle("fill", cx, cy, 20)
+    love.graphics.circle("fill", target_x, target_y, 4.0)
+    love.graphics.print("Click to move", 10.0, 10.0)
+end

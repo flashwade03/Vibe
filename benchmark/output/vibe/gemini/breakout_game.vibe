@@ -1,41 +1,51 @@
 let paddle_x: Float = 360.0
-let paddle_y: Float = 570.0
 let bx: Float = 400.0
 let by: Float = 400.0
 let vx: Float = 200.0
 let vy: Float = -200.0
 let brick_alive: List[Float] = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-let brick_x: List[Float] = [5.0, 105.0, 205.0, 305.0, 405.0, 505.0, 605.0, 705.0]
 let score: Int = 0
 let game_over: Bool = false
 
 fn update(dt: Float)
     if not game_over
-        if key_down("left")
-            paddle_x = paddle_x - 300.0 * dt
-        if key_down("right")
-            paddle_x = paddle_x + 300.0 * dt
+        if key_down("left") and paddle_x > 0.0
+            paddle_x -= 300.0 * dt
+        if key_down("right") and paddle_x < 720.0
+            paddle_x += 300.0 * dt
 
-        bx = bx + vx * dt
-        by = by + vy * dt
+        bx += vx * dt
+        by += vy * dt
 
+        if bx < 6.0 or bx > 794.0
+            vx = -vx
         if by < 6.0
             vy = -vy
-            by = 6.0
 
-        if by >= 564.0 and bx >= paddle_x and bx <= paddle_x + 80.0
-            if vy > 0.0
-                vy = -vy
+        if by >= 564.0 and by <= 576.0 and bx >= paddle_x and bx <= paddle_x + 80.0
+            vy = -vy
+            by = 564.0
 
-        if bx < 6.0
-            vx = -vx
-            bx = 6.0
-
-        if bx > 794.0
-            vx = -vx
-            bx = 794.0
-
-        for i in range(0, len(brick_alive))
+        for i in range(0, 8)
             if brick_alive[i] == 1.0
-                let cx: Float = brick_x[i]
-                if bx >= cx and bx <= cx + 90.0 and by >= 50.0 and by <= 70
+                let brick_x = 5.0 + float(i) * 100.0
+                if bx >= brick_x and bx <= brick_x + 90.0 and by >= 50.0 and by <= 70.0
+                    brick_alive[i] = 0.0
+                    vy = -vy
+                    score += 1
+
+        if by > 600.0
+            game_over = true
+
+fn draw()
+    draw_rect(paddle_x, 570.0, 80.0, 12.0)
+    draw_circle(bx, by, 6.0)
+
+    for i in range(0, 8)
+        if brick_alive[i] == 1.0
+            draw_rect(5.0 + float(i) * 100.0, 50.0, 90.0, 20.0)
+
+    draw_text("Score: " + str(score), 10.0, 10.0)
+
+    if game_over
+        draw_text("GAME OVER", 360.0, 300.0)

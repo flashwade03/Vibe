@@ -24,12 +24,12 @@ function love.load()
     love.window.setTitle("Asteroids")
 
     for i = 1, 6 do
-        ax[i] = love.math.random(0, 800)
-        ay[i] = love.math.random(0, 600)
-        avx[i] = love.math.random(-60, 60)
-        avy[i] = love.math.random(-60, 60)
-        asize[i] = 25.0
-        aalive[i] = 1.0
+        table.insert(ax, love.math.random(0, 800))
+        table.insert(ay, love.math.random(0, 600))
+        table.insert(avx, love.math.random(-60, 60))
+        table.insert(avy, love.math.random(-60, 60))
+        table.insert(asize, 25.0)
+        table.insert(aalive, 1.0)
     end
 end
 
@@ -56,7 +56,7 @@ function love.update(dt)
         if ship_y > 600 then ship_y = 0 end
         if ship_y < 0 then ship_y = 600 end
 
-        for i = 1, #ax do
+        for i = #ax, 1, -1 do
             if aalive[i] == 1.0 then
                 ax[i] = ax[i] + avx[i] * dt
                 ay[i] = ay[i] + avy[i] * dt
@@ -65,6 +65,12 @@ function love.update(dt)
                 if ax[i] < 0 then ax[i] = 800 end
                 if ay[i] > 600 then ay[i] = 0 end
                 if ay[i] < 0 then ay[i] = 600 end
+
+                local sdx = ship_x - ax[i]
+                local sdy = ship_y - ay[i]
+                if math.sqrt(sdx * sdx + sdy * sdy) < asize[i] + 8.0 then
+                    game_over = true
+                end
             end
         end
 
@@ -74,8 +80,8 @@ function love.update(dt)
                 by[j] = by[j] + bvy[j] * dt
                 blife[j] = blife[j] - dt
 
-                for i = 1, #ax do
-                    if aalive[i] == 1.0 then
+                for i = #ax, 1, -1 do
+                    if blife[j] > 0.0 and aalive[i] == 1.0 then
                         local ddx = bx[j] - ax[i]
                         local ddy = by[j] - ay[i]
                         if math.sqrt(ddx * ddx + ddy * ddy) < asize[i] then
@@ -84,22 +90,6 @@ function love.update(dt)
                             score = score + 1
                         end
                     end
-                end
-            else
-                table.remove(bx, j)
-                table.remove(by, j)
-                table.remove(bvx, j)
-                table.remove(bvy, j)
-                table.remove(blife, j)
-            end
-        end
-
-        for i = 1, #ax do
-            if aalive[i] == 1.0 then
-                local sdx = ship_x - ax[i]
-                local sdy = ship_y - ay[i]
-                if math.sqrt(sdx * sdx + sdy * sdy) < asize[i] + 8.0 then
-                    game_over = true
                 end
             end
         end
@@ -119,8 +109,9 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    love.graphics.circle("line", ship_x, ship_y, 8.0)
-    love.graphics.circle("line", ship_x + math.cos(ship_angle) * 15.0, ship_y + math.sin(ship_angle) * 15.0, 3.0)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle("fill", ship_x, ship_y, 8.0)
+    love.graphics.circle("fill", ship_x + math.cos(ship_angle) * 15.0, ship_y + math.sin(ship_angle) * 15.0, 3.0)
 
     for i = 1, #ax do
         if aalive[i] == 1.0 then
@@ -130,7 +121,7 @@ function love.draw()
 
     for j = 1, #bx do
         if blife[j] > 0.0 then
-            love.graphics.circle("line", bx[j], by[j], 2.0)
+            love.graphics.circle("fill", bx[j], by[j], 2.0)
         end
     end
 

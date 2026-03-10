@@ -1,7 +1,7 @@
 local player_x = 400
 local player_y = 300
 local player_radius = 20
-local player_speed = 150
+local speed = 150
 
 local enemy_radius = 15
 local enemy_xs = {100, 700, 200, 600, 400}
@@ -18,16 +18,16 @@ function love.update(dt)
     hit = false
 
     if love.keyboard.isDown("left") then
-        player_x = player_x - player_speed * dt
+        player_x = player_x - speed * dt
     end
     if love.keyboard.isDown("right") then
-        player_x = player_x + player_speed * dt
+        player_x = player_x + speed * dt
     end
     if love.keyboard.isDown("up") then
-        player_y = player_y - player_speed * dt
+        player_y = player_y - speed * dt
     end
     if love.keyboard.isDown("down") then
-        player_y = player_y + player_speed * dt
+        player_y = player_y + speed * dt
     end
 
     for i = 1, #enemy_xs do

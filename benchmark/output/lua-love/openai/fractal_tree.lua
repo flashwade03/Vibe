@@ -20,14 +20,14 @@ end
 
 function love.update(dt)
     if not built then
-        table.insert(q_xs, 400.0)
-        table.insert(q_ys, 580.0)
-        table.insert(q_angles, -1.5708)
-        table.insert(q_lens, 100.0)
-        table.insert(q_depths, 0.0)
+        q_xs = {400.0}
+        q_ys = {580.0}
+        q_angles = {-1.5708}
+        q_lens = {100.0}
+        q_depths = {0.0}
 
         local ptr = 1
-        for _ = 1, 500 do
+        for iter = 1, 500 do
             if ptr > #q_xs then break end
 
             local sx = q_xs[ptr]
@@ -78,6 +78,6 @@ function love.draw()
         end
     end
 
-    love.graphics.print("Segments: " .. #seg_x1s, 10, 10)
-    love.graphics.print("Angle: " .. branch_angle, 10, 30)
+    love.graphics.print("Segments: " .. tostring(#seg_x1s), 10, 10)
+    love.graphics.print("Angle: " .. tostring(branch_angle), 10, 30)
 end

@@ -12,14 +12,14 @@ fn update(dt: Float)
         p1_y = p1_y - 300.0 * dt
     if key_down("s")
         p1_y = p1_y + 300.0 * dt
-    if key_down("up")
-        p2_y = p2_y - 300.0 * dt
-    if key_down("down")
-        p2_y = p2_y + 300.0 * dt
     if p1_y < 0.0
         p1_y = 0.0
     if p1_y > 520.0
         p1_y = 520.0
+    if key_down("up")
+        p2_y = p2_y - 300.0 * dt
+    if key_down("down")
+        p2_y = p2_y + 300.0 * dt
     if p2_y < 0.0
         p2_y = 0.0
     if p2_y > 520.0
@@ -27,14 +27,16 @@ fn update(dt: Float)
     ball_x = ball_x + ball_vx * dt
     ball_y = ball_y + ball_vy * dt
     if ball_y < 8.0
-        ball_vy = 0.0 - ball_vy
+        ball_vy = -ball_vy
+        ball_y = 8.0
     if ball_y > 592.0
-        ball_vy = 0.0 - ball_vy
+        ball_vy = -ball_vy
+        ball_y = 592.0
     if ball_x - 8.0 <= 42.0 and ball_x > 30.0 and ball_y >= p1_y and ball_y <= p1_y + 80.0
-        ball_vx = 0.0 - ball_vx
+        ball_vx = -ball_vx
         ball_x = 50.0
     if ball_x + 8.0 >= 758.0 and ball_x < 770.0 and ball_y >= p2_y and ball_y <= p2_y + 80.0
-        ball_vx = 0.0 - ball_vx
+        ball_vx = -ball_vx
         ball_x = 750.0
     if ball_x < 0.0
         score2 = score2 + 1

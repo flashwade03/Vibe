@@ -1,14 +1,13 @@
 local player_x = 400
 local player_y = 300
 local player_speed = 300
-
-local bx = {}
-local by = {}
-local bvx = {}
-local bvy = {}
-local blife = {}
-
+local bullet_speed = 250
 local spawn_timer = 0.3
+local bullets_x = {}
+local bullets_y = {}
+local bullets_vx = {}
+local bullets_vy = {}
+local bullets_life = {}
 local survived_time = 0
 local hit = false
 
@@ -19,7 +18,7 @@ end
 
 function love.update(dt)
     if not hit then
-        -- Update player position
+        -- Player movement
         if love.keyboard.isDown("left") then
             player_x = player_x - player_speed * dt
         end
@@ -33,7 +32,7 @@ function love.update(dt)
             player_y = player_y + player_speed * dt
         end
 
-        -- Spawn bullets
+        -- Bullet spawning
         spawn_timer = spawn_timer - dt
         if spawn_timer <= 0 then
             spawn_timer = 0.3
@@ -60,28 +59,28 @@ function love.update(dt)
             dx = dx / length
             dy = dy / length
 
-            table.insert(bx, spawn_x)
-            table.insert(by, spawn_y)
-            table.insert(bvx, dx * 250)
-            table.insert(bvy, dy * 250)
-            table.insert(blife, 4.0)
+            table.insert(bullets_x, spawn_x)
+            table.insert(bullets_y, spawn_y)
+            table.insert(bullets_vx, dx * bullet_speed)
+            table.insert(bullets_vy, dy * bullet_speed)
+            table.insert(bullets_life, 4.0)
         end
 
-        -- Update bullets
-        for i = #bx, 1, -1 do
-            bx[i] = bx[i] + bvx[i] * dt
-            by[i] = by[i] + bvy[i] * dt
-            blife[i] = blife[i] - dt
+        -- Bullet movement and life update
+        for i = #bullets_x, 1, -1 do
+            bullets_x[i] = bullets_x[i] + bullets_vx[i] * dt
+            bullets_y[i] = bullets_y[i] + bullets_vy[i] * dt
+            bullets_life[i] = bullets_life[i] - dt
 
-            if blife[i] <= 0 then
-                table.remove(bx, i)
-                table.remove(by, i)
-                table.remove(bvx, i)
-                table.remove(bvy, i)
-                table.remove(blife, i)
+            if bullets_life[i] <= 0 then
+                table.remove(bullets_x, i)
+                table.remove(bullets_y, i)
+                table.remove(bullets_vx, i)
+                table.remove(bullets_vy, i)
+                table.remove(bullets_life, i)
             else
-                local dist = math.sqrt((player_x - bx[i])^2 + (player_y - by[i])^2)
-                if dist < 13 then
+                local dist = math.sqrt((player_x - bullets_x[i])^2 + (player_y - bullets_y[i])^2)
+                if dist < 13.0 then
                     hit = true
                 end
             end
@@ -92,15 +91,18 @@ function love.update(dt)
 end
 
 function love.draw()
-    if hit then
-        love.graphics.print("HIT! Time: " .. tostring(math.floor(survived_time)), 350, 290)
-    else
-        love.graphics.circle("fill", player_x, player_y, 10)
-        for i = 1, #bx do
-            if blife[i] > 0 then
-                love.graphics.rectangle("fill", bx[i] - 3, by[i] - 3, 6, 6)
-            end
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle("fill", player_x, player_y, 10)
+
+    for i = 1, #bullets_x do
+        if bullets_life[i] > 0 then
+            love.graphics.rectangle("fill", bullets_x[i] - 3, bullets_y[i] - 3, 6, 6)
         end
-        love.graphics.print("Time: " .. tostring(math.floor(survived_time)), 10, 10)
+    end
+
+    love.graphics.print("Time: " .. math.floor(survived_time), 10, 10)
+
+    if hit then
+        love.graphics.printf("HIT! Time: " .. math.floor(survived_time), 0, 300, 800, "center")
     end
 end

@@ -3,7 +3,7 @@ local held_item = 0.0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Inventory Grid")
+    love.window.setTitle("Inventory Management")
     for i = 0, 19 do
         table.insert(inv_items, 0.0)
     end
@@ -30,7 +30,6 @@ end
 function love.mousepressed(mx, my, button)
     local col = math.floor((mx - 200.0) / 80.0)
     local row = math.floor((my - 100.0) / 80.0)
-
     if col >= 0 and col < 5 and row >= 0 and row < 4 then
         local idx = row * 5 + col + 1
         if held_item == 0.0 and inv_items[idx] > 0.0 then
@@ -53,7 +52,6 @@ function love.draw()
             local x = 200.0 + col * 80.0
             local y = 100.0 + row * 80.0
             love.graphics.rectangle("line", x, y, 80, 80)
-
             local val = inv_items[row * 5 + col + 1]
             if val == 1.0 then
                 love.graphics.rectangle("fill", x + 25.0, y + 20.0, 30.0, 8.0)
@@ -65,7 +63,6 @@ function love.draw()
             end
         end
     end
-
     love.graphics.print("Held: " .. tostring(math.floor(held_item)), 10.0, 10.0)
     love.graphics.print("1-3: Add | Click: Pick/Place", 200.0, 540.0)
 end

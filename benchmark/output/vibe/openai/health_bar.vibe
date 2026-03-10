@@ -15,9 +15,18 @@ fn update(dt: Float)
             health = max_health
 
 fn draw()
+    -- Draw health bar background
     draw_rect(250.0, 50.0, 300.0, 30.0)
+
+    -- Calculate and draw health bar filled portion
     let bar_width: Float = (health / max_health) * 300.0
     draw_rect(250.0, 50.0, bar_width, 30.0)
+
+    -- Display health text
     draw_text("HP: " + str(int(health)) + " / 100", 250.0, 90.0)
+
+    -- Draw player
     draw_rect(384.0, 300.0, 32.0, 32.0)
+
+    -- Display instructions
     draw_text("Press SPACE to take damage", 230.0, 550.0)

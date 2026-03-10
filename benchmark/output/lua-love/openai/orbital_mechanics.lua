@@ -15,16 +15,13 @@ end
 
 function love.draw()
     -- Draw the sun
-    love.graphics.setColor(1, 1, 0) -- Yellow
+    love.graphics.setColor(1, 1, 0)
     love.graphics.circle("fill", 400, 300, 20)
 
     -- Draw orbiting bodies and their paths
     for i = 1, 3 do
-        local x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
-        local y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
-
         -- Draw orbit path
-        love.graphics.setColor(0.5, 0.5, 0.5) -- Gray
+        love.graphics.setColor(0.5, 0.5, 0.5)
         for j = 0, 35 do
             local angle = j * 0.1745
             local px = 400.0 + math.cos(angle) * orb_radii[i]
@@ -32,12 +29,14 @@ function love.draw()
             love.graphics.circle("fill", px, py, 1.0)
         end
 
-        -- Draw orbiting body
-        love.graphics.setColor(0, 0, 1) -- Blue
+        -- Calculate and draw the orbiting body
+        local x = 400.0 + math.cos(orb_angles[i]) * orb_radii[i]
+        local y = 300.0 + math.sin(orb_angles[i]) * orb_radii[i]
+        love.graphics.setColor(1, 1, 1)
         love.graphics.circle("fill", x, y, 10)
     end
 
     -- Display the current angle of body 0
-    love.graphics.setColor(1, 1, 1) -- White
+    love.graphics.setColor(1, 1, 1)
     love.graphics.print("Angle: " .. string.format("%.2f", orb_angles[1]), 10, 10)
 end

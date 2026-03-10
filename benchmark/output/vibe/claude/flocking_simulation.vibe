@@ -11,38 +11,38 @@ fn load()
         boid_vys = boid_vys + [rand_float(-50.0, 50.0)]
 
 fn update(dt: Float)
-    let center_x: Float = 0.0
-    let center_y: Float = 0.0
+    let sum_x: Float = 0.0
+    let sum_y: Float = 0.0
     for i in range(0, 15)
-        center_x = center_x + boid_xs[i]
-        center_y = center_y + boid_ys[i]
-    center_x = center_x / 15.0
-    center_y = center_y / 15.0
+        sum_x = sum_x + boid_xs[i]
+        sum_y = sum_y + boid_ys[i]
+    let center_x: Float = sum_x / 15.0
+    let center_y: Float = sum_y / 15.0
     for i in range(0, 15)
         boid_vxs[i] = boid_vxs[i] + (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] = boid_vys[i] + (center_y - boid_ys[i]) * 0.5 * dt
         for j in range(0, 15)
-            if i != j
+            if j != i
                 let sdx: Float = boid_xs[i] - boid_xs[j]
                 let sdy: Float = boid_ys[i] - boid_ys[j]
-                let sdist: Float = sqrt(sdx * sdx + sdy * sdy)
-                if sdist < 30.0 and sdist > 0.1
-                    boid_vxs[i] = boid_vxs[i] + (sdx / sdist) * 100.0 * dt
-                    boid_vys[i] = boid_vys[i] + (sdy / sdist) * 100.0 * dt
+                let sd: Float = sqrt(sdx * sdx + sdy * sdy)
+                if sd < 30.0 and sd > 0.1
+                    boid_vxs[i] = boid_vxs[i] + (sdx / sd) * 100.0 * dt
+                    boid_vys[i] = boid_vys[i] + (sdy / sd) * 100.0 * dt
         let spd: Float = sqrt(boid_vxs[i] * boid_vxs[i] + boid_vys[i] * boid_vys[i])
         if spd > 150.0
             boid_vxs[i] = boid_vxs[i] / spd * 150.0
             boid_vys[i] = boid_vys[i] / spd * 150.0
         boid_xs[i] = boid_xs[i] + boid_vxs[i] * dt
         boid_ys[i] = boid_ys[i] + boid_vys[i] * dt
-        if boid_xs[i] > 800.0
-            boid_xs[i] = 0.0
         if boid_xs[i] < 0.0
             boid_xs[i] = 800.0
-        if boid_ys[i] > 600.0
-            boid_ys[i] = 0.0
+        if boid_xs[i] > 800.0
+            boid_xs[i] = 0.0
         if boid_ys[i] < 0.0
             boid_ys[i] = 600.0
+        if boid_ys[i] > 600.0
+            boid_ys[i] = 0.0
 
 fn draw()
     for i in range(0, 15)

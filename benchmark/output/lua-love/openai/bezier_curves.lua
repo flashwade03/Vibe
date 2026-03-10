@@ -61,6 +61,6 @@ function love.draw()
     end
 
     -- Draw text
-    love.graphics.print("Point: " .. tostring(selected + 1), 10, 10)
-    love.graphics.print("Keys 1-4 select, arrows move", 10, 30)
+    love.graphics.print("Point: " .. tostring(selected + 1), 10.0, 10.0)
+    love.graphics.print("Keys 1-4 select, arrows move", 10.0, 30.0)
 end

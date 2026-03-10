@@ -1,4 +1,3 @@
-```python
 import pygame
 import sys
 
@@ -8,24 +7,12 @@ pygame.display.set_caption("Breakout")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 36)
 
+# Game state
 paddle_x = 360.0
-paddle_y = 570.0
-paddle_w = 80.0
-paddle_h = 12.0
 paddle_speed = 300.0
-
-bx = 400.0
-by = 400.0
-vx = 200.0
-vy = -200.0
-ball_radius = 6
-
-brick_xs = [5.0, 105.0, 205.0, 305.0, 405.0, 505.0, 605.0, 705.0]
-brick_y = 50.0
-brick_w = 90.0
-brick_h = 20.0
-brick_alive = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-
+ball_x, ball_y = 400.0, 400.0
+ball_vx, ball_vy = 200.0, -200.0
+brick_alive = [1.0] * 8
 score = 0
 game_over = False
 
@@ -37,50 +24,64 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    keys = pygame.key.get_pressed()
-
     if not game_over:
-        if keys[pygame.K_LEFT]:
+        # Paddle movement
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and paddle_x > 0:
             paddle_x -= paddle_speed * dt
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] and paddle_x < 720:
             paddle_x += paddle_speed * dt
 
-        bx += vx * dt
-        by += vy * dt
+        # Ball movement
+        ball_x += ball_vx * dt
+        ball_y += ball_vy * dt
 
-        if by < 6.0:
-            by = 6.0
-            vy = -vy
+        # Wall collisions
+        if ball_x < 6.0 or ball_x > 794.0:
+            ball_vx *= -1
+        if ball_y < 6.0:
+            ball_vy *= -1
+        
+        # Paddle collision
+        if ball_y >= 564.0 and ball_y <= 576.0 and paddle_x <= ball_x <= paddle_x + 80.0:
+            ball_vy = -abs(ball_vy)
 
-        if by >= 564.0 and bx >= paddle_x and bx <= paddle_x + 80.0:
-            if vy > 0:
-                vy = -vy
-                by = 564.0
-
-        if bx < 6.0:
-            bx = 6.0
-            vx = -vx
-        elif bx > 794.0:
-            bx = 794.0
-            vx = -vx
-
+        # Brick collisions
         for i in range(8):
             if brick_alive[i] == 1.0:
-                if brick_xs[i] <= bx <= brick_xs[i] + brick_w and brick_y <= by <= brick_y + brick_h:
+                bx_start = 5 + (i * 100)
+                if bx_start <= ball_x <= bx_start + 90 and 50 <= ball_y <= 70:
                     brick_alive[i] = 0.0
-                    vy = -vy
+                    ball_vy *= -1
                     score += 1
-                    break
 
-        if by > 600.0:
+        # Game Over check
+        if ball_y > 600:
             game_over = True
 
+    # Drawing
     screen.fill((0, 0, 0))
-
-    pygame.draw.rect(screen, (255, 255, 255), (int(paddle_x), int(paddle_y), int(paddle_w), int(paddle_h)))
     
-    pygame.draw.circle(screen, (255, 255, 255), (int(bx), int(by)), ball_radius)
-
+    # Draw paddle
+    pygame.draw.rect(screen, (255, 255, 255), (int(paddle_x), 570, 80, 12))
+    
+    # Draw ball
+    pygame.draw.circle(screen, (255, 255, 255), (int(ball_x), int(ball_y)), 6)
+    
+    # Draw bricks
     for i in range(8):
         if brick_alive[i] == 1.0:
-            pygame.draw.rect(screen, (255, 255, 255), (int(brick_xs[i]), int(brick_y
+            pygame.draw.rect(screen, (255, 255, 255), (5 + (i * 100), 50, 90, 20))
+            
+    # Draw score
+    text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(text, (10, 10))
+    
+    if game_over:
+        over_text = font.render("GAME OVER", True, (255, 255, 255))
+        screen.blit(over_text, (330, 300))
+
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()

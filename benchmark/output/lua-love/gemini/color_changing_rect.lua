@@ -1,13 +1,10 @@
-local x = 368
-local y = 268
+local x = 400 - 32
+local y = 300 - 32
 local speed = 100
-
-local str = tostring
-local draw_text = love.graphics.print
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Vibe Game")
 end
 
 function love.update(dt)
@@ -27,5 +24,7 @@ end
 
 function love.draw()
     love.graphics.rectangle("fill", x, y, 64, 64)
-    draw_text("x: " .. str(x) .. " y: " .. str(y), 10, 10)
+    
+    local text = "x: " .. tostring(x) .. " y: " .. tostring(y)
+    love.graphics.print(text, 10, 10)
 end

@@ -1,22 +1,23 @@
 let px: Float = 384.0
 let py: Float = 550.0
-let speed: Float = 200.0
+let p_speed: Float = 200.0
 let bullet_xs: List[Float] = []
 let bullet_ys: List[Float] = []
+let b_speed: Float = 300.0
 
 fn update(dt: Float)
-    if key_down("right")
-        px = px + speed * dt
-    if key_down("left")
-        px = px - speed * dt
+    if key_down("left") and px > 0.0
+        px -= p_speed * dt
+    if key_down("right") and px < 768.0
+        px += p_speed * dt
 
-    for i in range(0, len(bullet_ys))
-        bullet_ys[i] = bullet_ys[i] - 300.0 * dt
+    for i in range(0, len(bullet_xs))
+        bullet_ys[i] -= b_speed * dt
 
 fn keypressed(k: String)
     if k == "space"
-        bullet_xs = bullet_xs + [px + 14.0]
-        bullet_ys = bullet_ys + [py]
+        bullet_xs += [px + 14.0]
+        bullet_ys += [py]
 
 fn draw()
     draw_rect(px, py, 32.0, 32.0)

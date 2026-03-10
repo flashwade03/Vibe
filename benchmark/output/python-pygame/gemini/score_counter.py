@@ -3,10 +3,10 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Score Counter")
+pygame.display.set_caption("Score Clicker")
 clock = pygame.time.Clock()
-
 font = pygame.font.Font(None, 36)
+
 score = 0
 
 running = True
@@ -16,17 +16,18 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
+        
+        # Handling key press event for spacebar
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 score += 1
 
-    keys = pygame.key.get_pressed()
+    # Rendering the score
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
 
     screen.fill((0, 0, 0))
+    screen.blit(score_text, (10, 10))
     
-    text = font.render("Score: " + str(score), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
-
     pygame.display.flip()
 
 pygame.quit()

@@ -39,14 +39,15 @@ fn keypressed(k: String)
     if k == "k"
         press_lane = 3
     if press_lane >= 0
+        let did_hit: Bool = false
         for i in range(0, len(note_ys))
-            if note_hit[i] == 0.0 and int(note_lanes[i]) == press_lane and note_ys[i] > 470.0 and note_ys[i] < 530.0
+            if note_hit[i] == 0.0 and int(note_lanes[i]) == press_lane and note_ys[i] > 470.0 and note_ys[i] < 530.0 and not did_hit
                 note_hit[i] = 1.0
                 score = score + 1
                 combo = combo + 1
                 flash_timer = 0.15
                 flash_lane = press_lane
-                break
+                did_hit = true
 
 fn draw()
     for lane in range(0, 4)

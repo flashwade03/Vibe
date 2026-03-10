@@ -1,9 +1,9 @@
 use vibe::*;
 
-let shake_x: Float = 0.0;
-let shake_y: Float = 0.0;
-let shake_timer: Float = 0.0;
-let shake_intensity: Float = 0.0;
+let mut shake_x: Float = 0.0;
+let mut shake_y: Float = 0.0;
+let mut shake_timer: Float = 0.0;
+let mut shake_intensity: Float = 0.0;
 
 fn keypressed(k: String) {
     if k == "space" {

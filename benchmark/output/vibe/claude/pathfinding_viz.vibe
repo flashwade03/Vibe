@@ -1,7 +1,7 @@
 let grid: List[Float] = []
-let parent: List[Float] = []
 let queue: List[Float] = []
 let q_ptr: Int = 0
+let parent: List[Float] = []
 let bfs_running: Bool = false
 let found: Bool = false
 
@@ -43,38 +43,37 @@ fn update(dt: Float)
             found = true
             let p: Int = 191
             for iter in range(0, 192)
-                if int(parent[p]) <= 0
-                    break
-                p = int(parent[p])
-                if p != 0
-                    grid[p] = 3.0
+                if int(parent[p]) > 0
+                    p = int(parent[p])
+                    if p != 0
+                        grid[p] = 3.0
         else
             if grid[cur] != 4.0
                 grid[cur] = 2.0
-            let cur_row: Int = cur / 16
-            let cur_col: Int = cur - cur_row * 16
-            if cur_row > 0
-                let n: Int = (cur_row - 1) * 16 + cur_col
+            let crow: Int = cur / 16
+            let ccol: Int = cur - crow * 16
+            if crow > 0
+                let n: Int = (crow - 1) * 16 + ccol
                 if (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0
                     parent[n] = float(cur)
                     queue = queue + [float(n)]
-            if cur_row < 11
-                let n: Int = (cur_row + 1) * 16 + cur_col
+            if crow < 11
+                let n: Int = (crow + 1) * 16 + ccol
                 if (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0
                     parent[n] = float(cur)
                     queue = queue + [float(n)]
-            if cur_col > 0
-                let n: Int = cur_row * 16 + cur_col - 1
+            if ccol > 0
+                let n: Int = crow * 16 + ccol - 1
                 if (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0
                     parent[n] = float(cur)
                     queue = queue + [float(n)]
-            if cur_col < 15
-                let n: Int = cur_row * 16 + cur_col + 1
+            if ccol < 15
+                let n: Int = crow * 16 + ccol + 1
                 if (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0
                     parent[n] = float(cur)
                     queue = queue + [float(n)]
-        if q_ptr >= len(queue) and not found
-            bfs_running = false
+    if q_ptr >= len(queue) and bfs_running
+        bfs_running = false
 
 fn draw()
     for row in range(0, 12)

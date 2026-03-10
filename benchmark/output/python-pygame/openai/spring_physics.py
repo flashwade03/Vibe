@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Spring Mass System")
+pygame.display.set_caption("Mass-Spring System")
 clock = pygame.time.Clock()
 
 # Constants
@@ -14,7 +14,7 @@ damping = 0.95
 gravity = 200.0
 anchor_speed = 200.0
 
-# Mass state variables
+# Mass properties
 mass_xs = []
 mass_ys = []
 mass_vxs = []
@@ -70,13 +70,12 @@ def draw():
     for i in range(4):
         for j in range(8):
             lt = float(j) / 8.0
-            x = mass_xs[i] + (mass_xs[i+1] - mass_xs[i]) * lt
-            y = mass_ys[i] + (mass_ys[i+1] - mass_ys[i]) * lt
+            x = mass_xs[i] + (mass_xs[i + 1] - mass_xs[i]) * lt
+            y = mass_ys[i] + (mass_ys[i + 1] - mass_ys[i]) * lt
             pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), 2)
     font = pygame.font.Font(None, 36)
     text = font.render("Arrows move anchor", True, (255, 255, 255))
     screen.blit(text, (10, 10))
-    pygame.display.flip()
 
 load()
 running = True
@@ -89,6 +88,7 @@ while running:
 
     update(dt)
     draw()
+    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

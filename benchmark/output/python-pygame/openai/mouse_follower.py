@@ -30,7 +30,7 @@ while running:
     pygame.draw.circle(screen, (255, 255, 255), (int(cx), int(cy)), 20)
     # Draw the target marker
     pygame.draw.circle(screen, (255, 255, 255), (int(target_x), int(target_y)), 4)
-    # Display text
+    # Draw the text
     font = pygame.font.Font(None, 36)
     text = font.render("Click to move", True, (255, 255, 255))
     screen.blit(text, (10, 10))

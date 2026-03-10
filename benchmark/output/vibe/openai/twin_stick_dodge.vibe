@@ -1,6 +1,9 @@
 let player_x: Float = 400.0
 let player_y: Float = 300.0
 let player_speed: Float = 300.0
+let spawn_timer: Float = 0.3
+let survived_time: Float = 0.0
+let hit: Bool = false
 
 let bx: List[Float] = []
 let by: List[Float] = []
@@ -8,27 +11,9 @@ let bvx: List[Float] = []
 let bvy: List[Float] = []
 let blife: List[Float] = []
 
-let spawn_timer: Float = 0.3
-let survived_time: Float = 0.0
-let hit: Bool = false
-
 fn update(dt: Float)
     if not hit
-        survived_time += dt
-        spawn_timer -= dt
-
-        if spawn_timer <= 0.0
-            spawn_bullet()
-            spawn_timer = 0.3
-
-        for i in range(0, len(bx))
-            bx[i] += bvx[i] * dt
-            by[i] += bvy[i] * dt
-            blife[i] -= dt
-
-            if sqrt((player_x - bx[i]) * (player_x - bx[i]) + (player_y - by[i]) * (player_y - by[i])) < 13.0 and blife[i] > 0.0
-                hit = true
-
+        -- Move player
         if key_down("right")
             player_x += player_speed * dt
         if key_down("left")
@@ -37,6 +22,27 @@ fn update(dt: Float)
             player_y += player_speed * dt
         if key_down("up")
             player_y -= player_speed * dt
+
+        -- Update spawn timer
+        spawn_timer -= dt
+        if spawn_timer <= 0.0
+            spawn_bullet()
+            spawn_timer = 0.3
+
+        -- Move bullets and check collision
+        for i in range(0, len(bx))
+            bx[i] += bvx[i] * dt
+            by[i] += bvy[i] * dt
+            blife[i] -= dt
+
+            -- Check collision
+            let dx = player_x - bx[i]
+            let dy = player_y - by[i]
+            if sqrt(dx * dx + dy * dy) < 13.0 and blife[i] > 0.0
+                hit = true
+
+        -- Update survived time
+        survived_time += dt
 
 fn spawn_bullet()
     let edge = int(rand_float(0.0, 4.0))
@@ -52,7 +58,7 @@ fn spawn_bullet()
     else if edge == 2
         spawn_x = rand_float(0.0, 800.0)
         spawn_y = 600.0
-    else
+    else if edge == 3
         spawn_x = 0.0
         spawn_y = rand_float(0.0, 600.0)
 

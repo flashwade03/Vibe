@@ -1,10 +1,11 @@
-local player_x = 100
-local player_y = 400
-local player_vy = 0
-local player_speed = 250
-local gravity = 600
-local jump_vel = -350
+local px, py = 100, 400
+local vx, vy = 0, 0
+local prev_y = 400
 local on_ground = false
+
+local gravity = 600.0
+local jump_vel = -350.0
+local speed = 250.0
 
 local plat_xs = {50, 300, 500, 200, 450}
 local plat_ys = {450, 380, 300, 220, 150}
@@ -16,56 +17,61 @@ function love.load()
 end
 
 function love.update(dt)
-    local prev_y = player_y
-
-    if love.keyboard.isDown("left") then
-        player_x = player_x - player_speed * dt
-    end
-    if love.keyboard.isDown("right") then
-        player_x = player_x + player_speed * dt
-    end
-
-    if love.keyboard.isDown("up") and on_ground then
-        player_vy = jump_vel
+    prev_y = py
+    
+    -- Horizontal movement
+    vx = 0
+    if love.keyboard.isDown("left") then vx = -speed end
+    if love.keyboard.isDown("right") then vx = speed end
+    px = px + vx * dt
+    
+    -- Vertical movement
+    vy = vy + gravity * dt
+    py = py + vy * dt
+    
+    -- Jump
+    if on_ground and love.keyboard.isDown("up") then
+        vy = jump_vel
         on_ground = false
     end
-
-    player_vy = player_vy + gravity * dt
-    player_y = player_y + player_vy * dt
-
+    
+    -- Collision with platforms
     on_ground = false
-
-    if player_vy >= 0 then
+    if vy >= 0 then
         for i = 1, #plat_xs do
-            if prev_y + 20 <= plat_ys[i] then
-                if player_y + 20 >= plat_ys[i] and player_x + 20 > plat_xs[i] and player_x < plat_xs[i] + plat_ws[i] then
-                    player_y = plat_ys[i] - 20.0
-                    player_vy = 0
-                    on_ground = true
-                end
+            if prev_y + 20 <= plat_ys[i] and py + 20 >= plat_ys[i] and 
+               px + 20 > plat_xs[i] and px < plat_xs[i] + plat_ws[i] then
+                py = plat_ys[i] - 20.0
+                vy = 0
+                on_ground = true
             end
         end
+        -- Ground collision
+        if py + 20 >= 580 then
+            py = 580 - 20
+            vy = 0
+            on_ground = true
+        end
     end
-
-    if player_y + 20 >= 580 then
-        player_y = 580 - 20.0
-        player_vy = 0
-        on_ground = true
-    end
-
-    if player_y > 620 then
-        player_x = 100
-        player_y = 400
-        player_vy = 0
+    
+    -- Reset if fallen
+    if py > 620 then
+        px, py = 100, 400
+        vy = 0
     end
 end
 
 function love.draw()
-    love.graphics.rectangle("fill", player_x, player_y, 20, 20)
-
+    love.graphics.print("Use arrows + up to jump", 10, 10)
+    
+    -- Draw player
+    love.graphics.rectangle("fill", px, py, 20, 20)
+    
+    -- Draw platforms
     for i = 1, #plat_xs do
         love.graphics.rectangle("fill", plat_xs[i], plat_ys[i], plat_ws[i], 12)
     end
-
-    love.graphics.print("Use arrows + up to jump", 10, 10)
+    
+    -- Draw ground
+    love.graphics.rectangle("fill", 0, 580, 800, 20)
 end

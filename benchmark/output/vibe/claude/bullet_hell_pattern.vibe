@@ -10,32 +10,31 @@ let px: Float = 400.0
 let py: Float = 500.0
 
 fn update(dt: Float)
-    if game_over
-        return
-    emit_angle = emit_angle + 2.5 * dt
-    emit_timer = emit_timer + dt
-    if emit_timer >= 0.05
-        emit_timer = 0.0
-        for k in range(0, 3)
-            let angle: Float = emit_angle + float(k) * 2.094
-            bul_xs = bul_xs + [400.0]
-            bul_ys = bul_ys + [200.0]
-            bul_vxs = bul_vxs + [cos(angle) * 120.0]
-            bul_vys = bul_vys + [sin(angle) * 120.0]
-            bul_lifes = bul_lifes + [5.0]
-    if key_down("left")
-        px = px - 300.0 * dt
-    if key_down("right")
-        px = px + 300.0 * dt
-    for i in range(0, len(bul_xs))
-        bul_xs[i] = bul_xs[i] + bul_vxs[i] * dt
-        bul_ys[i] = bul_ys[i] + bul_vys[i] * dt
-        bul_lifes[i] = bul_lifes[i] - dt
-        if bul_lifes[i] > 0.0
-            let ddx: Float = px - bul_xs[i]
-            let ddy: Float = py - bul_ys[i]
-            if sqrt(ddx * ddx + ddy * ddy) < 11.0
-                game_over = true
+    if not game_over
+        emit_angle = emit_angle + 2.5 * dt
+        emit_timer = emit_timer + dt
+        if emit_timer >= 0.05
+            emit_timer = 0.0
+            for k in range(0, 3)
+                let angle: Float = emit_angle + float(k) * 2.094
+                bul_xs = bul_xs + [400.0]
+                bul_ys = bul_ys + [200.0]
+                bul_vxs = bul_vxs + [cos(angle) * 120.0]
+                bul_vys = bul_vys + [sin(angle) * 120.0]
+                bul_lifes = bul_lifes + [5.0]
+        if key_down("left")
+            px = px - 300.0 * dt
+        if key_down("right")
+            px = px + 300.0 * dt
+        for i in range(0, len(bul_xs))
+            bul_xs[i] = bul_xs[i] + bul_vxs[i] * dt
+            bul_ys[i] = bul_ys[i] + bul_vys[i] * dt
+            bul_lifes[i] = bul_lifes[i] - dt
+            if bul_lifes[i] > 0.0
+                let ddx: Float = px - bul_xs[i]
+                let ddy: Float = py - bul_ys[i]
+                if sqrt(ddx * ddx + ddy * ddy) < 11.0
+                    game_over = true
 
 fn draw()
     draw_circle(400.0, 200.0, 12.0)

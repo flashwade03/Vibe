@@ -16,7 +16,7 @@ fn draw()
     else if state == 1
         draw_rect(target_x, target_y, 20.0, 20.0)
         draw_text("Score: " + str(score), 10.0, 10.0)
-        draw_text("Time: " + str(int(timer)), 10.0, 30.0)
+        draw_text("Time: " + str(int(timer)), 700.0, 10.0)
     else if state == 2
         draw_text("Game Over! Score: " + str(score), 250.0, 260.0)
         draw_text("Press SPACE to Restart", 250.0, 300.0)

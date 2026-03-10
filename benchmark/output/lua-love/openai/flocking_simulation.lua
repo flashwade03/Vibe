@@ -5,12 +5,13 @@ local boid_vys = {}
 local num_boids = 15
 
 function rand_float(min, max)
-    return min + math.random() * (max - min)
+    return min + (max - min) * love.math.random()
 end
 
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Boids Simulation")
+
     for i = 1, num_boids do
         table.insert(boid_xs, rand_float(0.0, 800.0))
         table.insert(boid_ys, rand_float(0.0, 600.0))
@@ -20,18 +21,17 @@ function love.load()
 end
 
 function love.update(dt)
-    local center_x = 0
-    local center_y = 0
-
     for i = 1, num_boids do
-        center_x = center_x + boid_xs[i]
-        center_y = center_y + boid_ys[i]
-    end
+        local center_x, center_y = 0, 0
 
-    center_x = center_x / num_boids
-    center_y = center_y / num_boids
+        for j = 1, num_boids do
+            center_x = center_x + boid_xs[j]
+            center_y = center_y + boid_ys[j]
+        end
 
-    for i = 1, num_boids do
+        center_x = center_x / num_boids
+        center_y = center_y / num_boids
+
         -- Cohesion
         boid_vxs[i] = boid_vxs[i] + (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] = boid_vys[i] + (center_y - boid_ys[i]) * 0.5 * dt
@@ -42,6 +42,7 @@ function love.update(dt)
                 local dx = boid_xs[i] - boid_xs[j]
                 local dy = boid_ys[i] - boid_ys[j]
                 local distance = math.sqrt(dx * dx + dy * dy)
+
                 if distance < 30.0 then
                     boid_vxs[i] = boid_vxs[i] + (dx / distance) * 100.0 * dt
                     boid_vys[i] = boid_vys[i] + (dy / distance) * 100.0 * dt

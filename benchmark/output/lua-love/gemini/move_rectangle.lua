@@ -1,10 +1,10 @@
-local x = 384
-local y = 284
+local x = 400 - 16
+local y = 300 - 16
 local speed = 200
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Vibe Rectangle")
 end
 
 function love.update(dt)

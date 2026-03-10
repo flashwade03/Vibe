@@ -24,10 +24,10 @@ fn keypressed(k: String)
         bul_alive = bul_alive + [1.0]
 
 fn update(dt: Float)
-    if key_down("left")
-        px -= 250.0 * dt
     if key_down("right")
         px += 250.0 * dt
+    if key_down("left")
+        px -= 250.0 * dt
     if px < 0.0
         px = 0.0
     if px > 768.0
@@ -77,4 +77,7 @@ fn draw()
     if alive == 0
         draw_text("YOU WIN!", 340.0, 280.0)
 
-load()
+fn main()
+    load()
+
+main()

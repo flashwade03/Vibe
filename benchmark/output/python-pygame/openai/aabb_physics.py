@@ -48,20 +48,20 @@ def update(dt):
                 box_ys[i] = plat_ys[j] - box_hs[i]
                 box_vys[i] = 0.0
 
-    # Box-box push
+    # Box-box collision and push
     for i in range(6):
         for j in range(6):
             if j > i and (box_xs[i] < box_xs[j] + box_ws[j] and
                           box_xs[i] + box_ws[i] > box_xs[j] and
                           box_ys[i] < box_ys[j] + box_hs[j] and
                           box_ys[i] + box_hs[i] > box_ys[j]):
-                ov = (box_xs[i] + box_ws[i]) - box_xs[j]
-                if ov > 0.0:
-                    box_xs[i] -= ov * 0.5
-                    box_xs[j] += ov * 0.5
+                overlap = (box_xs[i] + box_ws[i]) - box_xs[j]
+                if overlap > 0.0:
+                    box_xs[i] -= overlap * 0.5
+                    box_xs[j] += overlap * 0.5
 
-def keypressed(key):
-    if key == pygame.K_SPACE:
+def keypressed(k):
+    if k == pygame.K_SPACE:
         for i in range(6):
             box_ys[i] = random.uniform(50.0, 200.0)
             box_vys[i] = 0.0

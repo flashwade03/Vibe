@@ -1,7 +1,5 @@
 local paddle_x = 360
 local paddle_y = 570
-local paddle_width = 80
-local paddle_height = 12
 local paddle_speed = 300
 
 local ball_x = 400
@@ -20,7 +18,7 @@ local game_over = false
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Breakout")
+    love.window.setTitle("Breakout Game")
 
     for i = 0, 7 do
         table.insert(bricks, {x = i * 100 + 5, y = 50})
@@ -51,14 +49,15 @@ function love.update(dt)
     end
 
     -- Ball collision with paddle
-    if ball_y >= paddle_y - ball_radius and ball_x >= paddle_x and ball_x <= paddle_x + paddle_width then
+    if ball_y >= paddle_y - ball_radius and ball_x >= paddle_x and ball_x <= paddle_x + 80 then
         ball_vy = -ball_vy
     end
 
     -- Ball collision with bricks
     for i, brick in ipairs(bricks) do
         if brick_alive[i] == 1.0 then
-            if ball_x > brick.x and ball_x < brick.x + brick_width and ball_y > brick.y and ball_y < brick.y + brick_height then
+            if ball_x >= brick.x and ball_x <= brick.x + brick_width and
+               ball_y >= brick.y and ball_y <= brick.y + brick_height then
                 brick_alive[i] = 0.0
                 ball_vy = -ball_vy
                 score = score + 1
@@ -74,7 +73,7 @@ end
 
 function love.draw()
     -- Draw paddle
-    love.graphics.rectangle("fill", paddle_x, paddle_y, paddle_width, paddle_height)
+    love.graphics.rectangle("fill", paddle_x, paddle_y, 80, 12)
 
     -- Draw ball
     love.graphics.circle("fill", ball_x, ball_y, ball_radius)

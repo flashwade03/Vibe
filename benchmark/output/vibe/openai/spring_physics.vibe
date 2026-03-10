@@ -51,10 +51,8 @@ fn update(dt: Float)
 fn draw()
     for i in range(0, 5)
         draw_circle(mass_xs[i], mass_ys[i], 10.0)
-
     for i in range(0, 4)
         for j in range(0, 8)
             let lt: Float = float(j) / 8.0
             draw_circle(mass_xs[i] + (mass_xs[i+1] - mass_xs[i]) * lt, mass_ys[i] + (mass_ys[i+1] - mass_ys[i]) * lt, 2.0)
-
     draw_text("Arrows move anchor", 10.0, 10.0)

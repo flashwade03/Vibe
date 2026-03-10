@@ -6,7 +6,7 @@ local char_speed = 0.08
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Text Reveal")
+    love.window.setTitle("Vibe Text Reveal")
 end
 
 function love.update(dt)
@@ -21,7 +21,6 @@ end
 
 function love.draw()
     love.graphics.print(full_text, 100, 280)
-    
     local cover_x = 100 + char_index * 10
     love.graphics.rectangle("fill", cover_x, 270, 700, 30)
     
@@ -36,8 +35,8 @@ function love.draw()
     end
 end
 
-function love.keypressed(k)
-    if k == "space" then
+function love.keypressed(key)
+    if key == "space" then
         char_index = 0
         char_timer = 0.0
     end

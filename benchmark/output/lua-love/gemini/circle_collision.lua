@@ -1,55 +1,39 @@
-local px = 400
-local py = 300
-local p_radius = 20
+local px, py = 400, 300
 local speed = 150
+local hit = false
 
 local enemy_xs = {100, 700, 200, 600, 400}
 local enemy_ys = {100, 100, 400, 400, 500}
-local e_radius = 15
-
-local hit = false
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Vibe Program")
+    love.window.setTitle("Vibe Game")
 end
 
 function love.update(dt)
     hit = false
 
-    if love.keyboard.isDown("left") then
-        px = px - speed * dt
-    end
-    if love.keyboard.isDown("right") then
-        px = px + speed * dt
-    end
-    if love.keyboard.isDown("up") then
-        py = py - speed * dt
-    end
-    if love.keyboard.isDown("down") then
-        py = py + speed * dt
-    end
+    if love.keyboard.isDown("left") then px = px - speed * dt end
+    if love.keyboard.isDown("right") then px = px + speed * dt end
+    if love.keyboard.isDown("up") then py = py - speed * dt end
+    if love.keyboard.isDown("down") then py = py + speed * dt end
 
     for i = 1, #enemy_xs do
-        local ex = enemy_xs[i]
-        local ey = enemy_ys[i]
-        local dx = px - ex
-        local dy = py - ey
-        local distance = math.sqrt(dx * dx + dy * dy)
-        
-        if distance < (p_radius + e_radius) then
+        local ex, ey = enemy_xs[i], enemy_ys[i]
+        local dist = math.sqrt((px - ex)^2 + (py - ey)^2)
+        if dist < (20 + 15) then
             hit = true
         end
     end
 end
 
 function love.draw()
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill", px, py, p_radius)
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.circle("fill", px, py, 20)
 
     love.graphics.setColor(1, 0, 0)
     for i = 1, #enemy_xs do
-        love.graphics.circle("fill", enemy_xs[i], enemy_ys[i], e_radius)
+        love.graphics.circle("fill", enemy_xs[i], enemy_ys[i], 15)
     end
 
     love.graphics.setColor(1, 1, 1)

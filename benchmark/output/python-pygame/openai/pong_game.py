@@ -6,7 +6,6 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("2-Player Pong")
 clock = pygame.time.Clock()
 
-# Game state variables
 p1_y = 260.0
 p2_y = 260.0
 ball_x = 400.0
@@ -59,16 +58,18 @@ def update(dt):
 
 def draw():
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), (30.0, p1_y, 12.0, 80.0))
-    pygame.draw.rect(screen, (255, 255, 255), (758.0, p2_y, 12.0, 80.0))
+    pygame.draw.rect(screen, (255, 255, 255), (30, p1_y, 12, 80))
+    pygame.draw.rect(screen, (255, 255, 255), (758, p2_y, 12, 80))
     pygame.draw.circle(screen, (255, 255, 255), (int(ball_x), int(ball_y)), 8)
+
     for i in range(0, 30):
-        pygame.draw.rect(screen, (255, 255, 255), (398.0, float(i) * 20.0, 4.0, 10.0))
+        pygame.draw.rect(screen, (255, 255, 255), (398, i * 20, 4, 10))
+
     font = pygame.font.Font(None, 36)
     text1 = font.render(str(score1), True, (255, 255, 255))
     text2 = font.render(str(score2), True, (255, 255, 255))
-    screen.blit(text1, (300.0, 20.0))
-    screen.blit(text2, (480.0, 20.0))
+    screen.blit(text1, (300, 20))
+    screen.blit(text2, (480, 20))
 
 running = True
 while running:

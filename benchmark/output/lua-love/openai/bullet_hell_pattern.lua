@@ -10,7 +10,7 @@ local game_over = false
 
 local px = 400.0
 local py = 500.0
-local player_speed = 300.0
+local player_speed = 300
 
 function love.load()
     love.window.setMode(800, 600)
@@ -59,13 +59,11 @@ end
 
 function love.draw()
     love.graphics.circle("fill", 400.0, 200.0, 12.0)
-
     for i = 1, #bul_xs do
         if bul_lifes[i] > 0.0 then
             love.graphics.circle("fill", bul_xs[i], bul_ys[i], 3.0)
         end
     end
-
     love.graphics.circle("fill", px, py, 8.0)
 
     if game_over then

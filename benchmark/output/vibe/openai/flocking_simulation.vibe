@@ -46,10 +46,11 @@ fn update(dt: Float)
             vx = vx / speed * 150.0
             vy = vy / speed * 150.0
 
+        -- Update velocity
         boid_vxs[i] = vx
         boid_vys[i] = vy
 
-        -- Update positions
+        -- Update position
         boid_xs[i] += vx * dt
         boid_ys[i] += vy * dt
 

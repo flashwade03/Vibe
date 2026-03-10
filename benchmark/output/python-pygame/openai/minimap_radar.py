@@ -4,17 +4,16 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Game with Minimap")
+pygame.display.set_caption("Vibe World with Minimap")
 clock = pygame.time.Clock()
 
 player_x, player_y = 1000.0, 1000.0
 speed = 300
-item_xs = []
-item_ys = []
+item_xs, item_ys = [], []
 
 def load():
     global item_xs, item_ys
-    for i in range(20):
+    for _ in range(20):
         item_xs.append(random.uniform(0, 2000))
         item_ys.append(random.uniform(0, 2000))
 
@@ -50,23 +49,19 @@ while running:
     # Draw player in main view
     pygame.draw.rect(screen, (255, 255, 255), (400, 300, 16, 16))
 
-    # Draw minimap background
+    # Draw minimap
     pygame.draw.rect(screen, (50, 50, 50), (630, 10, 160, 120))
-
-    # Draw items on minimap
     for i in range(20):
         minimap_x = 630.0 + (item_xs[i] / 2000.0) * 160.0
         minimap_y = 10.0 + (item_ys[i] / 2000.0) * 120.0
         pygame.draw.rect(screen, (255, 255, 255), (minimap_x, minimap_y, 2, 2))
-
-    # Draw player on minimap
     minimap_player_x = 630.0 + (player_x / 2000.0) * 160.0
     minimap_player_y = 10.0 + (player_y / 2000.0) * 120.0
     pygame.draw.rect(screen, (255, 0, 0), (minimap_player_x, minimap_player_y, 4, 4))
 
     # Display player position
     font = pygame.font.Font(None, 36)
-    text = font.render(f"Pos: {int(player_x)}, {int(player_y)}", True, (255, 255, 255))
+    text = font.render("Pos: " + str(int(player_x)) + ", " + str(int(player_y)), True, (255, 255, 255))
     screen.blit(text, (10, 10))
 
     pygame.display.flip()

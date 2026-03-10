@@ -7,8 +7,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Screen Shake Effect")
 clock = pygame.time.Clock()
 
-shake_x = 0.0
-shake_y = 0.0
+shake_x, shake_y = 0.0, 0.0
 shake_timer = 0.0
 shake_intensity = 0.0
 
@@ -30,14 +29,14 @@ while running:
         shake_timer -= dt
         shake_x = random.uniform(-shake_intensity, shake_intensity)
         shake_y = random.uniform(-shake_intensity, shake_intensity)
-        shake_intensity -= 20.0 * dt
+        shake_intensity = max(0.0, shake_intensity - 20.0 * dt)
     else:
         shake_x = 0.0
         shake_y = 0.0
 
     screen.fill((0, 0, 0))
 
-    # Draw the main rectangle
+    # Draw main rectangle
     pygame.draw.rect(screen, (255, 255, 255), (368.0 + shake_x, 268.0 + shake_y, 64.0, 64.0))
 
     # Draw corner markers
@@ -46,7 +45,7 @@ while running:
     pygame.draw.rect(screen, (255, 255, 255), (50.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
     pygame.draw.rect(screen, (255, 255, 255), (734.0 + shake_x, 534.0 + shake_y, 16.0, 16.0))
 
-    # Display text
+    # Draw text
     text = font.render("Press SPACE to shake", True, (255, 255, 255))
     screen.blit(text, (280.0 + shake_x, 550.0 + shake_y))
 

@@ -25,11 +25,12 @@ end
 
 function love.update(dt)
     if love.keyboard.isDown("left") then
-        px = math.max(0.0, px - 250.0 * dt)
+        px = px - 250 * dt
     end
     if love.keyboard.isDown("right") then
-        px = math.min(768.0, px + 250.0 * dt)
+        px = px + 250 * dt
     end
+    px = math.max(0, math.min(px, 768))
 
     local reverse = false
     for i = 1, #inv_xs do
@@ -95,7 +96,7 @@ function love.draw()
         end
     end
 
-    love.graphics.print("Score: " .. score, 10.0, 10.0)
+    love.graphics.print("Score: " .. score, 10, 10)
 
     local alive = 0
     for i = 1, #inv_alive do
@@ -105,6 +106,6 @@ function love.draw()
     end
 
     if alive == 0 then
-        love.graphics.print("YOU WIN!", 340.0, 280.0)
+        love.graphics.print("YOU WIN!", 340, 280)
     end
 end

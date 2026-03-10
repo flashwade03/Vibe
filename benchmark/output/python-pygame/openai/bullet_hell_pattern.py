@@ -30,7 +30,7 @@ def update(dt):
 
         if emit_timer >= 0.05:
             emit_timer = 0.0
-            for k in range(3):
+            for k in range(0, 3):
                 angle = emit_angle + float(k) * 2.094
                 bul_xs.append(400.0)
                 bul_ys.append(200.0)
@@ -70,8 +70,8 @@ def draw():
         screen.blit(text, (340, 300))
 
     alive = sum(1 for life in bul_lifes if life > 0.0)
-    text = font.render("Bullets: " + str(alive), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+    bullet_text = font.render(f"Bullets: {alive}", True, (255, 255, 255))
+    screen.blit(bullet_text, (10, 10))
 
 running = True
 while running:

@@ -5,8 +5,8 @@ function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("2D Heat Diffusion")
     for i = 1, 192 do
-        table.insert(heat, 0.0)
-        table.insert(next_heat, 0.0)
+        heat[i] = 0.0
+        next_heat[i] = 0.0
     end
 end
 

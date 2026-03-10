@@ -14,12 +14,10 @@ fn load()
 
 fn mousepressed(mx: Float, my: Float, button: Int)
     for i in range(0, 30)
-        if cstate[i] == 0.0
-            let ddx: Float = mx - cx[i]
-            let ddy: Float = my - cy[i]
-            let dist: Float = sqrt(ddx * ddx + ddy * ddy)
-            if dist < 15.0
-                cstate[i] = 1.0
+        let ddx: Float = mx - cx[i]
+        let ddy: Float = my - cy[i]
+        if sqrt(ddx * ddx + ddy * ddy) < 15.0 and cstate[i] == 0.0
+            cstate[i] = 1.0
 
 fn update(dt: Float)
     for i in range(0, 30)
@@ -32,12 +30,10 @@ fn update(dt: Float)
                 if cstate[j] == 0.0
                     let ddx: Float = cx[i] - cx[j]
                     let ddy: Float = cy[i] - cy[j]
-                    let dist: Float = sqrt(ddx * ddx + ddy * ddy)
-                    if dist < cradius[i] + 15.0
+                    if sqrt(ddx * ddx + ddy * ddy) < cradius[i] + 15.0
                         cstate[j] = 1.0
 
 fn draw()
-    let exploded: Int = 0
     for i in range(0, 30)
         if cstate[i] == 0.0
             draw_circle(cx[i], cy[i], 15.0)
@@ -45,6 +41,8 @@ fn draw()
             draw_circle(cx[i], cy[i], cradius[i])
         else
             draw_circle(cx[i], cy[i], 3.0)
+    let count: Int = 0
+    for i in range(0, 30)
         if cstate[i] > 0.0
-            exploded = exploded + 1
-    draw_text("Exploded: " + str(exploded), 10.0, 10.0)
+            count = count + 1
+    draw_text("Exploded: " + str(count), 10.0, 10.0)

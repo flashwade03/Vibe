@@ -11,7 +11,6 @@ function love.load()
 end
 
 function love.update(dt)
-    -- Horizontal movement
     if love.keyboard.isDown("left") then
         x = x - speed * dt
     end
@@ -19,18 +18,15 @@ function love.update(dt)
         x = x + speed * dt
     end
 
-    -- Gravity and vertical movement
     vy = vy + gravity * dt
     y = y + vy * dt
 
-    -- Ground collision
     if y >= 550 then
         y = 550
         vy = 0
         on_ground = true
     end
 
-    -- Jumping
     if love.keyboard.isDown("up") and on_ground then
         vy = -300.0
         on_ground = false

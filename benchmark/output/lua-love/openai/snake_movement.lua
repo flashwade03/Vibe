@@ -22,8 +22,8 @@ function love.update(dt)
         if new_y < 0.0 then new_y = 580.0 end
 
         for i = #snake_xs, 2, -1 do
-            snake_xs[i] = snake_xs[i-1]
-            snake_ys[i] = snake_ys[i-1]
+            snake_xs[i] = snake_xs[i - 1]
+            snake_ys[i] = snake_ys[i - 1]
         end
 
         snake_xs[1] = new_x
@@ -32,18 +32,18 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if key == "right" and dir_x ~= -1 then
-        dir_x = 1
-        dir_y = 0
-    elseif key == "left" and dir_x ~= 1 then
-        dir_x = -1
-        dir_y = 0
-    elseif key == "up" and dir_y ~= 1 then
-        dir_x = 0
-        dir_y = -1
-    elseif key == "down" and dir_y ~= -1 then
-        dir_x = 0
-        dir_y = 1
+    if key == "right" and not (dir_x == -1.0 and dir_y == 0.0) then
+        dir_x = 1.0
+        dir_y = 0.0
+    elseif key == "left" and not (dir_x == 1.0 and dir_y == 0.0) then
+        dir_x = -1.0
+        dir_y = 0.0
+    elseif key == "up" and not (dir_x == 0.0 and dir_y == 1.0) then
+        dir_x = 0.0
+        dir_y = -1.0
+    elseif key == "down" and not (dir_x == 0.0 and dir_y == -1.0) then
+        dir_x = 0.0
+        dir_y = 1.0
     end
 end
 

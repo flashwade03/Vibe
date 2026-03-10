@@ -21,7 +21,7 @@ function love.update(dt)
     for i = #ring_xs, 1, -1 do
         ring_radii[i] = ring_radii[i] + 80.0 * dt
         ring_lifes[i] = ring_lifes[i] - dt
-        if ring_lifes[i] <= 0.0 then
+        if ring_lifes[i] <= 0 then
             table.remove(ring_xs, i)
             table.remove(ring_ys, i)
             table.remove(ring_radii, i)

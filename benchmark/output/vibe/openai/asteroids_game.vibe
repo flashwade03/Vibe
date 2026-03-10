@@ -37,7 +37,6 @@ fn update(dt: Float)
         if key_down("up")
             ship_vx += cos(ship_angle) * 300.0 * dt
             ship_vy += sin(ship_angle) * 300.0 * dt
-
         ship_vx = ship_vx * 0.99
         ship_vy = ship_vy * 0.99
         ship_x += ship_vx * dt
@@ -53,23 +52,16 @@ fn update(dt: Float)
             ship_y = 600.0
 
         for i in range(0, len(ax))
-            if aalive[i] == 1.0
-                ax[i] += avx[i] * dt
-                ay[i] += avy[i] * dt
-
-                if ax[i] > 800.0
-                    ax[i] = 0.0
-                if ax[i] < 0.0
-                    ax[i] = 800.0
-                if ay[i] > 600.0
-                    ay[i] = 0.0
-                if ay[i] < 0.0
-                    ay[i] = 600.0
-
-                let sdx: Float = ship_x - ax[i]
-                let sdy: Float = ship_y - ay[i]
-                if sqrt(sdx*sdx + sdy*sdy) < asize[i] + 8.0
-                    game_over = true
+            ax[i] += avx[i] * dt
+            ay[i] += avy[i] * dt
+            if ax[i] > 800.0
+                ax[i] = 0.0
+            if ax[i] < 0.0
+                ax[i] = 800.0
+            if ay[i] > 600.0
+                ay[i] = 0.0
+            if ay[i] < 0.0
+                ay[i] = 600.0
 
         for j in range(0, len(bx))
             if blife[j] > 0.0
@@ -77,8 +69,15 @@ fn update(dt: Float)
                 by[j] += bvy[j] * dt
                 blife[j] -= dt
 
-                for i in range(0, len(ax))
-                    if aalive[i] == 1.0
+        for i in range(0, len(ax))
+            if aalive[i] == 1.0
+                let sdx: Float = ship_x - ax[i]
+                let sdy: Float = ship_y - ay[i]
+                if sqrt(sdx*sdx + sdy*sdy) < asize[i] + 8.0
+                    game_over = true
+
+                for j in range(0, len(bx))
+                    if blife[j] > 0.0
                         let ddx: Float = bx[j] - ax[i]
                         let ddy: Float = by[j] - ay[i]
                         if sqrt(ddx*ddx + ddy*ddy) < asize[i]
@@ -99,16 +98,12 @@ fn keypressed(k: String)
 fn draw()
     draw_circle(ship_x, ship_y, 8.0)
     draw_circle(ship_x + cos(ship_angle) * 15.0, ship_y + sin(ship_angle) * 15.0, 3.0)
-
     for i in range(0, len(ax))
         if aalive[i] == 1.0
             draw_circle(ax[i], ay[i], asize[i])
-
     for j in range(0, len(bx))
         if blife[j] > 0.0
             draw_circle(bx[j], by[j], 2.0)
-
     draw_text("Score: " + str(score), 10.0, 10.0)
-
     if game_over
         draw_text("GAME OVER", 340.0, 280.0)

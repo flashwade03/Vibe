@@ -45,17 +45,14 @@ function love.update(dt)
     -- Collision detection
     on_ground = false
     for i = 1, #plat_xs do
-        if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and
-           player_y + 20 >= plat_ys[i] and
-           player_x + 20 > plat_xs[i] and
-           player_x < plat_xs[i] + plat_ws[i] then
-            player_y = plat_ys[i] - 20
+        if player_vy >= 0 and prev_y + 20 <= plat_ys[i] and player_y + 20 >= plat_ys[i] and player_x + 20 > plat_xs[i] and player_x < plat_xs[i] + plat_ws[i] then
+            player_y = plat_ys[i] - 20.0
             player_vy = 0
             on_ground = true
         end
     end
 
-    -- Ground check
+    -- Ground collision
     if player_y + 20 >= 580 then
         player_y = 580 - 20
         player_vy = 0

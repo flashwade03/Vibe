@@ -2,19 +2,17 @@ let x: Float = 384.0
 let y: Float = 550.0
 let vy: Float = 0.0
 let on_ground: Bool = true
-
-const SPEED: Float = 200.0
 const GRAVITY: Float = 500.0
-const JUMP_SPEED: Float = -300.0
+const SPEED: Float = 200.0
 
 fn update(dt: Float)
-    if key_down("left")
-        x = x - SPEED * dt
     if key_down("right")
         x = x + SPEED * dt
+    if key_down("left")
+        x = x - SPEED * dt
 
     if key_down("up") and on_ground
-        vy = JUMP_SPEED
+        vy = -300.0
         on_ground = false
 
     vy = vy + GRAVITY * dt

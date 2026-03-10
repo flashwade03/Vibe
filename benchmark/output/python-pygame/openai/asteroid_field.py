@@ -4,7 +4,7 @@ import random
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe: Dodge the Asteroids")
+pygame.display.set_caption("Vibe - Dodge the Asteroids")
 clock = pygame.time.Clock()
 
 player_x, player_y = 100.0, 300.0

@@ -56,8 +56,8 @@ fn update(dt: Float)
                 if n >= 0 and n < 192 and (grid[n] == 0.0 or grid[n] == 5.0) and parent[n] == -1.0
                     parent[n] = float(cur)
                     queue = queue + [float(n)]
-    if q_ptr >= len(queue) and not found
-        bfs_running = false
+        if q_ptr >= len(queue) and not found
+            bfs_running = false
 
 fn draw()
     for row in range(0, 12)

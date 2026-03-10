@@ -6,20 +6,17 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Breakout")
 clock = pygame.time.Clock()
 
-# Paddle
+# Game state variables
 paddle_x = 360.0
-paddle_speed = 300
+paddle_speed = 300.0
 
-# Ball
 ball_x, ball_y = 400.0, 400.0
+ball_vx, ball_vy = 200.0, -200.0
 ball_radius = 6
-ball_vx, ball_vy = 200, -200
 
-# Bricks
 brick_width, brick_height = 90, 20
 brick_alive = [1.0] * 8
 
-# Game state
 score = 0
 game_over = False
 
@@ -39,35 +36,36 @@ while running:
     if keys[pygame.K_RIGHT]:
         paddle_x += paddle_speed * dt
 
-    # Keep paddle within screen bounds
+    # Ensure paddle stays within screen bounds
     paddle_x = max(0, min(paddle_x, 720))
 
-    # Update ball position
-    ball_x += ball_vx * dt
-    ball_y += ball_vy * dt
+    if not game_over:
+        # Update ball position
+        ball_x += ball_vx * dt
+        ball_y += ball_vy * dt
 
-    # Ball collision with walls
-    if ball_x < ball_radius or ball_x > 800 - ball_radius:
-        ball_vx = -ball_vx
-    if ball_y < ball_radius:
-        ball_vy = -ball_vy
+        # Ball collision with walls
+        if ball_x < ball_radius or ball_x > 800 - ball_radius:
+            ball_vx = -ball_vx
+        if ball_y < ball_radius:
+            ball_vy = -ball_vy
 
-    # Ball collision with paddle
-    if ball_y >= 564.0 and paddle_x <= ball_x <= paddle_x + 80.0:
-        ball_vy = -ball_vy
+        # Ball collision with paddle
+        if ball_y >= 564 and paddle_x <= ball_x <= paddle_x + 80:
+            ball_vy = -ball_vy
 
-    # Ball collision with bricks
-    for i in range(8):
-        if brick_alive[i] == 1.0:
-            brick_x = i * 100 + 5
-            if brick_x <= ball_x <= brick_x + brick_width and 50 <= ball_y <= 50 + brick_height:
-                brick_alive[i] = 0.0
-                ball_vy = -ball_vy
-                score += 1
+        # Ball collision with bricks
+        for i in range(8):
+            if brick_alive[i] == 1.0:
+                brick_x = i * 100 + 5
+                if brick_x <= ball_x <= brick_x + brick_width and 50 <= ball_y <= 50 + brick_height:
+                    brick_alive[i] = 0.0
+                    ball_vy = -ball_vy
+                    score += 1
 
-    # Check if ball is out of bounds
-    if ball_y > 600:
-        game_over = True
+        # Check if ball is out of bounds
+        if ball_y > 600:
+            game_over = True
 
     # Drawing
     screen.fill((0, 0, 0))

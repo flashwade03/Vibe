@@ -1,4 +1,4 @@
-local state = 0
+local state = 0 -- 0 = menu, 1 = playing, 2 = gameover
 local score = 0
 local timer = 10.0
 local target_x = 0
@@ -7,7 +7,6 @@ local target_y = 0
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("3-State Game")
-    math.randomseed(os.time())
     resetTarget()
 end
 
@@ -35,11 +34,13 @@ end
 
 function love.keypressed(key)
     if key == "space" then
-        if state == 0 or state == 2 then
+        if state == 0 then
             state = 1
             score = 0
             timer = 10.0
             resetTarget()
+        elseif state == 2 then
+            state = 0
         end
     end
 end

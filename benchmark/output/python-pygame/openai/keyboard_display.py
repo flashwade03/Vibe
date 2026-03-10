@@ -3,10 +3,9 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe Program")
+pygame.display.set_caption("Key Press Tracker")
 clock = pygame.time.Clock()
 
-# Game state variables
 last_key = "none"
 key_count = 0
 
@@ -29,16 +28,15 @@ while running:
 
     screen.fill((0, 0, 0))
 
-    # Draw logic
-    text_last_key = font.render("Last Key: " + last_key, True, (255, 255, 255))
-    screen.blit(text_last_key, (250.0, 250.0))
+    last_key_text = font.render("Last Key: " + last_key, True, (255, 255, 255))
+    screen.blit(last_key_text, (250.0, 250.0))
 
-    text_key_count = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
-    screen.blit(text_key_count, (250.0, 290.0))
+    total_presses_text = font.render("Total Presses: " + str(key_count), True, (255, 255, 255))
+    screen.blit(total_presses_text, (250.0, 290.0))
 
     pygame.draw.rect(screen, (255, 255, 255), (300.0, 350.0, 200.0, 80.0), 2)
-    text_decorative = font.render(last_key, True, (255, 255, 255))
-    screen.blit(text_decorative, (370.0, 380.0))
+    key_in_box_text = font.render(last_key, True, (255, 255, 255))
+    screen.blit(key_in_box_text, (370.0, 380.0))
 
     pygame.display.flip()
 

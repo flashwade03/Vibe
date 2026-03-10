@@ -10,9 +10,9 @@ fn keypressed(k: String)
         let item_type: Float = 0.0
         if k == "1"
             item_type = 1.0
-        else if k == "2"
+        if k == "2"
             item_type = 2.0
-        else if k == "3"
+        if k == "3"
             item_type = 3.0
         for i in range(0, 20)
             if inv_items[i] == 0.0

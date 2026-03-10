@@ -7,18 +7,9 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Fractal Tree")
 clock = pygame.time.Clock()
 
-# Fractal tree variables
-seg_x1s = []
-seg_y1s = []
-seg_x2s = []
-seg_y2s = []
-
-q_xs = []
-q_ys = []
-q_angles = []
-q_lens = []
-q_depths = []
-
+# Fractal tree state variables
+seg_x1s, seg_y1s, seg_x2s, seg_y2s = [], [], [], []
+q_xs, q_ys, q_angles, q_lens, q_depths = [], [], [], [], []
 max_depth = 7
 branch_angle = 0.5
 built = False
@@ -26,7 +17,7 @@ built = False
 def update(dt):
     global built
     if not built:
-        # Seed the initial branch
+        # Seed the tree
         q_xs.append(400.0)
         q_ys.append(580.0)
         q_angles.append(-1.5708)  # -90 degrees in radians
@@ -37,6 +28,7 @@ def update(dt):
         for _ in range(500):
             if ptr >= len(q_xs):
                 break
+
             sx = q_xs[ptr]
             sy = q_ys[ptr]
             sa = q_angles[ptr]

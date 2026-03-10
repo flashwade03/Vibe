@@ -31,22 +31,23 @@ while running:
     screen.fill((0, 0, 0))
 
     # Draw health bar background
-    pygame.draw.rect(screen, (100, 100, 100), (250, 50, 300, 30))
-    # Draw health bar
-    bar_width = (health / max_health) * 300.0
-    pygame.draw.rect(screen, (255, 0, 0), (250, 50, bar_width, 30))
+    pygame.draw.rect(screen, (255, 255, 255), (250.0, 50.0, 300.0, 30.0), 2)
 
-    # Draw health text
+    # Draw filled portion of health bar
+    bar_width = (health / max_health) * 300.0
+    pygame.draw.rect(screen, (255, 255, 255), (250.0, 50.0, bar_width, 30.0))
+
+    # Display health text
     font = pygame.font.Font(None, 36)
     health_text = font.render(f"HP: {int(health)} / 100", True, (255, 255, 255))
-    screen.blit(health_text, (250, 90))
+    screen.blit(health_text, (250.0, 90.0))
 
     # Draw player
-    pygame.draw.rect(screen, (255, 255, 255), (384, 300, 32, 32))
+    pygame.draw.rect(screen, (255, 255, 255), (384.0, 300.0, 32, 32))
 
-    # Draw instructions
+    # Display instructions
     instructions = font.render("Press SPACE to take damage", True, (255, 255, 255))
-    screen.blit(instructions, (230, 550))
+    screen.blit(instructions, (230.0, 550.0))
 
     pygame.display.flip()
 

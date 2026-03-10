@@ -56,7 +56,5 @@ fn draw()
     for i in range(0, 9)
         for j in range(0, 5)
             let lt: Float = float(j) / 5.0
-            let lx: Float = node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt
-            let ly: Float = node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt
-            draw_circle(lx, ly, 2.0)
+            draw_circle(node_xs[i] + (node_xs[i + 1] - node_xs[i]) * lt, node_ys[i] + (node_ys[i + 1] - node_ys[i]) * lt, 2.0)
     draw_text("Arrows move anchor", 10.0, 10.0)

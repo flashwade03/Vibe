@@ -24,10 +24,10 @@ fn update(dt: Float)
     for i in range(0, len(note_ys))
         if note_hit[i] == 0.0
             note_ys[i] += note_speed * dt
-            if note_ys[i] > 600.0
-                note_hit[i] = 2.0
-                misses += 1
-                combo = 0
+        if note_ys[i] > 600.0 and note_hit[i] == 0.0
+            note_hit[i] = 2.0
+            misses += 1
+            combo = 0
 
     flash_timer -= dt
 

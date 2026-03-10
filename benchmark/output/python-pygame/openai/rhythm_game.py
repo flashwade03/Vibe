@@ -73,13 +73,11 @@ def draw():
             pygame.draw.rect(screen, (255, 255, 255), (note_xs[i] - 30.0, note_ys[i] - 10.0, 60.0, 20.0))
     if flash_timer > 0.0:
         pygame.draw.rect(screen, (255, 255, 255), (220.0 + float(flash_lane) * 100.0, 488.0, 60.0, 24.0))
-
     font = pygame.font.Font(None, 36)
-    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-    combo_text = font.render(f"Combo: {combo}", True, (255, 255, 255))
-    miss_text = font.render(f"Miss: {misses}", True, (255, 255, 255))
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    combo_text = font.render("Combo: " + str(combo), True, (255, 255, 255))
+    miss_text = font.render("Miss: " + str(misses), True, (255, 255, 255))
     keys_text = font.render("D F J K", True, (255, 255, 255))
-
     screen.blit(score_text, (10, 10))
     screen.blit(combo_text, (10, 30))
     screen.blit(miss_text, (10, 50))

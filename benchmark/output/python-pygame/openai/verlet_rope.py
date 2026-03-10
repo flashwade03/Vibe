@@ -7,18 +7,13 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Verlet Rope Simulation")
 clock = pygame.time.Clock()
 
+# Initialize node positions
 node_xs = []
 node_ys = []
 prev_xs = []
 prev_ys = []
 
-pin_x = 200.0
-pin_y = 200.0
-speed = 200.0
-rest_len = 40.0
-
 def load():
-    global node_xs, node_ys, prev_xs, prev_ys
     for i in range(10):
         xv = 200.0 + float(i) * 40.0
         node_xs.append(xv)
@@ -26,8 +21,14 @@ def load():
         node_ys.append(200.0)
         prev_ys.append(200.0)
 
+pin_x = 200.0
+pin_y = 200.0
+speed = 200.0
+rest_len = 40.0
+
 def update(dt):
     global pin_x, pin_y
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         pin_x -= speed * dt

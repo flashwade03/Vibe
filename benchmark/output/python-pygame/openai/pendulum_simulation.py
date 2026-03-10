@@ -7,12 +7,12 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Simple Pendulum")
 clock = pygame.time.Clock()
 
-# Pendulum parameters
-pivot_x, pivot_y = 400.0, 100.0
+# Pendulum state variables
 angle = 1.0
 angular_vel = 0.0
 length = 250.0
 gravity = 9.8
+pivot_x, pivot_y = 400.0, 100.0
 
 font = pygame.font.Font(None, 36)
 
@@ -26,7 +26,7 @@ def update(dt):
 def draw():
     screen.fill((0, 0, 0))
     
-    # Calculate bob position
+    # Compute bob position
     bob_x = pivot_x + math.sin(angle) * length
     bob_y = pivot_y + math.cos(angle) * length
     
@@ -64,7 +64,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mousepressed(*event.pos, event.button)
+            mx, my = pygame.mouse.get_pos()
+            mousepressed(mx, my, event.button)
 
     update(dt)
     draw()

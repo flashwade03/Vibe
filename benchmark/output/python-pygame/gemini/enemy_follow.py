@@ -4,13 +4,15 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Player and Enemy")
+pygame.display.set_caption("Vibe Game")
 clock = pygame.time.Clock()
 
+# Player state
 player_x, player_y = 400.0, 300.0
-enemy_x, enemy_y = 100.0, 100.0
-
 player_speed = 200.0
+
+# Enemy state
+enemy_x, enemy_y = 100.0, 100.0
 enemy_speed = 100.0
 
 running = True
@@ -21,6 +23,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Player movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player_x -= player_speed * dt
@@ -31,21 +34,26 @@ while running:
     if keys[pygame.K_DOWN]:
         player_y += player_speed * dt
 
+    # Enemy movement logic
     dx = player_x - enemy_x
     dy = player_y - enemy_y
     distance = math.sqrt(dx * dx + dy * dy)
 
     if distance > 1.0:
-        nx = dx / distance
-        ny = dy / distance
-        enemy_x += nx * enemy_speed * dt
-        enemy_y += ny * enemy_speed * dt
+        norm_dx = dx / distance
+        norm_dy = dy / distance
+        enemy_x += norm_dx * enemy_speed * dt
+        enemy_y += norm_dy * enemy_speed * dt
 
+    # Draw logic
     screen.fill((0, 0, 0))
-
+    
+    # Draw enemy (Red)
     pygame.draw.rect(screen, (255, 0, 0), (int(enemy_x), int(enemy_y), 32, 32))
+    
+    # Draw player (Blue)
     pygame.draw.rect(screen, (0, 0, 255), (int(player_x), int(player_y), 32, 32))
-
+    
     pygame.display.flip()
 
 pygame.quit()

@@ -12,10 +12,10 @@ fn update(dt: Float)
 fn draw()
     if frame == 0
         draw_rect(380.0, 280.0, 40.0, 40.0)
-    if frame == 1
+    else if frame == 1
         draw_rect(375.0, 275.0, 50.0, 50.0)
-    if frame == 2
+    else if frame == 2
         draw_rect(370.0, 270.0, 60.0, 60.0)
-    if frame == 3
+    else if frame == 3
         draw_rect(375.0, 275.0, 50.0, 50.0)
     draw_text("Frame: " + str(frame), 10.0, 10.0)

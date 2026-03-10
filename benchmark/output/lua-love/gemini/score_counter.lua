@@ -2,11 +2,11 @@ local score = 0
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Score Counter")
+    love.window.setTitle("Score Clicker")
 end
 
 function love.update(dt)
-    -- No update logic required for this specific behavior
+    -- Update logic
 end
 
 function love.keypressed(key)

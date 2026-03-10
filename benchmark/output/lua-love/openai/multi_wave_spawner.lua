@@ -7,74 +7,73 @@ local wave = 1
 local spawn_timer = 2.0
 local enemies_per_wave = 3
 
-local ex, ey, evx, evy, elife = {}, {}, {}, {}, {}
-local enemySize = 16
-local enemySpeedBase = 80
+local ex = {}
+local ey = {}
+local evx = {}
+local evy = {}
+local elife = {}
 
 local game_over = false
 
 function love.load()
     love.window.setMode(800, 600)
-    love.window.setTitle("Wave-based Enemy Spawner")
+    love.window.setTitle("Wave-Based Enemy Spawner")
 end
 
 function love.update(dt)
-    if game_over then return end
-
-    -- Player movement
-    if love.keyboard.isDown("left") then
-        playerX = playerX - playerSpeed * dt
-    end
-    if love.keyboard.isDown("right") then
-        playerX = playerX + playerSpeed * dt
-    end
-    if love.keyboard.isDown("up") then
-        playerY = playerY - playerSpeed * dt
-    end
-    if love.keyboard.isDown("down") then
-        playerY = playerY + playerSpeed * dt
-    end
-
-    -- Spawn enemies
-    spawn_timer = spawn_timer - dt
-    if spawn_timer <= 0 then
-        for i = 1, enemies_per_wave do
-            local edge = love.math.random() * 4
-            local x, y
-            if edge < 1 then
-                x = love.math.random() * 800
-                y = 0
-            elseif edge < 2 then
-                x = 800
-                y = love.math.random() * 600
-            elseif edge < 3 then
-                x = love.math.random() * 800
-                y = 600
-            else
-                x = 0
-                y = love.math.random() * 600
-            end
-
-            local dx = playerX - x
-            local dy = playerY - y
-            local dist = math.sqrt(dx * dx + dy * dy)
-            local speed = enemySpeedBase + wave * 20
-
-            table.insert(ex, x)
-            table.insert(ey, y)
-            table.insert(evx, (dx / dist) * speed)
-            table.insert(evy, (dy / dist) * speed)
-            table.insert(elife, 1.0)
+    if not game_over then
+        -- Player movement
+        if love.keyboard.isDown("left") then
+            playerX = playerX - playerSpeed * dt
+        end
+        if love.keyboard.isDown("right") then
+            playerX = playerX + playerSpeed * dt
+        end
+        if love.keyboard.isDown("up") then
+            playerY = playerY - playerSpeed * dt
+        end
+        if love.keyboard.isDown("down") then
+            playerY = playerY + playerSpeed * dt
         end
 
-        wave = wave + 1
-        enemies_per_wave = 3 + wave
-        spawn_timer = math.max(0.5, 3.0 - wave * 0.2)
-    end
+        -- Spawn enemies
+        spawn_timer = spawn_timer - dt
+        if spawn_timer <= 0 then
+            for i = 1, enemies_per_wave do
+                local edge = love.math.random() * 4
+                local x, y
+                if edge < 1 then
+                    x = love.math.random() * 800
+                    y = 0
+                elseif edge < 2 then
+                    x = 800
+                    y = love.math.random() * 600
+                elseif edge < 3 then
+                    x = love.math.random() * 800
+                    y = 600
+                else
+                    x = 0
+                    y = love.math.random() * 600
+                end
 
-    -- Update enemies
-    for i = #ex, 1, -1 do
-        if elife[i] > 0 then
+                local dx = playerX - x
+                local dy = playerY - y
+                local dist = math.sqrt(dx * dx + dy * dy)
+                local speed = 80 + wave * 20
+                table.insert(ex, x)
+                table.insert(ey, y)
+                table.insert(evx, (dx / dist) * speed)
+                table.insert(evy, (dy / dist) * speed)
+                table.insert(elife, 1.0)
+            end
+
+            wave = wave + 1
+            enemies_per_wave = 3 + wave
+            spawn_timer = math.max(0.5, 3.0 - wave * 0.2)
+        end
+
+        -- Update enemies
+        for i = #ex, 1, -1 do
             ex[i] = ex[i] + evx[i] * dt
             ey[i] = ey[i] + evy[i] * dt
             elife[i] = elife[i] - dt
@@ -82,26 +81,38 @@ function love.update(dt)
             -- Check collision with player
             local dx = playerX - ex[i]
             local dy = playerY - ey[i]
-            local distance = math.sqrt(dx * dx + dy * dy)
-            if distance < playerRadius + enemySize / 2 then
+            if math.sqrt(dx * dx + dy * dy) < playerRadius + 8 then
                 game_over = true
+            end
+
+            -- Remove dead enemies
+            if elife[i] <= 0 then
+                table.remove(ex, i)
+                table.remove(ey, i)
+                table.remove(evx, i)
+                table.remove(evy, i)
+                table.remove(elife, i)
             end
         end
     end
 end
 
 function love.draw()
+    -- Draw player
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", playerX, playerY, playerRadius)
 
+    -- Draw enemies
     for i = 1, #ex do
         if elife[i] > 0 then
-            love.graphics.rectangle("fill", ex[i] - enemySize / 2, ey[i] - enemySize / 2, enemySize, enemySize)
+            love.graphics.rectangle("fill", ex[i] - 8, ey[i] - 8, 16, 16)
         end
     end
 
+    -- Draw wave number
     love.graphics.print("Wave: " .. wave, 10, 10)
 
+    -- Draw game over message
     if game_over then
         love.graphics.printf("GAME OVER", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end

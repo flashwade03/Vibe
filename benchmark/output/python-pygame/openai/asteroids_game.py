@@ -24,7 +24,6 @@ ax, ay, avx, avy, asize, aalive = [], [], [], [], [], []
 bx, by, bvx, bvy, blife = [], [], [], [], []
 
 def load():
-    global ax, ay, avx, avy, asize, aalive
     for _ in range(6):
         ax.append(random.uniform(0.0, 800.0))
         ay.append(random.uniform(0.0, 600.0))
@@ -35,8 +34,9 @@ def load():
 
 def update(dt):
     global ship_x, ship_y, ship_angle, ship_vx, ship_vy, game_over, score
-    keys = pygame.key.get_pressed()
+
     if not game_over:
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             ship_angle -= 3.0 * dt
         if keys[pygame.K_RIGHT]:
@@ -51,28 +51,22 @@ def update(dt):
         ship_y += ship_vy * dt
 
         # Wrap ship
-        if ship_x > 800.0:
-            ship_x = 0.0
-        if ship_x < 0.0:
-            ship_x = 800.0
-        if ship_y > 600.0:
-            ship_y = 0.0
-        if ship_y < 0.0:
-            ship_y = 600.0
+        if ship_x > 800.0: ship_x = 0.0
+        if ship_x < 0.0: ship_x = 800.0
+        if ship_y > 600.0: ship_y = 0.0
+        if ship_y < 0.0: ship_y = 600.0
 
         # Move asteroids
         for i in range(len(ax)):
             if aalive[i] == 1.0:
                 ax[i] += avx[i] * dt
                 ay[i] += avy[i] * dt
-                if ax[i] > 800.0:
-                    ax[i] = 0.0
-                if ax[i] < 0.0:
-                    ax[i] = 800.0
-                if ay[i] > 600.0:
-                    ay[i] = 0.0
-                if ay[i] < 0.0:
-                    ay[i] = 600.0
+
+                # Wrap asteroids
+                if ax[i] > 800.0: ax[i] = 0.0
+                if ax[i] < 0.0: ax[i] = 800.0
+                if ay[i] > 600.0: ay[i] = 0.0
+                if ay[i] < 0.0: ay[i] = 600.0
 
         # Move bullets
         for j in range(len(bx)):
@@ -116,24 +110,25 @@ def draw():
     screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (255, 255, 255), (int(ship_x), int(ship_y)), 8)
     pygame.draw.circle(screen, (255, 255, 255), (int(ship_x + math.cos(ship_angle) * 15.0), int(ship_y + math.sin(ship_angle) * 15.0)), 3)
-    
+
     for i in range(len(ax)):
         if aalive[i] == 1.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(ax[i]), int(ay[i])), int(asize[i]))
-    
+
     for j in range(len(bx)):
         if blife[j] > 0.0:
             pygame.draw.circle(screen, (255, 255, 255), (int(bx[j]), int(by[j])), 2)
-    
+
     font = pygame.font.Font(None, 36)
     text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(text, (10, 10))
-    
+
     if game_over:
         game_over_text = font.render("GAME OVER", True, (255, 255, 255))
         screen.blit(game_over_text, (340, 280))
 
 load()
+
 running = True
 while running:
     dt = clock.tick(60) / 1000.0

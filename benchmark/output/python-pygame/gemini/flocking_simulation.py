@@ -5,7 +5,7 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Boids")
+pygame.display.set_caption("Boids Simulation")
 clock = pygame.time.Clock()
 
 boid_xs = []
@@ -13,11 +13,14 @@ boid_ys = []
 boid_vxs = []
 boid_vys = []
 
-for i in range(15):
-    boid_xs.append(random.uniform(0.0, 800.0))
-    boid_ys.append(random.uniform(0.0, 600.0))
-    boid_vxs.append(random.uniform(-50.0, 50.0))
-    boid_vys.append(random.uniform(-50.0, 50.0))
+def load():
+    for _ in range(15):
+        boid_xs.append(random.uniform(0.0, 800.0))
+        boid_ys.append(random.uniform(0.0, 600.0))
+        boid_vxs.append(random.uniform(-50.0, 50.0))
+        boid_vys.append(random.uniform(-50.0, 50.0))
+
+load()
 
 running = True
 while running:
@@ -27,38 +30,44 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    for i in range(15):
-        center_x = sum(boid_xs) / 15.0
-        center_y = sum(boid_ys) / 15.0
+    sum_x = sum(boid_xs)
+    sum_y = sum(boid_ys)
+    center_x = sum_x / 15.0
+    center_y = sum_y / 15.0
 
+    for i in range(15):
+        # Cohesion
         boid_vxs[i] += (center_x - boid_xs[i]) * 0.5 * dt
         boid_vys[i] += (center_y - boid_ys[i]) * 0.5 * dt
 
+        # Separation
         for j in range(15):
             if i != j:
                 dx = boid_xs[i] - boid_xs[j]
                 dy = boid_ys[i] - boid_ys[j]
-                dist = math.hypot(dx, dy)
-                if 0 < dist < 30.0:
+                dist = math.sqrt(dx*dx + dy*dy)
+                if dist < 30.0 and dist > 0:
                     boid_vxs[i] += (dx / dist) * 100.0 * dt
                     boid_vys[i] += (dy / dist) * 100.0 * dt
 
-        speed = math.hypot(boid_vxs[i], boid_vys[i])
+        # Clamp speed
+        speed = math.sqrt(boid_vxs[i]**2 + boid_vys[i]**2)
         if speed > 150.0:
             boid_vxs[i] = (boid_vxs[i] / speed) * 150.0
             boid_vys[i] = (boid_vys[i] / speed) * 150.0
 
+        # Update position
         boid_xs[i] += boid_vxs[i] * dt
         boid_ys[i] += boid_vys[i] * dt
 
+        # Wrap around
         boid_xs[i] %= 800.0
         boid_ys[i] %= 600.0
 
     screen.fill((0, 0, 0))
-    
     for i in range(15):
         pygame.draw.rect(screen, (255, 255, 255), (int(boid_xs[i]), int(boid_ys[i]), 4, 4))
-
+    
     pygame.display.flip()
 
 pygame.quit()

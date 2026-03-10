@@ -14,10 +14,11 @@ fn keypressed(k: String)
     if k == "3"
         item_type = 3.0
     if item_type > 0.0
+        let found: Bool = false
         for i in range(0, 20)
-            if inv_items[i] == 0.0
+            if inv_items[i] == 0.0 and not found
                 inv_items[i] = item_type
-                break
+                found = true
 
 fn mousepressed(mx: Float, my: Float, button: Int)
     let col: Int = int((mx - 200.0) / 80.0)

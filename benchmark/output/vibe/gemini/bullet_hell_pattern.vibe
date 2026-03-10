@@ -1,0 +1,58 @@
+let bul_xs: List[Float] = []
+let bul_ys: List[Float] = []
+let bul_vxs: List[Float] = []
+let bul_vys: List[Float] = []
+let bul_lifes: List[Float] = []
+
+let emit_angle: Float = 0.0
+let emit_timer: Float = 0.0
+let game_over: Bool = false
+
+let px: Float = 400.0
+let py: Float = 500.0
+
+fn update(dt: Float)
+    if not game_over
+        emit_angle += 2.5 * dt
+        emit_timer += dt
+        if emit_timer >= 0.05
+            emit_timer = 0.0
+            for k in range(0, 3)
+                let angle: Float = emit_angle + float(k) * 2.094
+                bul_xs = bul_xs + [400.0]
+                bul_ys = bul_ys + [200.0]
+                bul_vxs = bul_vxs + [cos(angle) * 120.0]
+                bul_vys = bul_vys + [sin(angle) * 120.0]
+                bul_lifes = bul_lifes + [5.0]
+
+        if key_down("left")
+            px -= 300.0 * dt
+        if key_down("right")
+            px += 300.0 * dt
+
+        for i in range(0, len(bul_xs))
+            bul_xs[i] += bul_vxs[i] * dt
+            bul_ys[i] += bul_vys[i] * dt
+            bul_lifes[i] -= dt
+            if bul_lifes[i] > 0.0
+                let ddx: Float = px - bul_xs[i]
+                let ddy: Float = py - bul_ys[i]
+                if sqrt(ddx * ddx + ddy * ddy) < 11.0
+                    game_over = true
+
+fn draw()
+    draw_circle(400.0, 200.0, 12.0)
+    for i in range(0, len(bul_xs))
+        if bul_lifes[i] > 0.0
+            draw_circle(bul_xs[i], bul_ys[i], 3.0)
+
+    draw_circle(px, py, 8.0)
+
+    if game_over
+        draw_text("GAME OVER", 340.0, 300.0)
+
+    let alive: Int = 0
+    for i in range(0, len(bul_lifes))
+        if bul_lifes[i] > 0.0
+            alive += 1
+    draw_text("Bullets: " + str(alive), 10.0, 10.0)

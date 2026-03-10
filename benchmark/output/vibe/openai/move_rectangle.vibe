@@ -4,13 +4,13 @@ const SPEED: Float = 200.0
 
 fn update(dt: Float)
     if key_down("right")
-        x += SPEED * dt
+        x = x + SPEED * dt
     if key_down("left")
-        x -= SPEED * dt
+        x = x - SPEED * dt
     if key_down("down")
-        y += SPEED * dt
+        y = y + SPEED * dt
     if key_down("up")
-        y -= SPEED * dt
+        y = y - SPEED * dt
 
 fn draw()
-    draw_rect(x, y, 32.0, 32.0)
+    draw_rect(x, y, 32, 32)

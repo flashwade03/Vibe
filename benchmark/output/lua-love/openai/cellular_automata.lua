@@ -7,7 +7,7 @@ local paused = false
 function love.load()
     love.window.setMode(800, 600)
     love.window.setTitle("Conway's Game of Life")
-    for i = 1, 300 do
+    for i = 0, 299 do
         if love.math.random() > 0.7 then
             table.insert(cells, 1.0)
         else
@@ -57,8 +57,7 @@ function love.update(dt)
                     end
                 end
             end
-
-            for i = 1, 300 do
+            for i = 0, 299 do
                 cells[i] = next_cells[i]
             end
         end
@@ -69,7 +68,7 @@ function love.draw()
     for row = 0, 14 do
         for col = 0, 19 do
             if cells[row * 20 + col] == 1.0 then
-                love.graphics.rectangle("fill", col * 40, row * 40, 38, 38)
+                love.graphics.rectangle("fill", col * 40.0, row * 40.0, 38.0, 38.0)
             end
         end
     end

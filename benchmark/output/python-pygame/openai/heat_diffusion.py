@@ -6,8 +6,8 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("2D Heat Diffusion")
 clock = pygame.time.Clock()
 
-heat = [0.0 for _ in range(192)]
-next_heat = [0.0 for _ in range(192)]
+heat = [0.0] * 192
+next_heat = [0.0] * 192
 
 def mousepressed(mx, my, button):
     col = int(mx / 50.0)
@@ -55,9 +55,10 @@ def draw():
                 pygame.draw.rect(screen, (255, 255, 255), (col * 50.0 + 1.0 + off, row * 50.0 + 1.0 + off, size, size))
     font = pygame.font.Font(None, 36)
     text = font.render("Click to add heat", True, (255, 255, 255))
-    screen.blit(text, (10, 10))
+    screen.blit(text, (10.0, 10.0))
     text = font.render("Max: " + str(int(max_t)), True, (255, 255, 255))
-    screen.blit(text, (10, 30))
+    screen.blit(text, (10.0, 30.0))
+    pygame.display.flip()
 
 running = True
 while running:
@@ -72,7 +73,6 @@ while running:
 
     update(dt)
     draw()
-    pygame.display.flip()
 
 pygame.quit()
 sys.exit()

@@ -9,18 +9,17 @@ pygame.display.set_caption("Vibe Game")
 clock = pygame.time.Clock()
 
 # Player variables
-player_x, player_y = 400.0, 300.0
+player_x, player_y = 400, 300
 player_speed = 250
 player_radius = 12
 
 # Enemy variables
 ex, ey, evx, evy, elife = [], [], [], [], []
+
+# Game state variables
 wave = 1
 spawn_timer = 2.0
 enemies_per_wave = 3
-enemy_radius = 8
-
-# Game state
 game_over = False
 
 def rand_float(min_val, max_val):
@@ -28,7 +27,6 @@ def rand_float(min_val, max_val):
 
 def spawn_enemies():
     global wave, enemies_per_wave, spawn_timer
-    speed = 80 + wave * 20
     for _ in range(enemies_per_wave):
         edge = rand_float(0.0, 4.0)
         if 0 <= edge < 1:
@@ -46,10 +44,11 @@ def spawn_enemies():
         direction_x /= length
         direction_y /= length
 
-        ex.append(x)
-        ey.append(y)
+        speed = 80 + wave * 20
         evx.append(direction_x * speed)
         evy.append(direction_y * speed)
+        ex.append(x)
+        ey.append(y)
         elife.append(1.0)
 
     wave += 1
@@ -86,7 +85,7 @@ while running:
                 elife[i] -= dt
 
                 distance = math.sqrt((player_x - ex[i]) ** 2 + (player_y - ey[i]) ** 2)
-                if distance < player_radius + enemy_radius:
+                if distance < player_radius + 8:
                     game_over = True
 
     screen.fill((0, 0, 0))
@@ -94,10 +93,10 @@ while running:
 
     for i in range(len(ex)):
         if elife[i] > 0:
-            pygame.draw.rect(screen, (255, 255, 255), (int(ex[i]) - 8, int(ey[i]) - 8, 16, 16))
+            pygame.draw.rect(screen, (255, 255, 255), (int(ex[i]), int(ey[i]), 16, 16))
 
     font = pygame.font.Font(None, 36)
-    wave_text = font.render("Wave: " + str(wave), True, (255, 255, 255))
+    wave_text = font.render(f"Wave: {wave}", True, (255, 255, 255))
     screen.blit(wave_text, (10, 10))
 
     if game_over:

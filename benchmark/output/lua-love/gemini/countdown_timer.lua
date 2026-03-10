@@ -6,15 +6,17 @@ function love.load()
 end
 
 function love.update(dt)
-    timer = timer - dt
-    if timer < 0.0 then
-        timer = 0.0
+    if timer > 0 then
+        timer = timer - dt
+        if timer < 0 then
+            timer = 0
+        end
     end
 end
 
 function love.draw()
-    if timer > 0.0 then
-        love.graphics.print(tostring(math.ceil(timer)), 350, 280)
+    if timer > 0 then
+        love.graphics.print(tostring(math.floor(timer)), 350, 280)
     else
         love.graphics.print("Time Up!", 330, 280)
     end

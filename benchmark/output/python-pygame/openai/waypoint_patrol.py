@@ -19,13 +19,19 @@ patrol_speed = 120.0
 
 font = pygame.font.Font(None, 36)
 
-def update(dt):
-    global patrol_x, patrol_y, current_wp
+running = True
+while running:
+    dt = clock.tick(60) / 1000.0
 
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Update logic
     dx = wp_xs[current_wp] - patrol_x
     dy = wp_ys[current_wp] - patrol_y
     dist = math.sqrt(dx * dx + dy * dy)
-
+    
     if dist > 2.0:
         patrol_x += (dx / dist) * patrol_speed * dt
         patrol_y += (dy / dist) * patrol_speed * dt
@@ -34,7 +40,7 @@ def update(dt):
         if current_wp >= 4:
             current_wp = 0
 
-def draw():
+    # Draw logic
     screen.fill((0, 0, 0))
 
     # Draw waypoints
@@ -44,20 +50,10 @@ def draw():
     # Draw patrol enemy
     pygame.draw.rect(screen, (255, 255, 255), (patrol_x - 12.0, patrol_y - 12.0, 24, 24))
 
-    # Draw waypoint text
+    # Display current waypoint
     text = font.render("Waypoint: " + str(current_wp), True, (255, 255, 255))
     screen.blit(text, (10.0, 10.0))
 
-running = True
-while running:
-    dt = clock.tick(60) / 1000.0
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    update(dt)
-    draw()
     pygame.display.flip()
 
 pygame.quit()

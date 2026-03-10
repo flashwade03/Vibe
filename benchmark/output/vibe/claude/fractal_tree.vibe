@@ -20,33 +20,32 @@ fn update(dt: Float)
         q_depths = q_depths + [0.0]
         let ptr: Int = 0
         for iter in range(0, 500)
-            if ptr >= len(q_xs)
-                break
-            let sx: Float = q_xs[ptr]
-            let sy: Float = q_ys[ptr]
-            let sa: Float = q_angles[ptr]
-            let sl: Float = q_lens[ptr]
-            let sd: Float = q_depths[ptr]
-            let ex: Float = sx + cos(sa) * sl
-            let ey: Float = sy + sin(sa) * sl
-            seg_x1s = seg_x1s + [sx]
-            seg_y1s = seg_y1s + [sy]
-            seg_x2s = seg_x2s + [ex]
-            seg_y2s = seg_y2s + [ey]
-            if sd < float(max_depth)
-                let nl: Float = sl * 0.7
-                let nd: Float = sd + 1.0
-                q_xs = q_xs + [ex]
-                q_ys = q_ys + [ey]
-                q_angles = q_angles + [sa - branch_angle]
-                q_lens = q_lens + [nl]
-                q_depths = q_depths + [nd]
-                q_xs = q_xs + [ex]
-                q_ys = q_ys + [ey]
-                q_angles = q_angles + [sa + branch_angle]
-                q_lens = q_lens + [nl]
-                q_depths = q_depths + [nd]
-            ptr = ptr + 1
+            if ptr < len(q_xs)
+                let sx: Float = q_xs[ptr]
+                let sy: Float = q_ys[ptr]
+                let sa: Float = q_angles[ptr]
+                let sl: Float = q_lens[ptr]
+                let sd: Float = q_depths[ptr]
+                let ex: Float = sx + cos(sa) * sl
+                let ey: Float = sy + sin(sa) * sl
+                seg_x1s = seg_x1s + [sx]
+                seg_y1s = seg_y1s + [sy]
+                seg_x2s = seg_x2s + [ex]
+                seg_y2s = seg_y2s + [ey]
+                if sd < float(max_depth)
+                    let nl: Float = sl * 0.7
+                    let nd: Float = sd + 1.0
+                    q_xs = q_xs + [ex]
+                    q_ys = q_ys + [ey]
+                    q_angles = q_angles + [sa - branch_angle]
+                    q_lens = q_lens + [nl]
+                    q_depths = q_depths + [nd]
+                    q_xs = q_xs + [ex]
+                    q_ys = q_ys + [ey]
+                    q_angles = q_angles + [sa + branch_angle]
+                    q_lens = q_lens + [nl]
+                    q_depths = q_depths + [nd]
+                ptr = ptr + 1
         built = true
 
 fn draw()

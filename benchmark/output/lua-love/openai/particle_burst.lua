@@ -27,10 +27,10 @@ end
 
 function love.update(dt)
     for i = #particle_lifes, 1, -1 do
+        particle_lifes[i] = particle_lifes[i] - dt
         if particle_lifes[i] > 0 then
             particle_xs[i] = particle_xs[i] + particle_vxs[i] * dt
             particle_ys[i] = particle_ys[i] + particle_vys[i] * dt
-            particle_lifes[i] = particle_lifes[i] - dt
         else
             table.remove(particle_xs, i)
             table.remove(particle_ys, i)

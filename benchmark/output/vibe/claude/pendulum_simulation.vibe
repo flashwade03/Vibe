@@ -3,14 +3,14 @@ let angular_vel: Float = 0.0
 let length: Float = 250.0
 let gravity: Float = 9.8
 
-fn mousepressed(mx: Float, my: Float, button: Int)
-    angular_vel = angular_vel + 0.5
-
 fn update(dt: Float)
     let angular_acc: Float = (0.0 - gravity / length) * sin(angle)
     angular_vel = angular_vel + angular_acc * dt
     angular_vel = angular_vel * 0.999
     angle = angle + angular_vel * dt
+
+fn mousepressed(mx: Float, my: Float, button: Int)
+    angular_vel = angular_vel + 0.5
 
 fn draw()
     let bob_x: Float = 400.0 + sin(angle) * length

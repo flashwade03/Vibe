@@ -27,14 +27,14 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Draw enemy
+    -- Draw the enemy rectangle
     love.graphics.rectangle("fill", patrol_x - 12.0, patrol_y - 12.0, 24, 24)
 
-    -- Draw waypoints
+    -- Draw the waypoints
     for i = 1, #wp_xs do
         love.graphics.rectangle("fill", wp_xs[i] - 4.0, wp_ys[i] - 4.0, 8, 8)
     end
 
     -- Display current waypoint
-    love.graphics.print("Waypoint: " .. tostring(current_wp), 10, 10)
+    love.graphics.print("Waypoint: " .. tostring(current_wp), 10.0, 10.0)
 end

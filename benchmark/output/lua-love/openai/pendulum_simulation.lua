@@ -30,7 +30,6 @@ function love.draw()
     end
 
     love.graphics.circle("fill", bob_x, bob_y, 15.0)
-
     love.graphics.print("Angle: " .. string.format("%.2f", angle), 10.0, 10.0)
     love.graphics.print("Click to push", 10.0, 30.0)
 end

@@ -22,12 +22,13 @@ while running:
     vis = math.sin(timer * 2.0)
 
     screen.fill((0, 0, 0))
+
     if vis > 0.0:
         text = font.render("Hello Vibe!", True, (255, 255, 255))
-        screen.blit(text, (300, 280))
-    
+        screen.blit(text, (300.0, 280.0))
+
     time_text = font.render("Time: " + str(int(timer)), True, (255, 255, 255))
-    screen.blit(time_text, (10, 10))
+    screen.blit(time_text, (10.0, 10.0))
 
     pygame.display.flip()
 

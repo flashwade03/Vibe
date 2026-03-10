@@ -3,12 +3,13 @@ import sys
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Vibe")
+pygame.display.set_caption("Bouncing Ball")
 clock = pygame.time.Clock()
 
+# Ball state
 x, y = 400.0, 300.0
-vx, vy = 150.0, 150.0
 radius = 16
+vx, vy = 150.0, 150.0
 
 running = True
 while running:
@@ -18,26 +19,28 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Update position
     x += vx * dt
     y += vy * dt
 
-    if x - radius <= 0:
+    # Collision detection with edges
+    if x - radius < 0:
         x = radius
-        vx = abs(vx)
-    elif x + radius >= 800:
+        vx *= -1
+    elif x + radius > 800:
         x = 800 - radius
-        vx = -abs(vx)
+        vx *= -1
 
-    if y - radius <= 0:
+    if y - radius < 0:
         y = radius
-        vy = abs(vy)
-    elif y + radius >= 600:
+        vy *= -1
+    elif y + radius > 600:
         y = 600 - radius
-        vy = -abs(vy)
+        vy *= -1
 
+    # Draw
     screen.fill((0, 0, 0))
     pygame.draw.circle(screen, (255, 255, 255), (int(x), int(y)), radius)
-
     pygame.display.flip()
 
 pygame.quit()

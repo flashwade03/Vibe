@@ -76,6 +76,7 @@ fn update(dt: Float)
 
 fn draw()
     draw_circle(px, py, 12.0)
+
     for i in range(0, len(ex))
         if elife[i] > 0.0
             draw_rect(ex[i] - 8.0, ey[i] - 8.0, 16.0, 16.0)
@@ -83,4 +84,4 @@ fn draw()
     draw_text("Wave: " + str(wave), 10.0, 10.0)
 
     if game_over
-        draw_text("GAME OVER", 350.0, 290.0)
+        draw_text("GAME OVER", 350.0, 300.0)
