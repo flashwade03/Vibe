@@ -1,0 +1,45 @@
+-- ============================================
+-- Demo: Bouncing Balls
+-- First working Vibe game demo
+-- Uses: struct, list, for-in, update/draw
+-- ============================================
+
+struct Ball
+    x: Float
+    y: Float
+    vx: Float
+    vy: Float
+    r: Float
+
+let balls: List[Ball] = []
+let score: Int = 0
+
+fn spawn_ball(bx: Float, by: Float)
+    let b = Ball(bx, by, rand_float(-200.0, 200.0), rand_float(-200.0, 200.0), rand_float(8.0, 20.0))
+    append(balls, b)
+
+fn load()
+    spawn_ball(400.0, 300.0)
+    spawn_ball(200.0, 150.0)
+    spawn_ball(600.0, 450.0)
+
+fn update(dt: Float)
+    for b in balls
+        b.x = b.x + b.vx * dt
+        b.y = b.y + b.vy * dt
+        if b.x < b.r or b.x > 800.0 - b.r
+            b.vx = -b.vx
+        if b.y < b.r or b.y > 600.0 - b.r
+            b.vy = -b.vy
+
+fn draw()
+    set_color(0.2, 0.8, 1.0)
+    for b in balls
+        draw_circle(b.x, b.y, b.r)
+    set_color(1.0, 1.0, 1.0)
+    draw_text("Balls: " + str(len(balls)) + "  Press SPACE to add", 10.0, 10.0)
+
+fn keypressed(k: String)
+    if k == "space"
+        spawn_ball(rand_float(100.0, 700.0), rand_float(100.0, 500.0))
+        score = score + 1

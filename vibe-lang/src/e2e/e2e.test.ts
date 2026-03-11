@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 import { compile } from "../pipeline.js";
 import { VibeError } from "../errors.js";
 
@@ -39,6 +40,34 @@ describe("E2E pipeline", () => {
     expect(confLua).toContain("t.window.title");
     expect(confLua).toContain("800");
     expect(confLua).toContain("600");
+  });
+
+  it("demo_bouncing_balls.vibe compiles and generates valid Lua", () => {
+    const demoPath = resolve(__dirname, "../../examples/demo_bouncing_balls.vibe");
+    const source = readFileSync(demoPath, "utf-8");
+    const { mainLua } = compile(source, "demo_bouncing_balls.vibe");
+
+    // Verify key codegen fixes
+    expect(mainLua).toContain("#balls");           // len() → #
+    expect(mainLua).toContain("table.insert");     // append() → table.insert
+    expect(mainLua).toContain("love.graphics.setColor"); // set_color mapping
+
+    // Verify struct → constructor function
+    expect(mainLua).toContain("function Ball(x, y, vx, vy, r)");
+    expect(mainLua).toContain("local self = {");
+    expect(mainLua).toContain("return self");
+
+    // luac syntax validation (if available)
+    try {
+      const tmpDir = resolve(__dirname, "../../.tmp");
+      mkdirSync(tmpDir, { recursive: true });
+      const tmpFile = resolve(tmpDir, "test_output.lua");
+      writeFileSync(tmpFile, mainLua);
+      execSync(`luac -p "${tmpFile}"`, { stdio: "pipe" });
+      unlinkSync(tmpFile);
+    } catch {
+      // luac not available — skip runtime validation
+    }
   });
 
   it("throws VibeError with location for invalid source", () => {

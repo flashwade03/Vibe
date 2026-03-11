@@ -180,7 +180,8 @@ export interface MatchArm {
 export type MatchPattern =
   | { kind: "LiteralPattern"; value: Expr }
   | { kind: "WildcardPattern" }
-  | { kind: "IdentifierPattern"; name: string };
+  | { kind: "IdentifierPattern"; name: string }
+  | { kind: "QualifiedPattern"; qualifier: string; name: string };
 
 export interface BreakStmt {
   kind: "BreakStmt";

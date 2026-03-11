@@ -685,4 +685,33 @@ fn draw()
     expect((decl.annotations[0].args[0] as StringLiteral).value).toBe("collision");
     expect((decl.annotations[0].args[1] as StringLiteral).value).toBe("enemy");
   });
+
+  // 50. Match with qualified enum patterns (Enum.Variant)
+  it("parses match with qualified enum patterns", () => {
+    const prog = p("match state\n  GameState.Menu\n    draw_text(\"menu\", 0.0, 0.0)\n  GameState.Playing\n    draw_text(\"play\", 0.0, 0.0)");
+    const matchStmt = prog.body[0] as MatchStmt;
+    expect(matchStmt.kind).toBe("MatchStmt");
+    expect(matchStmt.arms).toHaveLength(2);
+    expect(matchStmt.arms[0].pattern.kind).toBe("QualifiedPattern");
+    if (matchStmt.arms[0].pattern.kind === "QualifiedPattern") {
+      expect(matchStmt.arms[0].pattern.qualifier).toBe("GameState");
+      expect(matchStmt.arms[0].pattern.name).toBe("Menu");
+    }
+    if (matchStmt.arms[1].pattern.kind === "QualifiedPattern") {
+      expect(matchStmt.arms[1].pattern.qualifier).toBe("GameState");
+      expect(matchStmt.arms[1].pattern.name).toBe("Playing");
+    }
+  });
+
+  // 51. Struct fields with `let` prefix (LLM-generated pattern)
+  it("parses struct fields with let prefix", () => {
+    const prog = p("struct Player\n  let x: Float\n  let y: Float = 0.0");
+    const decl = prog.body[0] as StructDecl;
+    expect(decl.kind).toBe("StructDecl");
+    expect(decl.fields).toHaveLength(2);
+    expect(decl.fields[0].name).toBe("x");
+    expect(decl.fields[0].typeAnnotation).toBe("Float");
+    expect(decl.fields[1].name).toBe("y");
+    expect(decl.fields[1].defaultValue).toBeDefined();
+  });
 });

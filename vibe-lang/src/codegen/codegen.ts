@@ -71,7 +71,23 @@ const BUILTIN_MAP: Record<string, { lua: string; prependArgs?: string[] }> = {
   cos:         { lua: "math.cos" },
   sin:         { lua: "math.sin" },
   rand_float:  { lua: "love.math.random" },
+  append:      { lua: "table.insert" },
+  remove:      { lua: "table.remove" },
+  abs:         { lua: "math.abs" },
+  min:         { lua: "math.min" },
+  max:         { lua: "math.max" },
+  rand_int:    { lua: "math.random" },
+  print:       { lua: "print" },
+  set_color:   { lua: "love.graphics.setColor" },
+  draw_line:   { lua: "love.graphics.line" },
+  get_width:   { lua: "love.graphics.getWidth" },
+  get_height:  { lua: "love.graphics.getHeight" },
+  set_bg_color: { lua: "love.graphics.setBackgroundColor" },
 };
+
+// ── Continue label state (reset per generate() call) ────────
+let _continueCounter = 0;
+const _continueLabelStack: string[] = [];
 
 // ── Public API ──────────────────────────────────────────────
 
@@ -79,6 +95,8 @@ const BUILTIN_MAP: Record<string, { lua: string; prependArgs?: string[] }> = {
  * Generate Lua source code from a Vibe Program AST.
  */
 export function generate(program: Program): string {
+  _continueCounter = 0;
+  _continueLabelStack.length = 0;
   const parts: string[] = [];
 
   for (let i = 0; i < program.body.length; i++) {
@@ -317,9 +335,16 @@ function emitStmt(stmt: Stmt, depth: number): string {
       return emitReturnStmt(stmt, depth);
     case "BreakStmt":
       return `${indent(depth)}break`;
-    case "ContinueStmt":
-      // Lua doesn't have continue; skip for now
+    case "ContinueStmt": {
+      // LuaJIT (used by LÖVE) supports goto for continue emulation
+      const label = _continueLabelStack.length > 0
+        ? _continueLabelStack[_continueLabelStack.length - 1]
+        : null;
+      if (label) {
+        return `${indent(depth)}goto ${label}`;
+      }
       return `${indent(depth)}-- continue`;
+    }
     case "Assignment":
       return emitAssignment(stmt, depth);
     case "ExprStmt":
@@ -359,6 +384,14 @@ function emitForStmt(node: ForStmt, depth: number): string {
   const prefix = indent(depth);
   const lines: string[] = [];
   const variant = node.variant;
+
+  // Continue label support (LuaJIT goto)
+  const hasContinue = bodyContainsContinue(node.body);
+  let continueLabel: string | null = null;
+  if (hasContinue) {
+    continueLabel = `__continue_${++_continueCounter}__`;
+    _continueLabelStack.push(continueLabel);
+  }
 
   if (variant.kind === "ForIn") {
     const varName = escapeLuaReserved(variant.variable);
@@ -402,9 +435,34 @@ function emitForStmt(node: ForStmt, depth: number): string {
   for (const stmt of node.body) {
     lines.push(emitStmt(stmt, depth + 1));
   }
+
+  // Emit continue label before loop end
+  if (continueLabel) {
+    lines.push(`${indent(depth + 1)}::${continueLabel}::`);
+    _continueLabelStack.pop();
+  }
+
   lines.push(`${prefix}end`);
 
   return lines.join("\n");
+}
+
+/** Check if a statement list contains a ContinueStmt (non-recursive into nested loops). */
+function bodyContainsContinue(stmts: Stmt[]): boolean {
+  for (const stmt of stmts) {
+    if (stmt.kind === "ContinueStmt") return true;
+    if (stmt.kind === "IfStmt") {
+      if (bodyContainsContinue(stmt.body)) return true;
+      if (stmt.elseBody && bodyContainsContinue(stmt.elseBody)) return true;
+    }
+    if (stmt.kind === "MatchStmt") {
+      for (const arm of stmt.arms) {
+        if (bodyContainsContinue(arm.body)) return true;
+      }
+    }
+    // Don't descend into nested ForStmt — they get their own labels
+  }
+  return false;
 }
 
 function emitMatchStmt(node: MatchStmt, depth: number): string {
@@ -473,6 +531,8 @@ function emitPatternCondition(subject: string, pattern: MatchPattern): string {
       return `${subject} == ${emitExpr(pattern.value)}`;
     case "IdentifierPattern":
       return `${subject} == "${pattern.name}"`;
+    case "QualifiedPattern":
+      return `${subject} == "${pattern.qualifier}.${pattern.name}"`;
     case "WildcardPattern":
       return "true";
   }
@@ -517,6 +577,7 @@ function emitExpr(expr: Expr): string {
     case "BoolLiteral":
       return expr.value ? "true" : "false";
     case "Identifier":
+      if (expr.name === "none") return "nil";
       return escapeLuaReserved(expr.name);
     case "BinaryExpr":
       return emitBinaryExpr(expr);
@@ -526,8 +587,20 @@ function emitExpr(expr: Expr): string {
       return emitCallExpr(expr);
     case "FieldAccess":
       return `${emitExpr(expr.object)}.${escapeLuaReserved(expr.field)}`;
-    case "IndexAccess":
-      return `${emitExpr(expr.object)}[${emitExpr(expr.index)}]`;
+    case "IndexAccess": {
+      // Vibe is 0-indexed, Lua is 1-indexed. Adjust numeric indices.
+      const idx = expr.index;
+      if (idx.kind === "StringLiteral") {
+        // Map access with string key — no adjustment
+        return `${emitExpr(expr.object)}[${emitExpr(idx)}]`;
+      }
+      if (idx.kind === "IntLiteral") {
+        // Literal index — adjust at compile time
+        return `${emitExpr(expr.object)}[${idx.value + 1}]`;
+      }
+      // Variable/expression index — add + 1 at runtime
+      return `${emitExpr(expr.object)}[${emitExpr(idx)} + 1]`;
+    }
     case "GroupExpr":
       return `(${emitExpr(expr.expr)})`;
     case "ListLiteral":
@@ -576,6 +649,15 @@ function emitUnaryExpr(node: UnaryExpr): string {
 }
 
 function emitCallExpr(node: CallExpr): string {
+  // Special case: len() → Lua # prefix operator
+  if (
+    node.callee.kind === "Identifier" &&
+    node.callee.name === "len" &&
+    node.args.length === 1
+  ) {
+    return `#${emitExpr(node.args[0])}`;
+  }
+
   // Check for built-in function mapping
   if (node.callee.kind === "Identifier") {
     const mapping = BUILTIN_MAP[node.callee.name];

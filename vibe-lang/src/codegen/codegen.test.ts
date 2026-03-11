@@ -773,8 +773,8 @@ describe("codegen", () => {
     expect(generate(ast)).toBe("function test()\n  break\nend");
   });
 
-  // 36. Continue → -- continue (Lua workaround)
-  it("36. continue → -- continue", () => {
+  // 36. Continue outside loop → comment fallback
+  it("36. continue outside loop → -- continue", () => {
     const ast = mkProgram({
       kind: "FnDecl",
       name: "test",
@@ -783,6 +783,38 @@ describe("codegen", () => {
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  -- continue\nend");
+  });
+
+  // 36b. Continue inside loop → goto label
+  it("36b. continue inside loop → goto + label", () => {
+    const forStmt: ForStmt = {
+      kind: "ForStmt",
+      variant: {
+        kind: "ForIn",
+        variable: "i",
+        iterable: mkCall("range", [mkInt(10)]),
+      },
+      body: [
+        {
+          kind: "IfStmt",
+          condition: mkBinary("==", mkId("i"), mkInt(3)),
+          body: [{ kind: "ContinueStmt", loc } as Stmt],
+          loc,
+        } as IfStmt,
+        mkExprStmt(mkCall("print", [mkId("i")])),
+      ],
+      loc,
+    };
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [forStmt],
+      loc,
+    });
+    const result = generate(ast);
+    expect(result).toContain("goto __continue_1__");
+    expect(result).toContain("::__continue_1__::");
   });
 
   // ── Struct codegen tests ──────────────────────────────────
@@ -942,5 +974,111 @@ describe("codegen", () => {
     const result = generate(ast);
     expect(result).toContain("function Player_draw(p)");
     expect(result).toContain('love.graphics.rectangle("fill", 0, 0, 32, 32)');
+  });
+
+  // ── CodeGen bug fix tests ─────────────────────────────────
+
+  // 45. len() → Lua # operator
+  it("45. len() → # prefix operator", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("len", [mkId("xs")]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  #xs\nend");
+  });
+
+  // 46. IndexAccess with int literal → +1
+  it("46. index access literal → +1", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [
+        mkExprStmt({
+          kind: "IndexAccess",
+          object: mkId("xs"),
+          index: mkInt(0),
+          loc,
+        }),
+      ],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  xs[1]\nend");
+  });
+
+  // 47. IndexAccess with variable → + 1
+  it("47. index access variable → + 1", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [
+        mkExprStmt({
+          kind: "IndexAccess",
+          object: mkId("xs"),
+          index: mkId("i"),
+          loc,
+        }),
+      ],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  xs[i + 1]\nend");
+  });
+
+  // 48. IndexAccess with string key (map) → no adjustment
+  it("48. map access string key → no +1", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [
+        mkExprStmt({
+          kind: "IndexAccess",
+          object: mkId("m"),
+          index: mkStr("key"),
+          loc,
+        }),
+      ],
+      loc,
+    });
+    expect(generate(ast)).toBe('function test()\n  m["key"]\nend');
+  });
+
+  // 49. none → nil
+  it("49. none identifier → nil", () => {
+    const ast = mkProgram({
+      kind: "LetDecl",
+      name: "x",
+      value: mkId("none"),
+      loc,
+    });
+    expect(generate(ast)).toBe("local x = nil");
+  });
+
+  // 50. append() → table.insert()
+  it("50. append() → table.insert()", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("append", [mkId("list"), mkInt(1)]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  table.insert(list, 1)\nend");
+  });
+
+  // 51. set_color() → love.graphics.setColor()
+  it("51. set_color() → love.graphics.setColor()", () => {
+    const ast = mkProgram({
+      kind: "FnDecl",
+      name: "test",
+      params: [],
+      body: [mkExprStmt(mkCall("set_color", [mkFloat(1.0), mkFloat(0.0), mkFloat(0.0)]))],
+      loc,
+    });
+    expect(generate(ast)).toBe("function test()\n  love.graphics.setColor(1.0, 0.0, 0.0)\nend");
   });
 });

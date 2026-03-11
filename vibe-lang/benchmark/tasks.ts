@@ -487,4 +487,139 @@ export const tasks: Task[] = [
       "Space starts a new round",
     ],
   },
+
+  // ══════════════════════════════════════════════════════════════
+  // STRUCT (8) — Tests struct, enum, trait, and has keywords.
+  // These tasks require language features beyond the v0 subset
+  // (fn/let/const/if/else/return/for) and will expose gaps in
+  // parser support for struct/enum/trait declarations.
+  // ══════════════════════════════════════════════════════════════
+
+  {
+    id: "struct_basic",
+    name: "Basic Struct",
+    difficulty: "medium",
+    description:
+      "Write a Vibe program that defines a Ball struct with fields x: Float, y: Float, vx: Float, vy: Float. Create a Ball instance starting at (400, 300) with velocity (150, 100). In fn update(dt: Float), move the ball by adding vx*dt to x and vy*dt to y. Bounce the ball off the edges of an 800x600 window by negating the appropriate velocity component. In fn draw(), draw the ball as a circle with radius 16 at its current position.",
+    expectedBehaviors: [
+      "Ball struct defined with x, y, vx, vy fields",
+      "Ball instance created at (400, 300)",
+      "Ball moves each frame using velocity * dt",
+      "Ball bounces off all 4 window edges",
+      "Ball drawn as a circle with radius 16",
+      "Movement is frame-independent",
+    ],
+  },
+
+  {
+    id: "struct_methods",
+    name: "Struct with Methods",
+    difficulty: "medium",
+    description:
+      "Write a Vibe program that defines a Player struct with fields x: Float, y: Float, health: Int. Define a move method for Player that takes dx: Float and dy: Float and updates the position. Define a take_damage method that reduces health by a given amount, clamping at 0. Create a Player at (400, 300) with 100 health. In fn update(dt: Float), read arrow keys and call the move method with speed 200 * dt. Press space to deal 10 damage. In fn draw(), draw the player as a 32x32 rectangle and draw a health bar above it showing current health out of 100.",
+    expectedBehaviors: [
+      "Player struct with x, y, health fields",
+      "move method updates position",
+      "take_damage method reduces health, clamped at 0",
+      "Arrow keys move player via move method",
+      "Space deals 10 damage via take_damage",
+      "Health bar drawn above the player",
+    ],
+  },
+
+  {
+    id: "enum_state_machine",
+    name: "Enum State Machine",
+    difficulty: "hard",
+    description:
+      "Write a Vibe program that defines a GameState enum with variants Menu, Playing, and GameOver. Use a let state variable initialized to GameState.Menu. In fn update(dt: Float), use match on the state to handle transitions: in Menu, pressing space sets state to Playing; in Playing, a 10-second timer counts down and when it reaches 0, state becomes GameOver; in GameOver, pressing space resets the timer and returns to Menu. In fn draw(), use match to draw different screens: Menu shows \"Press SPACE to Start\", Playing shows the countdown timer as text, GameOver shows \"Game Over - Press SPACE\".",
+    expectedBehaviors: [
+      "GameState enum with Menu, Playing, GameOver variants",
+      "match expression used for state transitions",
+      "Space transitions from Menu to Playing",
+      "10-second countdown timer in Playing state",
+      "Timer expiry transitions to GameOver",
+      "Different screen drawn per state via match",
+    ],
+  },
+
+  {
+    id: "enum_with_data",
+    name: "Enum with Data Variants",
+    difficulty: "hard",
+    description:
+      "Write a Vibe program that defines a Particle struct with fields x: Float, y: Float, vx: Float, vy: Float, life: Float. Define a ParticleType enum with data variants: Spark(speed: Float) and Smoke(size: Float). Store a list of particles and their types. Every 0.2 seconds, spawn a Spark particle at (400, 300) with random direction and the speed from the variant, and a Smoke particle at (400, 500) with the size from the variant. In fn update(dt: Float), move each particle by its velocity, decrease life by dt, and remove dead particles. In fn draw(), use match on ParticleType to draw Sparks as small 2x2 rectangles and Smoke as larger rectangles using the size value.",
+    expectedBehaviors: [
+      "Particle struct with x, y, vx, vy, life fields",
+      "ParticleType enum with Spark(speed) and Smoke(size) data variants",
+      "Sparks spawned at (400, 300) with random direction",
+      "Smoke spawned at (400, 500) with configurable size",
+      "Dead particles removed when life reaches 0",
+      "match on ParticleType for different draw logic",
+    ],
+  },
+
+  {
+    id: "struct_composition",
+    name: "Struct Composition",
+    difficulty: "hard",
+    description:
+      "Write a Vibe program that defines a Position struct with x: Float, y: Float fields, a Velocity struct with vx: Float, vy: Float fields, and a Bullet struct that has pos: Position and vel: Velocity fields. Define a Player struct with pos: Position field. Create a player at (400, 550). Store active bullets in a list. In fn update(dt: Float), move the player left/right with arrow keys at 250 px/s. When spacebar is pressed, create a new Bullet with the player's x position and y=540, velocity (0, -400). Move each bullet by its velocity each frame. Remove bullets that go off the top of the screen. In fn draw(), draw the player as a 32x32 rectangle and each bullet as a 4x8 rectangle.",
+    expectedBehaviors: [
+      "Position struct with x, y fields",
+      "Velocity struct with vx, vy fields",
+      "Bullet struct composed of Position and Velocity",
+      "Spacebar spawns bullet at player position",
+      "Bullets move upward at 400 px/s",
+      "Off-screen bullets removed from list",
+    ],
+  },
+
+  {
+    id: "trait_drawable",
+    name: "Trait Drawable",
+    difficulty: "trap",
+    description:
+      "Write a Vibe program that defines a Drawable trait with a single method draw(self_x: Float, self_y: Float). Define a Player struct with x: Float, y: Float, size: Float fields that implements Drawable using \"struct Player has Drawable\". The Player draw method draws a rectangle at (self_x, self_y) with the given size. Define an Enemy struct with x: Float, y: Float, radius: Float fields that also implements Drawable using \"struct Enemy has Drawable\". The Enemy draw method draws a circle at (self_x, self_y) with the given radius. Create one player at (200, 300) with size 32 and 3 enemies at different positions with radius 16. In fn update(dt: Float), move the player with arrow keys at 200 px/s. In fn draw(), call the draw method on the player and all enemies.",
+    expectedBehaviors: [
+      "Drawable trait defined with draw method",
+      "Player struct implements Drawable via has",
+      "Enemy struct implements Drawable via has",
+      "Player drawn as rectangle using trait method",
+      "Enemies drawn as circles using trait method",
+      "Player moves with arrow keys at 200 px/s",
+    ],
+  },
+
+  {
+    id: "trait_updatable",
+    name: "Trait Updatable and Drawable",
+    difficulty: "trap",
+    description:
+      "Write a Vibe program that defines two traits: Updatable with a method update_entity(self_x: Float, self_y: Float, dt: Float) that returns new x and y values, and Drawable with a method draw_entity(self_x: Float, self_y: Float). Define a Player struct with x: Float, y: Float fields using \"struct Player has Updatable, Drawable\". The Player's update_entity reads WASD keys and moves at 200 px/s. The Player's draw_entity draws a 32x32 rectangle. Define an Enemy struct with x: Float, y: Float, target_x: Float, target_y: Float fields using \"struct Enemy has Updatable, Drawable\". The Enemy's update_entity moves toward (target_x, target_y) at 80 px/s. The Enemy's draw_entity draws a circle with radius 16. Create one player at (400, 300) and 3 enemies at random positions that follow the player. In fn update(dt: Float), call update_entity on all entities. In fn draw(), call draw_entity on all entities.",
+    expectedBehaviors: [
+      "Updatable trait with update_entity method",
+      "Drawable trait with draw_entity method",
+      "Player struct implements both traits via has",
+      "Enemy struct implements both traits via has",
+      "Player moves with WASD keys",
+      "Enemies follow the player at 80 px/s",
+    ],
+  },
+
+  {
+    id: "struct_list_management",
+    name: "Struct List Management",
+    difficulty: "hard",
+    description:
+      "Write a Vibe program that defines an Asteroid struct with fields x: Float, y: Float, vx: Float, vy: Float, radius: Float, active: Bool. Maintain a list of asteroids. Every 0.8 seconds, spawn a new asteroid at the top of the screen (y=0) at a random x position between 0 and 800, with a random downward velocity between 50 and 150 px/s, a random horizontal velocity between -30 and 30 px/s, and a random radius between 10 and 30. In fn update(dt: Float), move each asteroid by its velocity. Mark asteroids as inactive when they move below y=650. Remove inactive asteroids from the list. Display the count of active asteroids at (10, 10). In fn draw(), draw each active asteroid as a circle at its position with its radius.",
+    expectedBehaviors: [
+      "Asteroid struct with position, velocity, radius, active fields",
+      "New asteroid spawned every 0.8 seconds",
+      "Random x position, velocity, and radius per asteroid",
+      "Asteroids move downward each frame",
+      "Off-screen asteroids marked inactive and removed",
+      "Active asteroid count displayed",
+    ],
+  },
 ];

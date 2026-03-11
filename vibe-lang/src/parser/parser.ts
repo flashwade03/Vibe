@@ -158,6 +158,22 @@ class Parser {
     }
 
     const tok = this.peek();
+
+    // Skip orphaned INDENT blocks at top level (e.g. LLM generates trait body without header)
+    if (tok.type === TokenType.INDENT) {
+      this.advance(); // consume INDENT
+      this.skipNewlines();
+      while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
+        this.advance();
+        this.skipNewlines();
+      }
+      if (this.at(TokenType.DEDENT)) {
+        this.advance();
+      }
+      this.skipNewlines();
+      return this.parseTopLevelDecl();
+    }
+
     switch (tok.type) {
       case TokenType.KW_FN:
         return this.parseFnDecl();
@@ -171,6 +187,12 @@ class Parser {
         return this.parseEnumDecl(annotations);
       case TokenType.KW_TRAIT:
         return this.parseTraitDecl(annotations);
+      case TokenType.KW_IF:
+        return this.parseIfStmt();
+      case TokenType.KW_FOR:
+        return this.parseForStmt();
+      case TokenType.KW_MATCH:
+        return this.parseMatchStmt();
       default:
         // Allow top-level expression statements (e.g. function calls like load())
         return this.parseAssignOrExprStmt() as ExprStmt | Assignment;
@@ -321,6 +343,10 @@ class Parser {
   }
 
   private parseStructField(): StructField {
+    // Allow optional `let` prefix (LLMs often generate `let x: Float` in struct bodies)
+    if (this.at(TokenType.KW_LET) || this.at(TokenType.KW_CONST)) {
+      this.advance();
+    }
     const nameTok = this.expect(TokenType.IDENT);
     this.expect(TokenType.COLON);
     const typeAnnotation = this.consumeTypeAnnotation();
@@ -1026,6 +1052,10 @@ class Parser {
   }
 
   private parseMatchArm(): MatchArm {
+    // Skip optional `case` keyword (LLMs often generate `case Pattern` in match arms)
+    if (this.at(TokenType.IDENT) && this.peek().value === "case") {
+      this.advance();
+    }
     const patternTok = this.peek();
     const pattern = this.parseMatchPattern();
 
@@ -1104,9 +1134,14 @@ class Parser {
       return { kind: "LiteralPattern", value: { kind: "BoolLiteral", value: false, loc: this.loc(tok) } };
     }
 
-    // Identifier pattern (variant name or binding)
+    // Identifier pattern (variant name or binding), or qualified pattern (Enum.Variant)
     if (tok.type === TokenType.IDENT) {
       this.advance();
+      if (this.at(TokenType.DOT)) {
+        this.advance(); // consume .
+        const variant = this.expect(TokenType.IDENT);
+        return { kind: "QualifiedPattern", qualifier: tok.value, name: variant.value };
+      }
       return { kind: "IdentifierPattern", name: tok.value };
     }
 
