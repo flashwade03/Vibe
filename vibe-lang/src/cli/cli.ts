@@ -2,7 +2,7 @@
 
 import { readFileSync, mkdirSync, writeFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
-import { resolve, dirname } from "path";
+import { resolve } from "path";
 import { compile } from "../pipeline.js";
 import { VibeError } from "../errors.js";
 
@@ -19,6 +19,34 @@ function findLove(): string {
   return "love"; // fallback
 }
 
+/** Build a reverse source map from Lua output: lua line → vibe line. */
+function buildReverseMap(lua: string): Map<number, number> {
+  const map = new Map<number, number>();
+  const lines = lua.split("\n");
+  let currentVibeLine = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(/-- @vibe:(\d+)/);
+    if (match) {
+      currentVibeLine = parseInt(match[1], 10);
+    } else if (currentVibeLine > 0) {
+      map.set(i + 1, currentVibeLine); // Lua lines are 1-indexed
+    }
+  }
+  return map;
+}
+
+/** Translate Lua error messages to Vibe source locations. */
+function translateError(stderr: string, reverseMap: Map<number, number>, vibeFile: string): string {
+  // Pattern: main.lua:47: error message
+  return stderr.replace(/main\.lua:(\d+)/g, (_match, luaLine) => {
+    const vibeLine = reverseMap.get(parseInt(luaLine, 10));
+    if (vibeLine) {
+      return `${vibeFile}:${vibeLine}`;
+    }
+    return _match;
+  });
+}
+
 function main(): void {
   const args = process.argv.slice(2);
 
@@ -31,15 +59,27 @@ function main(): void {
 
   try {
     const source = readFileSync(filePath, "utf-8");
-    const { mainLua, confLua } = compile(source, filePath);
+    const { mainLua, confLua, preludeLua } = compile(source, filePath, { sourceMap: true });
 
     const buildDir = resolve("build");
     mkdirSync(buildDir, { recursive: true });
-    writeFileSync(resolve(buildDir, "main.lua"), mainLua);
+    writeFileSync(resolve(buildDir, "vibe_runtime.lua"), preludeLua);
+    writeFileSync(resolve(buildDir, "main.lua"), `require("vibe_runtime")\n${mainLua}`);
     writeFileSync(resolve(buildDir, "conf.lua"), confLua);
 
+    const reverseMap = buildReverseMap(mainLua);
+
     const lovePath = findLove();
-    execSync(`"${lovePath}" ${buildDir}`, { stdio: "inherit" });
+    try {
+      execSync(`"${lovePath}" ${buildDir}`, { stdio: ["inherit", "inherit", "pipe"] });
+    } catch (loveErr: any) {
+      // Translate Lua errors to Vibe line numbers
+      const stderr = loveErr.stderr?.toString() || "";
+      if (stderr) {
+        console.error(translateError(stderr, reverseMap, filePath));
+      }
+      process.exit(1);
+    }
   } catch (err) {
     if (err instanceof VibeError) {
       console.error(err.format());

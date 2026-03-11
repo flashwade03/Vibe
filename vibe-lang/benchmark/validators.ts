@@ -11,13 +11,28 @@ export interface ValidationResult {
 }
 
 function validateVibe(code: string): ValidationResult {
+  let lua: string;
   try {
     const tokens = lex(code, "benchmark.vibe");
     const ast = parse(tokens, "benchmark.vibe");
-    const lua = generate(ast);
-    return { valid: true, errors: [] };
+    lua = generate(ast);
   } catch (e: any) {
     return { valid: false, errors: [e.message || String(e)] };
+  }
+
+  // Verify generated Lua is syntactically valid via luac
+  try {
+    const tmpFile = "/tmp/vibe_benchmark_luac_test.lua";
+    writeFileSync(tmpFile, lua);
+    execSync(`luac -p "${tmpFile}"`, { timeout: 5000, stdio: "pipe" });
+    return { valid: true, errors: [] };
+  } catch (e: any) {
+    const errMsg = e.stderr?.toString() || e.message || String(e);
+    if (errMsg.includes("not found") || errMsg.includes("No such file")) {
+      // luac not available — skip Lua syntax check
+      return { valid: true, errors: [] };
+    }
+    return { valid: false, errors: [`luac: ${errMsg.trim()}`] };
   }
 }
 

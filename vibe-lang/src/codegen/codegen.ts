@@ -89,14 +89,25 @@ const BUILTIN_MAP: Record<string, { lua: string; prependArgs?: string[] }> = {
 let _continueCounter = 0;
 const _continueLabelStack: string[] = [];
 
+// ── Source map state ────────────────────────────────────────
+let _emitSourceMap = false;
+let _sourceFile = "source.vibe";
+
+export interface GenerateOptions {
+  sourceMap?: boolean;
+  sourceFile?: string;
+}
+
 // ── Public API ──────────────────────────────────────────────
 
 /**
  * Generate Lua source code from a Vibe Program AST.
  */
-export function generate(program: Program): string {
+export function generate(program: Program, options?: GenerateOptions): string {
   _continueCounter = 0;
   _continueLabelStack.length = 0;
+  _emitSourceMap = options?.sourceMap ?? false;
+  _sourceFile = options?.sourceFile ?? "source.vibe";
   const parts: string[] = [];
 
   for (let i = 0; i < program.body.length; i++) {
@@ -107,6 +118,9 @@ export function generate(program: Program): string {
       parts.push("");
     }
 
+    if (_emitSourceMap && decl.loc) {
+      parts.push(`-- @vibe:${decl.loc.line}`);
+    }
     parts.push(emitTopLevel(decl));
   }
 
@@ -319,36 +333,44 @@ function emitTraitImplDecl(node: TraitImplDecl): string {
 
 // ── Statements ──────────────────────────────────────────────
 
+function sourceComment(stmt: { loc?: { line: number } }, depth: number): string {
+  if (_emitSourceMap && stmt.loc) {
+    return `${indent(depth)}-- @vibe:${stmt.loc.line}\n`;
+  }
+  return "";
+}
+
 function emitStmt(stmt: Stmt, depth: number): string {
+  const src = sourceComment(stmt, depth);
   switch (stmt.kind) {
     case "LetDecl":
-      return emitLetDecl(stmt, depth);
+      return src + emitLetDecl(stmt, depth);
     case "ConstDecl":
-      return emitConstDecl(stmt, depth);
+      return src + emitConstDecl(stmt, depth);
     case "IfStmt":
-      return emitIfStmt(stmt, depth);
+      return src + emitIfStmt(stmt, depth);
     case "ForStmt":
-      return emitForStmt(stmt, depth);
+      return src + emitForStmt(stmt, depth);
     case "MatchStmt":
-      return emitMatchStmt(stmt, depth);
+      return src + emitMatchStmt(stmt, depth);
     case "ReturnStmt":
-      return emitReturnStmt(stmt, depth);
+      return src + emitReturnStmt(stmt, depth);
     case "BreakStmt":
-      return `${indent(depth)}break`;
+      return src + `${indent(depth)}break`;
     case "ContinueStmt": {
       // LuaJIT (used by LÖVE) supports goto for continue emulation
       const label = _continueLabelStack.length > 0
         ? _continueLabelStack[_continueLabelStack.length - 1]
         : null;
       if (label) {
-        return `${indent(depth)}goto ${label}`;
+        return src + `${indent(depth)}goto ${label}`;
       }
-      return `${indent(depth)}-- continue`;
+      return src + `${indent(depth)}-- continue`;
     }
     case "Assignment":
-      return emitAssignment(stmt, depth);
+      return src + emitAssignment(stmt, depth);
     case "ExprStmt":
-      return emitExprStmt(stmt, depth);
+      return src + emitExprStmt(stmt, depth);
   }
 }
 

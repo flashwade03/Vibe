@@ -70,6 +70,52 @@ describe("E2E pipeline", () => {
     }
   });
 
+  it("source maps emit @vibe line comments", () => {
+    const source = "let x: Int = 1\nlet y: Int = 2\n\nfn update(dt: Float)\n  x = x + 1";
+    const { mainLua } = compile(source, "test.vibe", { sourceMap: true });
+
+    expect(mainLua).toContain("-- @vibe:1");
+    expect(mainLua).toContain("-- @vibe:2");
+    expect(mainLua).toContain("-- @vibe:4");
+    // Without sourceMap, no comments
+    const { mainLua: plain } = compile(source, "test.vibe");
+    expect(plain).not.toContain("-- @vibe:");
+  });
+
+  it("compile returns preludeLua with Vec2, Color, and collision functions", () => {
+    const source = "let x: Int = 1";
+    const { preludeLua } = compile(source, "test.vibe");
+
+    // Vec2
+    expect(preludeLua).toContain("Vec2 = {}");
+    expect(preludeLua).toContain("function Vec2.new(x, y)");
+    expect(preludeLua).toContain("function Vec2:length()");
+    expect(preludeLua).toContain("function Vec2:normalize()");
+    expect(preludeLua).toContain("function Vec2:dot(other)");
+    expect(preludeLua).toContain("function Vec2:distance(other)");
+    expect(preludeLua).toContain("function Vec2:lerp(target, t)");
+
+    // Color
+    expect(preludeLua).toContain("Color = {}");
+    expect(preludeLua).toContain("function Color.rgb(r, g, b)");
+    expect(preludeLua).toContain("Color.RED");
+    expect(preludeLua).toContain("Color.WHITE");
+
+    // Math utilities
+    expect(preludeLua).toContain("function clamp(value, min_val, max_val)");
+    expect(preludeLua).toContain("function lerp(a, b, t)");
+    expect(preludeLua).toContain("function sign(x)");
+    expect(preludeLua).toContain("function distance(x1, y1, x2, y2)");
+    expect(preludeLua).toContain("function normalize(x, y)");
+    expect(preludeLua).toContain("function angle_to(x1, y1, x2, y2)");
+
+    // Collision
+    expect(preludeLua).toContain("function collides_rect(");
+    expect(preludeLua).toContain("function collides_circle(");
+    expect(preludeLua).toContain("function collides_point_rect(");
+    expect(preludeLua).toContain("function collides_point_circle(");
+  });
+
   it("throws VibeError with location for invalid source", () => {
     const source = readFixture("error_missing_eq.vibe");
 

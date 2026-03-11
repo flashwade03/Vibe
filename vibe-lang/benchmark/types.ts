@@ -21,7 +21,7 @@ export interface GenerationResult {
   language: Language;
   llm: LLMProvider;
   code: string;
-  compilesOk: boolean;
+  compilesOk: boolean; // full pipeline: parse + codegen + luac syntax check
   errors: string[];
   tokenCount: number; // approximate token count of generated code
   latencyMs: number;

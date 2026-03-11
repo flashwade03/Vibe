@@ -97,14 +97,55 @@ These are top-level functions that the engine calls automatically.
 | draw_rect | draw_rect(x: Float, y: Float, w: Float, h: Float) | Draws a filled rectangle |
 | draw_circle | draw_circle(x: Float, y: Float, radius: Float) | Draws a filled circle |
 | draw_text | draw_text(text: String, x: Float, y: Float) | Draws text at position |
+| draw_line | draw_line(x1: Float, y1: Float, x2: Float, y2: Float) | Draws a line |
+| set_color | set_color(r: Float, g: Float, b: Float) | Sets draw color (0.0-1.0 each) |
+| set_bg_color | set_bg_color(r: Float, g: Float, b: Float) | Sets background color |
+| get_width | get_width() -> Float | Returns window width (800) |
+| get_height | get_height() -> Float | Returns window height (600) |
 | str | str(value) -> String | Convert any value to String |
 | int | int(value: Float) -> Int | Convert Float to Int (truncates) |
 | float | float(value) -> Float | Convert to Float |
 | sqrt | sqrt(x: Float) -> Float | Square root |
 | cos | cos(x: Float) -> Float | Cosine (radians) |
 | sin | sin(x: Float) -> Float | Sine (radians) |
+| abs | abs(x: Float) -> Float | Absolute value |
+| min | min(a: Float, b: Float) -> Float | Minimum of two values |
+| max | max(a: Float, b: Float) -> Float | Maximum of two values |
 | rand_float | rand_float(min: Float, max: Float) -> Float | Random float in [min, max] |
+| rand_int | rand_int(min: Int, max: Int) -> Int | Random integer in [min, max] |
 | len | len(list: List) -> Int | Length of a list |
+| append | append(list: List, item) | Append item to list |
+| remove | remove(list: List, index: Int) | Remove item at index |
+| print | print(text: String) | Print to console (debug) |
+| clamp | clamp(value: Float, min: Float, max: Float) -> Float | Clamp value between min and max |
+| lerp | lerp(a: Float, b: Float, t: Float) -> Float | Linear interpolation |
+| sign | sign(x: Float) -> Int | Returns -1, 0, or 1 |
+| distance | distance(x1: Float, y1: Float, x2: Float, y2: Float) -> Float | Distance between two points |
+| normalize | normalize(x: Float, y: Float) -> (Float, Float) | Normalize a 2D vector |
+| angle_to | angle_to(x1: Float, y1: Float, x2: Float, y2: Float) -> Float | Angle from point 1 to point 2 |
+| collides_rect | collides_rect(ax, ay, aw, ah, bx, by, bw, bh) -> Bool | AABB collision check |
+| collides_circle | collides_circle(ax, ay, ar, bx, by, br) -> Bool | Circle-circle collision check |
+| collides_point_rect | collides_point_rect(px, py, rx, ry, rw, rh) -> Bool | Point-in-rectangle check |
+| collides_point_circle | collides_point_circle(px, py, cx, cy, cr) -> Bool | Point-in-circle check |
+
+## Vec2 (Built-in Type)
+\\\`\\\`\\\`
+let pos = Vec2.new(100.0, 200.0)   -- create a Vec2
+let vel = Vec2.new(1.0, 0.0)
+pos = pos + vel * dt                -- arithmetic operators work
+let d = pos.x                       -- access fields .x and .y
+let len = pos:length()              -- methods use : syntax
+let n = pos:normalize()
+let dist = pos:distance(other)
+let mid = pos:lerp(target, 0.5)
+\\\`\\\`\\\`
+
+## Color Constants
+\\\`\\\`\\\`
+set_color(Color.RED[1], Color.RED[2], Color.RED[3])
+-- Available: Color.RED, Color.GREEN, Color.BLUE, Color.WHITE, Color.BLACK,
+--            Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.GRAY
+\\\`\\\`\\\`
 
 ## Lists
 \`\`\`
