@@ -9,22 +9,30 @@
 Vibe is a new programming language built so that LLMs can understand and generate its code with perfect accuracy. It transpiles to Lua and runs on [LOVE 2D](https://love2d.org/), with plans for a custom engine in the future.
 
 ```
-let x: Float = 400.0
-let y: Float = 300.0
-let speed: Float = 200.0
+struct Ball
+    x: Float
+    y: Float
+    vx: Float
+    vy: Float
+    r: Float
+
+let balls: List[Ball] = []
 
 fn update(dt: Float)
-  if key_down("right")
-    x = x + speed * dt
-  if key_down("left")
-    x = x - speed * dt
-  if key_down("down")
-    y = y + speed * dt
-  if key_down("up")
-    y = y - speed * dt
+    for b in balls
+        b.x = b.x + b.vx * dt
+        b.y = b.y + b.vy * dt
+        if b.x < b.r or b.x > 800.0 - b.r
+            b.vx = -b.vx
+        if b.y < b.r or b.y > 600.0 - b.r
+            b.vy = -b.vy
 
 fn draw()
-  draw_rect(x, y, 32, 32)
+    set_color(0.2, 0.8, 1.0)
+    for b in balls
+        draw_circle(b.x, b.y, b.r)
+    set_color(1.0, 1.0, 1.0)
+    draw_text("Balls: " + str(len(balls)), 10.0, 10.0)
 ```
 
 ## Features
@@ -32,20 +40,23 @@ fn draw()
 - **Pure indentation** — No `:`, `do`, `then`, or `end`. Blocks are defined by indentation alone.
 - **20 keywords** — `fn let const if else for in match return break continue enum struct and or not use yield trait has`
 - **LLM-first design** — Minimal syntax ambiguity, consistent patterns, zero edge cases that trip up code generation.
+- **Structs, enums, traits** — `struct Player has Drawable`, `enum GameState`, `match state` with `Enum.Variant` patterns.
 - **Game-ready** — Built-in functions for input, drawing, and game loops. `fn update(dt)` and `fn draw()` map directly to the engine.
 - **Transpiles to Lua** — Generated code runs unmodified on LOVE 2D.
 
 ## LLM Benchmark
 
-Vibe is benchmarked against Python-Pygame and Lua-LOVE across 50 game tasks with 3 LLMs.
+38 game tasks across 4 difficulty levels (Easy/Medium/Hard/Trap), validated by parser across 3 languages and 2 LLMs.
 
-| Language | Claude | Gemini | OpenAI |
-|----------|--------|--------|--------|
-| **Vibe** | **100% (50/50)** | **100% (50/50)** | 96% (48/50) |
-| Python-Pygame | - | 100% (50/50) | 100% (50/50) |
-| Lua-LOVE | - | 100% (50/50) | 100% (50/50) |
+| Language | Gemini | OpenAI |
+|----------|--------|--------|
+| **Vibe** | **100% (38/38)** | 84% (32/38) |
+| Python-Pygame | 100% (38/38) | 100% (38/38) |
+| Lua-LOVE | 100% (38/38) | 89% (34/38) |
 
-Vibe generates the most concise code (avg 191-200 tokens vs 220-237) with the fastest latency.
+**Token efficiency** (Gemini avg): Vibe **161** vs Python 209 vs Lua 201. Vibe generates the most concise code — 47% fewer tokens than Python on simple tasks.
+
+OpenAI's 6 Vibe failures are all **Training Data Gravity** — the model drifts toward Python patterns (list comprehensions, dict literals) despite clear instructions.
 
 [Full benchmark results](vibe-lang/benchmark/results.md)
 
@@ -64,11 +75,7 @@ cd Vibe
 npm install
 
 # Transpile and run a .vibe file
-npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
-
-# Or if LOVE isn't in PATH (macOS)
-npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
-open -a love build
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/demo_bouncing_balls.vibe
 ```
 
 ### Run Tests
@@ -77,7 +84,7 @@ open -a love build
 npx vitest run
 ```
 
-76 tests across 4 suites: Lexer (22), Parser (24), CodeGen (27), E2E (3).
+129 tests across 4 suites: Lexer (22), Parser (51), CodeGen (52), E2E (4).
 
 ## Language Overview
 
@@ -92,29 +99,63 @@ const PI: Float = 3.14
 
 ```
 fn greet(name: String)
-  draw_text("Hello " + name, 100, 100)
+    draw_text("Hello " + name, 100.0, 100.0)
 ```
 
 ### Control Flow
 
 ```
 if health > 0
-  draw_text("Alive", 10, 10)
+    draw_text("Alive", 10.0, 10.0)
 else
-  draw_text("Game Over", 10, 10)
+    draw_text("Game Over", 10.0, 10.0)
 
 for enemy in enemies
-  draw_rect(enemy.x, enemy.y, 32, 32)
+    draw_rect(enemy.x, enemy.y, 32.0, 32.0)
 
-for i in range(10)
-  draw_circle(i * 50, 100, 10)
+match state
+    GameState.Menu
+        draw_text("Press SPACE", 300.0, 300.0)
+    GameState.Playing
+        draw_text("Playing!", 300.0, 300.0)
+```
+
+### Structs & Traits
+
+```
+struct Player has Drawable
+    x: Float
+    y: Float
+    size: Float
+
+    fn draw(self_x: Float, self_y: Float)
+        draw_rect(self_x, self_y, 32.0, 32.0)
+```
+
+### Enums & Match
+
+```
+enum GameState
+    Menu
+    Playing
+    GameOver
+
+let state: GameState = GameState.Menu
+
+match state
+    GameState.Menu
+        draw_text("Menu", 300.0, 300.0)
+    GameState.Playing
+        draw_text("Play", 300.0, 300.0)
+    GameState.GameOver
+        draw_text("Over", 300.0, 300.0)
 ```
 
 ### Boolean Operators
 
 ```
 if alive and not invincible
-  take_damage()
+    take_damage()
 ```
 
 ### Built-in Functions (v0)
@@ -125,23 +166,12 @@ if alive and not invincible
 | `draw_rect(x, y, w, h)` | Draw a filled rectangle |
 | `draw_circle(x, y, r)` | Draw a filled circle |
 | `draw_text(text, x, y)` | Draw text on screen |
-
-## Examples
-
-The `vibe-lang/examples/` directory contains 10 progressively complex programs:
-
-| # | File | Description |
-|---|------|-------------|
-| 01 | `hello_vibe.vibe` | Text display |
-| 02 | `moving_player.vibe` | Arrow key movement |
-| 03 | `coin_collector.vibe` | Collision and scoring |
-| 04 | `enemy_ai.vibe` | State machine AI |
-| 05 | `scene_transition.vibe` | Scene management |
-| 06 | `shooting_game.vibe` | Projectiles |
-| 07 | `platformer.vibe` | Gravity and jumping |
-| 08 | `inventory_system.vibe` | Data structures |
-| 09 | `particle_tween_effects.vibe` | Particles and tweens |
-| 10 | `coroutine_cutscene.vibe` | Coroutine cutscenes |
+| `set_color(r, g, b)` | Set drawing color |
+| `len(list)` | Get list length |
+| `append(list, item)` | Add item to list |
+| `abs(x)` / `min(a,b)` / `max(a,b)` | Math functions |
+| `rand_int(a, b)` / `rand_float(a, b)` | Random numbers |
+| `print(value)` | Print to console |
 
 ## Architecture
 
@@ -149,11 +179,12 @@ The `vibe-lang/examples/` directory contains 10 progressively complex programs:
 .vibe file → Lexer → Parser → CodeGen → Lua → LOVE 2D
 ```
 
-The transpiler is written in TypeScript with three independent modules:
+The transpiler is written in TypeScript (~3,500 lines) with three independent modules:
 
-- **Lexer** — Tokenizes source with Python-style INDENT/DEDENT
-- **Parser** — Hand-written recursive descent, produces AST
-- **CodeGen** — Walks AST, emits Lua with LOVE 2D API mappings
+- **Lexer** (648 lines) — Tokenizes source with Python-style INDENT/DEDENT
+- **Parser** (1,551 lines) — Hand-written recursive descent, produces AST
+- **CodeGen** (686 lines) — Walks AST, emits Lua with LOVE 2D API mappings
+- **Feedback** (492 lines) — Error-Feedback Loop for LLM retry (Layer 3 defense)
 
 ## Project Structure
 
@@ -162,7 +193,7 @@ vibe-lang/               — Vibe language (all language-related files)
   src/                   — Transpiler (lexer, parser, codegen, feedback, cli)
   grammar/               — PEG grammar definitions
   examples/              — Vibe example programs (.vibe)
-  benchmark/             — LLM benchmark (50 tasks × 3 languages × 3 LLMs)
+  benchmark/             — LLM benchmark (38 tasks × 3 languages × 2 LLMs)
 design/                  — Design documents
 research/                — Language design research
 build/                   — Generated Lua output (gitignored)
@@ -170,12 +201,12 @@ build/                   — Generated Lua output (gitignored)
 
 ## Roadmap
 
-Vibe is currently at **Phase 1 v0** — a minimal transpiler pipeline. Future directions include:
+Vibe v0 is complete — the transpiler pipeline handles structs, enums, traits, match, and game loops end-to-end. Next steps:
 
-- Type checker
-- `enum` / `match` / `struct` / `trait` / `has`
-- Annotation system (`@entity`, `@scene`, `@on`)
+- Type checker (annotations are parsed but currently ignored)
+- Annotation runtime (`@entity`, `@scene`, `@on`)
 - Module system (`use`)
+- Runtime benchmark validation (currently parser-only)
 - Hot reload
 - Source maps (Lua errors → Vibe line numbers)
 - LSP server

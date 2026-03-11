@@ -9,22 +9,30 @@
 Vibe는 LLM이 완벽한 정확도로 이해하고 생성할 수 있도록 만들어진 새로운 프로그래밍 언어입니다. Lua로 트랜스파일되어 [LOVE 2D](https://love2d.org/)에서 실행되며, 향후 자체 엔진을 목표로 합니다.
 
 ```
-let x: Float = 400.0
-let y: Float = 300.0
-let speed: Float = 200.0
+struct Ball
+    x: Float
+    y: Float
+    vx: Float
+    vy: Float
+    r: Float
+
+let balls: List[Ball] = []
 
 fn update(dt: Float)
-  if key_down("right")
-    x = x + speed * dt
-  if key_down("left")
-    x = x - speed * dt
-  if key_down("down")
-    y = y + speed * dt
-  if key_down("up")
-    y = y - speed * dt
+    for b in balls
+        b.x = b.x + b.vx * dt
+        b.y = b.y + b.vy * dt
+        if b.x < b.r or b.x > 800.0 - b.r
+            b.vx = -b.vx
+        if b.y < b.r or b.y > 600.0 - b.r
+            b.vy = -b.vy
 
 fn draw()
-  draw_rect(x, y, 32, 32)
+    set_color(0.2, 0.8, 1.0)
+    for b in balls
+        draw_circle(b.x, b.y, b.r)
+    set_color(1.0, 1.0, 1.0)
+    draw_text("Balls: " + str(len(balls)), 10.0, 10.0)
 ```
 
 ## 특징
@@ -32,20 +40,23 @@ fn draw()
 - **순수 들여쓰기** — `:`, `do`, `then`, `end` 없음. 들여쓰기만으로 블록을 구분합니다.
 - **20개 키워드** — `fn let const if else for in match return break continue enum struct and or not use yield trait has`
 - **LLM 퍼스트 설계** — 최소한의 문법 모호성, 일관된 패턴, 코드 생성을 방해하는 엣지 케이스 제로.
+- **구조체, 열거형, 트레이트** — `struct Player has Drawable`, `enum GameState`, `Enum.Variant` 패턴 매치.
 - **게임 레디** — 입력, 드로잉, 게임 루프를 위한 내장 함수. `fn update(dt)`와 `fn draw()`가 엔진에 직접 매핑됩니다.
 - **Lua로 트랜스파일** — 생성된 코드가 LOVE 2D에서 수정 없이 실행됩니다.
 
 ## LLM 벤치마크
 
-50개 게임 태스크 × 3개 언어 × 3개 LLM으로 벤치마크를 실행합니다.
+38개 게임 태스크 × 4단계 난이도(Easy/Medium/Hard/Trap), 3개 언어 × 2개 LLM으로 파서 기반 검증.
 
-| 언어 | Claude | Gemini | OpenAI |
-|------|--------|--------|--------|
-| **Vibe** | **100% (50/50)** | **100% (50/50)** | 96% (48/50) |
-| Python-Pygame | - | 100% (50/50) | 100% (50/50) |
-| Lua-LOVE | - | 100% (50/50) | 100% (50/50) |
+| 언어 | Gemini | OpenAI |
+|------|--------|--------|
+| **Vibe** | **100% (38/38)** | 84% (32/38) |
+| Python-Pygame | 100% (38/38) | 100% (38/38) |
+| Lua-LOVE | 100% (38/38) | 89% (34/38) |
 
-Vibe는 가장 간결한 코드(평균 191-200 토큰 vs 220-237)와 가장 빠른 레이턴시를 기록합니다.
+**토큰 효율성** (Gemini 평균): Vibe **161** vs Python 209 vs Lua 201. 간단한 태스크에서 Python 대비 47% 적은 토큰으로 코드를 생성합니다.
+
+OpenAI의 6건 Vibe 실패는 전부 **Training Data Gravity** — 명확한 지시에도 불구하고 Python 패턴(list comprehension, dict literal)으로 회귀하는 현상.
 
 [전체 벤치마크 결과](vibe-lang/benchmark/results.md)
 
@@ -64,11 +75,7 @@ cd Vibe
 npm install
 
 # .vibe 파일을 트랜스파일하고 실행
-npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
-
-# LOVE가 PATH에 없는 경우 (macOS)
-npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/02_moving_player.vibe
-open -a love build
+npx tsx vibe-lang/src/cli/cli.ts run vibe-lang/examples/demo_bouncing_balls.vibe
 ```
 
 ### 테스트 실행
@@ -77,7 +84,7 @@ open -a love build
 npx vitest run
 ```
 
-4개 스위트 76개 테스트: 렉서 (22), 파서 (24), 코드젠 (27), E2E (3).
+4개 스위트 129개 테스트: 렉서 (22), 파서 (51), 코드젠 (52), E2E (4).
 
 ## 언어 개요
 
@@ -92,29 +99,63 @@ const PI: Float = 3.14
 
 ```
 fn greet(name: String)
-  draw_text("Hello " + name, 100, 100)
+    draw_text("Hello " + name, 100.0, 100.0)
 ```
 
 ### 제어 흐름
 
 ```
 if health > 0
-  draw_text("Alive", 10, 10)
+    draw_text("Alive", 10.0, 10.0)
 else
-  draw_text("Game Over", 10, 10)
+    draw_text("Game Over", 10.0, 10.0)
 
 for enemy in enemies
-  draw_rect(enemy.x, enemy.y, 32, 32)
+    draw_rect(enemy.x, enemy.y, 32.0, 32.0)
 
-for i in range(10)
-  draw_circle(i * 50, 100, 10)
+match state
+    GameState.Menu
+        draw_text("Press SPACE", 300.0, 300.0)
+    GameState.Playing
+        draw_text("Playing!", 300.0, 300.0)
+```
+
+### 구조체 & 트레이트
+
+```
+struct Player has Drawable
+    x: Float
+    y: Float
+    size: Float
+
+    fn draw(self_x: Float, self_y: Float)
+        draw_rect(self_x, self_y, 32.0, 32.0)
+```
+
+### 열거형 & 매치
+
+```
+enum GameState
+    Menu
+    Playing
+    GameOver
+
+let state: GameState = GameState.Menu
+
+match state
+    GameState.Menu
+        draw_text("Menu", 300.0, 300.0)
+    GameState.Playing
+        draw_text("Play", 300.0, 300.0)
+    GameState.GameOver
+        draw_text("Over", 300.0, 300.0)
 ```
 
 ### 불리언 연산자
 
 ```
 if alive and not invincible
-  take_damage()
+    take_damage()
 ```
 
 ### 내장 함수 (v0)
@@ -125,23 +166,12 @@ if alive and not invincible
 | `draw_rect(x, y, w, h)` | 채워진 사각형 그리기 |
 | `draw_circle(x, y, r)` | 채워진 원 그리기 |
 | `draw_text(text, x, y)` | 텍스트 그리기 |
-
-## 예제
-
-`vibe-lang/examples/` 디렉토리에 점진적으로 복잡해지는 10개 프로그램이 있습니다:
-
-| # | 파일 | 설명 |
-|---|------|------|
-| 01 | `hello_vibe.vibe` | 텍스트 표시 |
-| 02 | `moving_player.vibe` | 화살표 키 이동 |
-| 03 | `coin_collector.vibe` | 충돌과 점수 |
-| 04 | `enemy_ai.vibe` | 상태 머신 AI |
-| 05 | `scene_transition.vibe` | 씬 관리 |
-| 06 | `shooting_game.vibe` | 발사체 |
-| 07 | `platformer.vibe` | 중력과 점프 |
-| 08 | `inventory_system.vibe` | 데이터 구조 |
-| 09 | `particle_tween_effects.vibe` | 파티클과 트윈 |
-| 10 | `coroutine_cutscene.vibe` | 코루틴 컷씬 |
+| `set_color(r, g, b)` | 드로잉 색상 설정 |
+| `len(list)` | 리스트 길이 |
+| `append(list, item)` | 리스트에 항목 추가 |
+| `abs(x)` / `min(a,b)` / `max(a,b)` | 수학 함수 |
+| `rand_int(a, b)` / `rand_float(a, b)` | 난수 생성 |
+| `print(value)` | 콘솔 출력 |
 
 ## 아키텍처
 
@@ -149,11 +179,12 @@ if alive and not invincible
 .vibe 파일 → Lexer → Parser → CodeGen → Lua → LOVE 2D
 ```
 
-트랜스파일러는 TypeScript로 작성되었으며 세 개의 독립 모듈로 구성됩니다:
+트랜스파일러는 TypeScript로 작성되었으며 (~3,500줄) 세 개의 독립 모듈로 구성됩니다:
 
-- **Lexer** — Python 스타일 INDENT/DEDENT로 토큰화
-- **Parser** — 수제 재귀 하강 파서, AST 생성
-- **CodeGen** — AST 순회, LOVE 2D API 매핑으로 Lua 출력
+- **Lexer** (648줄) — Python 스타일 INDENT/DEDENT로 토큰화
+- **Parser** (1,551줄) — 수제 재귀 하강 파서, AST 생성
+- **CodeGen** (686줄) — AST 순회, LOVE 2D API 매핑으로 Lua 출력
+- **Feedback** (492줄) — LLM 재시도를 위한 Error-Feedback Loop (Layer 3 방어)
 
 ## 프로젝트 구조
 
@@ -162,7 +193,7 @@ vibe-lang/               — Vibe 언어 (언어 관련 파일 전체)
   src/                   — 트랜스파일러 (lexer, parser, codegen, feedback, cli)
   grammar/               — PEG 문법 정의
   examples/              — Vibe 예제 프로그램 (.vibe)
-  benchmark/             — LLM 벤치마크 (50 tasks × 3 languages × 3 LLMs)
+  benchmark/             — LLM 벤치마크 (38 tasks × 3 languages × 2 LLMs)
 design/                  — 설계 문서
 research/                — 언어 설계 리서치
 build/                   — 생성된 Lua 출력 (gitignore)
@@ -170,12 +201,12 @@ build/                   — 생성된 Lua 출력 (gitignore)
 
 ## 로드맵
 
-Vibe는 현재 **Phase 1 v0** — 최소 트랜스파일러 파이프라인 단계입니다. 향후 방향:
+Vibe v0 완료 — 트랜스파일러 파이프라인이 struct, enum, trait, match, 게임 루프를 end-to-end로 처리합니다. 다음 단계:
 
-- 타입 체커
-- `enum` / `match` / `struct` / `trait` / `has`
-- 어노테이션 시스템 (`@entity`, `@scene`, `@on`)
+- 타입 체커 (어노테이션은 파싱하지만 현재 무시)
+- 어노테이션 런타임 (`@entity`, `@scene`, `@on`)
 - 모듈 시스템 (`use`)
+- 런타임 벤치마크 검증 (현재 파서 검증만)
 - 핫 리로드
 - 소스맵 (Lua 에러 → Vibe 줄번호 역매핑)
 - LSP 서버
