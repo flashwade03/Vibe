@@ -27,18 +27,23 @@
 
 ### Vibe Syntax Pass Rate by LLM
 - **Claude**: 100% — 공식 코드 생성기 (프로젝트 컨텍스트 포함, production 설정)
-- **Gemini**: 97% — `tower_defense_path` 1개 실패 (복잡한 태스크에서 Python `:` 혼입, 비결정적)
-- **OpenAI**: 66% — Training Data Gravity 심각 (Python 패턴 13건 혼입)
+- **Gemini**: 97% — `tower_defense_path` 1개 실패 (`:` 메서드 호출 구문 사용, 파서 미지원)
+- **OpenAI**: 66% — Training Data Gravity + 미지원 구문 사용 (13건)
 
-### OpenAI 실패 패턴 분류
-| 패턴 | 건수 | 원인 |
-|------|------|------|
-| COLON `:` (블록 구분자) | 4 | Python `def f():` 스타일 |
-| RBRACKET/COMMA (list comprehension) | 3 | Python `[x for x in ...]` |
-| LPAREN `(` (잘못된 구문) | 2 | 괄호식 표현 또는 default params |
-| EQ `=` (default params) | 1 | Python `fn foo(x=5)` |
-| DEDENT/INDENT (들여쓰기) | 2 | struct/enum 본문 들여쓰기 오류 |
-| IDENT (키워드 누락) | 1 | `let` 누락 |
+### 실패 패턴 분류 (OpenAI 13건 + Gemini 1건)
+| 패턴 | 건수 | 원인 | 태스크 |
+|------|------|------|--------|
+| `:` 메서드 호출 (파서 미지원) | 4 | `pos:lerp()`, `obj:draw()` 등 문서화되었으나 미구현 | mouse_follower, waypoint_patrol, trait_drawable, enemy_wave_loop |
+| list comprehension | 3 | Python `[x for x in ...]` | asteroid_field, space_invaders, tower_defense_path |
+| LPAREN (잘못된 구문) | 2 | default params / 괄호식 | pathfinding_viz, trait_updatable |
+| DEDENT/INDENT (들여쓰기) | 2 | struct/enum 본문 오류 | struct_methods, enum_with_data |
+| EQ `=` (default params) | 1 | Python `fn foo(x=5)` | particle_emitter_system |
+| IDENT (키워드 누락) | 1 | `let` 누락 | struct_list_management |
+
+### 핵심 발견
+- COLON 에러 4건은 Python trailing colon(`def f():`)이 아니라 **`:` 메서드 호출 구문**(`pos:lerp()`)
+- vibe-context.ts에 Vec2 `:` 메서드를 문서화했으나 파서가 미지원 → LLM이 문서를 따르면 실패
+- Gemini의 `tower_defense_path` 실패도 동일 원인 (`diff:length()`, `diff:normalize()`)
 
 ## Detailed Results
 
