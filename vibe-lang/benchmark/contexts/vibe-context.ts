@@ -229,6 +229,68 @@ fn draw()
         draw_circle(xs[i], ys[i], 20.0)
 \`\`\`
 
+## Complete Example 6: Struct with Methods
+\\\`\\\`\\\`
+struct Player
+    x: Float
+    y: Float
+    speed: Float = 200.0
+
+    fn move(p: Player, dx: Float, dy: Float, dt: Float)
+        p.x = p.x + dx * p.speed * dt
+        p.y = p.y + dy * p.speed * dt
+
+let player = Player(400.0, 300.0)
+
+fn update(dt: Float)
+    let dx: Float = 0.0
+    let dy: Float = 0.0
+    if key_down("right")
+        dx = 1.0
+    if key_down("left")
+        dx = -1.0
+    Player_move(player, dx, dy, dt)
+
+fn draw()
+    draw_rect(player.x, player.y, 32.0, 32.0)
+\\\`\\\`\\\`
+Note: struct methods are called as StructName_methodName(instance, args). No \`self\` parameter.
+
+## Complete Example 7: Enum with Match
+\\\`\\\`\\\`
+enum GameState
+    Menu
+    Playing
+    GameOver
+
+let state: String = "Menu"
+let score: Int = 0
+
+fn keypressed(k: String)
+    match state
+        "Menu"
+            if k == "space"
+                state = "Playing"
+        "Playing"
+            if k == "space"
+                score = score + 1
+            if k == "escape"
+                state = "GameOver"
+        "GameOver"
+            if k == "return"
+                state = "Menu"
+                score = 0
+
+fn draw()
+    match state
+        "Menu"
+            draw_text("Press SPACE to start", 300.0, 280.0)
+        "Playing"
+            draw_text("Score: " + str(score), 10.0, 10.0)
+        "GameOver"
+            draw_text("Game Over! Score: " + str(score), 250.0, 280.0)
+\\\`\\\`\\\`
+
 ## CRITICAL: DO NOT USE
 - Do NOT use \`while\`. Use \`for condition\` instead: \`for x > 0\`
 - \`+=\`, \`-=\`, \`*=\`, \`/=\`, \`%=\` are supported. \`x += 1\` is equivalent to \`x = x + 1\`
@@ -240,6 +302,11 @@ fn draw()
 - Do NOT use \`null\`, \`nil\`, \`None\`, \`undefined\`. Use \`none\`
 - Do NOT use \`&&\`, \`||\`, \`!\`. Use \`and\`, \`or\`, \`not\`
 - Do NOT use \`#\` or \`//\` for comments. Use \`--\`
+- Do NOT use list comprehensions \`[x for x in ...]\`. Use for loop with append()
+- Do NOT use tuples \`(a, b)\`. Use struct or separate variables
+- Do NOT use \`self\` parameter in methods. Struct methods take the instance explicitly
+- Do NOT use default parameter syntax \`fn foo(x=5)\`. Declare defaults in struct fields instead
+- Do NOT use \`global\` keyword. Top-level \`let\` variables are accessible everywhere
 
 ## Rules
 - Output ONLY the Vibe code, no explanations or markdown

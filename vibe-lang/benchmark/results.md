@@ -4,9 +4,18 @@
 
 ## Summary
 
-| Language | LLM | Pass Rate | Avg Tokens | Avg Latency |
-|----------|-----|-----------|------------|-------------|
-| **vibe** | **claude** | **100% (38/38)** | - | - |
+> Note: "Syntax Pass Rate" measures whether generated code is syntactically valid and transpiles to valid Lua. Runtime behavioral correctness is not yet measured.
+
+### Official Generator (Claude Code with project context)
+
+| Language | Claude |
+|----------|--------|
+| **Vibe** | **100% (38/38)** |
+
+### Third-party LLMs (API with system prompt only)
+
+| Language | LLM | Syntax Pass Rate | Avg Tokens | Avg Latency |
+|----------|-----|------------------|------------|-------------|
 | vibe | gemini | 97% (37/38) | 168 | 3519ms |
 | vibe | openai | 66% (25/38) | 165 | 10643ms |
 | python-pygame | gemini | 100% (38/38) | 208 | 3341ms |
@@ -16,8 +25,8 @@
 
 ## Analysis
 
-### Vibe Pass Rate by LLM
-- **Claude**: 100% — 공식 코드 생성기, Training Data Gravity 없음
+### Vibe Syntax Pass Rate by LLM
+- **Claude**: 100% — 공식 코드 생성기 (프로젝트 컨텍스트 포함, production 설정)
 - **Gemini**: 97% — `tower_defense_path` 1개 실패 (복잡한 태스크에서 Python `:` 혼입, 비결정적)
 - **OpenAI**: 66% — Training Data Gravity 심각 (Python 패턴 13건 혼입)
 

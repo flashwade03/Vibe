@@ -1,12 +1,12 @@
 # Vibe
 
-**A programming language designed for 100% accurate LLM code generation**, paired with a lightweight game engine.
+**A programming language designed for 100% syntax-accurate LLM code generation** — an LLM-first game programming language.
 
 [한국어](README.ko.md) | [日本語](README.ja.md)
 
 ## What is Vibe?
 
-Vibe is a new programming language built so that LLMs can understand and generate its code with perfect accuracy. It transpiles to Lua and runs on [LOVE 2D](https://love2d.org/), with plans for a custom engine in the future.
+Vibe is a new programming language built so that LLMs can generate syntactically valid code on the first try. It transpiles to Lua and runs on [LOVE 2D](https://love2d.org/), with plans for a custom engine in the future.
 
 ```
 struct Ball
@@ -44,19 +44,27 @@ fn draw()
 - **Game-ready** — Built-in functions for input, drawing, and game loops. `fn update(dt)` and `fn draw()` map directly to the engine.
 - **Transpiles to Lua** — Generated code runs unmodified on LOVE 2D.
 
-## LLM Benchmark
+## LLM Benchmark (Syntax Pass Rate)
 
-38 game tasks across 4 difficulty levels (Easy/Medium/Hard/Trap), validated by parser across 3 languages and 2 LLMs.
+38 game tasks across 4 difficulty levels (Easy/Medium/Hard/Trap), validated by full pipeline (lexer → parser → codegen → luac).
+
+**Official Generator (Claude Code with project context):**
+
+| Language | Claude |
+|----------|--------|
+| **Vibe** | **100% (38/38)** |
+
+**Third-party LLMs (API with system prompt only):**
 
 | Language | Gemini | OpenAI |
 |----------|--------|--------|
-| **Vibe** | **100% (38/38)** | 84% (32/38) |
+| **Vibe** | **97% (37/38)** | 66% (25/38) |
 | Python-Pygame | 100% (38/38) | 100% (38/38) |
-| Lua-LOVE | 100% (38/38) | 89% (34/38) |
+| Lua-LOVE | 100% (38/38) | 92% (35/38) |
 
-**Token efficiency** (Gemini avg): Vibe **161** vs Python 209 vs Lua 201. Vibe generates the most concise code — 47% fewer tokens than Python on simple tasks.
+**Token efficiency** (Gemini avg): Vibe **166** vs Python 209 vs Lua 210. Vibe generates the most concise code.
 
-OpenAI's 6 Vibe failures are all **Training Data Gravity** — the model drifts toward Python patterns (list comprehensions, dict literals) despite clear instructions.
+> Note: "Syntax pass rate" measures whether generated code is syntactically valid and transpiles to valid Lua. Runtime behavioral correctness is not yet measured.
 
 [Full benchmark results](vibe-lang/benchmark/results.md)
 

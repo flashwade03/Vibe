@@ -99,6 +99,20 @@ class Parser {
     return this.advance();
   }
 
+  /**
+   * Expect NEWLINE, but tolerate an optional `:` before it.
+   * This handles LLM-generated code with Python-style trailing colons
+   * (e.g., `fn foo():` or `if x > 0:`) without changing the language spec.
+   * The `:` is silently consumed as noise — it carries zero semantic information
+   * in block-header position.
+   */
+  private expectNewlineTolerateColon(): void {
+    if (this.at(TokenType.COLON)) {
+      this.advance(); // silently consume trailing ':'
+    }
+    this.expect(TokenType.NEWLINE);
+  }
+
   private loc(token: Token): Loc {
     return { line: token.line, col: token.col };
   }
@@ -214,7 +228,7 @@ class Parser {
       this.consumeTypeAnnotation(); // consume full type (e.g., Map[String, Float])
     }
 
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
     const body = this.parseIndentedBlock();
 
     return {
@@ -309,7 +323,7 @@ class Parser {
     // Optional: has Trait1, Trait2
     const traits = this.parseHasClause();
 
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
 
     // Parse struct body: fields and methods
     const fields: StructField[] = [];
@@ -385,7 +399,7 @@ class Parser {
   private parseEnumDecl(annotations: Annotation[]): EnumDecl {
     const kwTok = this.expect(TokenType.KW_ENUM);
     const nameTok = this.expect(TokenType.IDENT);
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
 
     const variants: EnumVariant[] = [];
 
@@ -456,7 +470,7 @@ class Parser {
       this.advance(); // consume has
       const targetTok = this.expect(TokenType.IDENT);
 
-      this.expect(TokenType.NEWLINE);
+      this.expectNewlineTolerateColon();
       const methods: FnDecl[] = [];
 
       if (this.at(TokenType.INDENT)) {
@@ -479,7 +493,7 @@ class Parser {
     }
 
     // Regular trait declaration
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
     const methods: FnDecl[] = [];
 
     if (this.at(TokenType.INDENT)) {
@@ -651,7 +665,7 @@ class Parser {
   private parseIfStmt(): IfStmt {
     const kwTok = this.expect(TokenType.KW_IF);
     const condition = this.parseExpr();
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
     const body = this.parseIndentedBlock();
 
     let elseBody: Stmt[] | undefined;
@@ -664,7 +678,7 @@ class Parser {
         elseBody = [this.parseIfStmt()];
       } else {
         // else block
-        this.expect(TokenType.NEWLINE);
+        this.expectNewlineTolerateColon();
         elseBody = this.parseIndentedBlock();
       }
     }
@@ -702,7 +716,7 @@ class Parser {
       variant = { kind: "ForCond", condition };
     }
 
-    this.expect(TokenType.NEWLINE);
+    this.expectNewlineTolerateColon();
     const body = this.parseIndentedBlock();
 
     return { kind: "ForStmt", variant, body, loc: this.loc(kwTok) };

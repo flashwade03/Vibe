@@ -1,12 +1,12 @@
 # Vibe
 
-**LLM이 100% 정확도로 코드를 생성할 수 있도록 설계된 프로그래밍 언어** + 경량 게임 엔진.
+**LLM이 100% 구문 정확도로 코드를 생성할 수 있도록 설계된 프로그래밍 언어** — LLM 퍼스트 게임 프로그래밍 언어.
 
 [English](README.md) | [日本語](README.ja.md)
 
 ## Vibe란?
 
-Vibe는 LLM이 완벽한 정확도로 이해하고 생성할 수 있도록 만들어진 새로운 프로그래밍 언어입니다. Lua로 트랜스파일되어 [LOVE 2D](https://love2d.org/)에서 실행되며, 향후 자체 엔진을 목표로 합니다.
+Vibe는 LLM이 구문적으로 완벽한 코드를 첫 시도에 생성할 수 있도록 설계된 새로운 프로그래밍 언어입니다. Lua로 트랜스파일되어 [LOVE 2D](https://love2d.org/)에서 실행되며, 향후 자체 엔진을 목표로 합니다.
 
 ```
 struct Ball
@@ -44,19 +44,27 @@ fn draw()
 - **게임 레디** — 입력, 드로잉, 게임 루프를 위한 내장 함수. `fn update(dt)`와 `fn draw()`가 엔진에 직접 매핑됩니다.
 - **Lua로 트랜스파일** — 생성된 코드가 LOVE 2D에서 수정 없이 실행됩니다.
 
-## LLM 벤치마크
+## LLM 벤치마크 (구문 통과율)
 
-38개 게임 태스크 × 4단계 난이도(Easy/Medium/Hard/Trap), 3개 언어 × 2개 LLM으로 파서 기반 검증.
+38개 게임 태스크 × 4단계 난이도(Easy/Medium/Hard/Trap), 풀 파이프라인 검증 (lexer → parser → codegen → luac).
+
+**공식 생성기 (Claude Code, 프로젝트 컨텍스트 포함):**
+
+| 언어 | Claude |
+|------|--------|
+| **Vibe** | **100% (38/38)** |
+
+**서드파티 LLM (API, 시스템 프롬프트만):**
 
 | 언어 | Gemini | OpenAI |
 |------|--------|--------|
-| **Vibe** | **100% (38/38)** | 84% (32/38) |
+| **Vibe** | **97% (37/38)** | 66% (25/38) |
 | Python-Pygame | 100% (38/38) | 100% (38/38) |
-| Lua-LOVE | 100% (38/38) | 89% (34/38) |
+| Lua-LOVE | 100% (38/38) | 92% (35/38) |
 
-**토큰 효율성** (Gemini 평균): Vibe **161** vs Python 209 vs Lua 201. 간단한 태스크에서 Python 대비 47% 적은 토큰으로 코드를 생성합니다.
+**토큰 효율성** (Gemini 평균): Vibe **166** vs Python 209 vs Lua 210.
 
-OpenAI의 6건 Vibe 실패는 전부 **Training Data Gravity** — 명확한 지시에도 불구하고 Python 패턴(list comprehension, dict literal)으로 회귀하는 현상.
+> 참고: "구문 통과율"은 생성된 코드가 문법적으로 유효하고 Lua로 트랜스파일됨을 의미합니다. 런타임 동작 정확성은 아직 측정하지 않습니다.
 
 [전체 벤치마크 결과](vibe-lang/benchmark/results.md)
 

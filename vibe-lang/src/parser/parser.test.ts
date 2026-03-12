@@ -714,4 +714,40 @@ fn draw()
     expect(decl.fields[1].name).toBe("y");
     expect(decl.fields[1].defaultValue).toBeDefined();
   });
+
+  // ── Optional colon tolerance (LLM noise) ──────────────────
+
+  it("tolerates trailing colon after fn signature", () => {
+    const prog = p("fn foo(x: Int):\n  return x");
+    const fn = prog.body[0] as FnDecl;
+    expect(fn.kind).toBe("FnDecl");
+    expect(fn.name).toBe("foo");
+    expect(fn.body).toHaveLength(1);
+  });
+
+  it("tolerates trailing colon after if condition", () => {
+    const prog = p("fn test()\n  if x > 0:\n    return x");
+    const fn = prog.body[0] as FnDecl;
+    const ifStmt = fn.body[0] as IfStmt;
+    expect(ifStmt.kind).toBe("IfStmt");
+  });
+
+  it("tolerates trailing colon after for loop", () => {
+    const prog = p("fn test()\n  for i in range(10):\n    let x = i");
+    const fn = prog.body[0] as FnDecl;
+    const forStmt = fn.body[0] as ForStmt;
+    expect(forStmt.kind).toBe("ForStmt");
+  });
+
+  it("tolerates trailing colon after struct/enum", () => {
+    const prog = p("struct Player:\n  x: Float\n  y: Float");
+    const decl = prog.body[0] as StructDecl;
+    expect(decl.kind).toBe("StructDecl");
+    expect(decl.fields).toHaveLength(2);
+
+    const prog2 = p("enum State:\n  Idle\n  Running");
+    const enumDecl = prog2.body[0] as EnumDecl;
+    expect(enumDecl.kind).toBe("EnumDecl");
+    expect(enumDecl.variants).toHaveLength(2);
+  });
 });
