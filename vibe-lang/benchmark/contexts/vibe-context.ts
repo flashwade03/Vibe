@@ -134,10 +134,8 @@ let pos = Vec2.new(100.0, 200.0)   -- create a Vec2
 let vel = Vec2.new(1.0, 0.0)
 pos = pos + vel * dt                -- arithmetic operators work
 let d = pos.x                       -- access fields .x and .y
-let len = pos:length()              -- methods use : syntax
-let n = pos:normalize()
-let dist = pos:distance(other)
-let mid = pos:lerp(target, 0.5)
+let dist = distance(pos.x, pos.y, other.x, other.y)  -- free functions
+let mid_x = lerp(pos.x, target.x, 0.5)               -- scalar lerp
 \\\`\\\`\\\`
 
 ## Color Constants

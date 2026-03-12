@@ -58,11 +58,11 @@ fn draw()
 
 | Language | Gemini | OpenAI |
 |----------|--------|--------|
-| **Vibe** | **100% (38/38)** | 71% (27/38) |
+| **Vibe** | **100% (38/38)** | 87% (33/38) |
 | Python-Pygame | 100% (38/38) | 100% (38/38) |
 | Lua-LOVE | 100% (38/38) | 100% (38/38) |
 
-**Token efficiency** (Gemini avg): Vibe **165** vs Python 207 vs Lua 203. Vibe generates the most concise code.
+**Token efficiency** (Gemini avg): Vibe **161** vs Python 206 vs Lua 203. Vibe generates the most concise code.
 
 > Note: "Syntax pass rate" measures whether generated code is syntactically valid and transpiles to valid Lua. Runtime behavioral correctness is not yet measured.
 
