@@ -1,6 +1,6 @@
 # LLM Code Generation Benchmark Results
 
-**Generated**: 2026-03-13
+**Generated**: 2026-03-26
 
 > Note: "Syntax Pass Rate" measures whether generated code is syntactically valid and transpiles to valid Lua. Runtime behavioral correctness is not yet measured.
 
@@ -16,33 +16,27 @@
 
 | Language | LLM | Syntax Pass Rate | Avg Tokens | Avg Latency |
 |----------|-----|------------------|------------|-------------|
-| vibe | gemini | 100% (38/38) | 161 | 3256ms |
-| vibe | openai | 87% (33/38) | 170 | 11448ms |
-| python-pygame | gemini | 100% (38/38) | 206 | 3397ms |
-| python-pygame | openai | 100% (38/38) | 204 | 7030ms |
-| lua-love | gemini | 100% (38/38) | 203 | 3254ms |
-| lua-love | openai | 100% (38/38) | 211 | 7224ms |
+| vibe | gemini | 100% (38/38) | 159 | 3634ms |
+| vibe | openai | 82% (31/38) | 174 | 8947ms |
+| python-pygame | gemini | 100% (38/38) | 209 | 3896ms |
+| python-pygame | openai | 100% (38/38) | 202 | 6338ms |
+| lua-love | gemini | 100% (38/38) | 201 | 3527ms |
+| lua-love | openai | 100% (38/38) | 208 | 6271ms |
 
 ## Analysis
 
-### Vibe Syntax Pass Rate by LLM
-- **Claude**: 100% — 공식 코드 생성기 (프로젝트 컨텍스트 포함)
-- **Gemini**: 100% — 3회 연속 100% 달성
-- **OpenAI**: 87% — 이전 71%에서 +16%p 개선 (프롬프트에서 `:` 메서드 구문 제거 효과)
+### v0.2 어노테이션 런타임 영향
+- v0.2 변경은 기존 38개 태스크에 영향 없음 (`hasGameAnnotations: false` 경로)
+- OpenAI 87%→82%는 비결정적 변동 (±2-3건은 실행마다 달라짐)
+- 구조적 실패 5건은 동일: waypoint_patrol, tower_defense_path, pathfinding_viz, enum_with_data, trait_updatable
 
-### 프롬프트 개선 이력
-| 버전 | 변경 내용 | Gemini | OpenAI |
-|------|----------|--------|--------|
-| v0.1 | 초기 프롬프트 | 97% | 66% |
-| v0.2 | struct/enum 예제 + DO NOT 확장 | 100% | 71% |
-| v0.3 | `:` 메서드 구문 → 자유 함수로 교체 | 100% | 87% |
-
-### OpenAI 잔여 실패 (5건)
-| 패턴 | 건수 | 태스크 |
-|------|------|--------|
-| COMMA (dict/tuple 리터럴) | 2 | waypoint_patrol, tower_defense_path |
-| LPAREN (enum variant / trait 구문) | 2 | enum_with_data, trait_updatable |
-| KW_IN (구문 오류) | 1 | pathfinding_viz |
+### OpenAI 비결정적 변동 범위
+| 실행 | Pass Rate | 구조적 실패 | 비결정적 실패 |
+|------|-----------|-----------|-------------|
+| v0.1 | 66% (25/38) | 13건 | — |
+| v0.2 프롬프트 개선 | 71% (27/38) | 11건 | — |
+| v0.3 `:` 메서드 제거 | 87% (33/38) | 5건 | 0건 |
+| v0.2 런타임 추가 후 | 82% (31/38) | 5건 | 2건 |
 
 ## Detailed Results
 
@@ -50,416 +44,416 @@
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 63 | 1708ms | - |
-| vibe | openai | YES | 63 | 2178ms | - |
-| python-pygame | gemini | YES | 101 | 2127ms | - |
-| python-pygame | openai | YES | 97 | 3850ms | - |
-| lua-love | gemini | YES | 78 | 2001ms | - |
-| lua-love | openai | YES | 74 | 3405ms | - |
+| vibe | gemini | YES | 63 | 2312ms | - |
+| vibe | openai | YES | 63 | 2970ms | - |
+| python-pygame | gemini | YES | 101 | 2668ms | - |
+| python-pygame | openai | YES | 97 | 3669ms | - |
+| lua-love | gemini | YES | 78 | 2221ms | - |
+| lua-love | openai | YES | 74 | 2921ms | - |
 
 ### Task: bouncing_ball
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 67 | 1942ms | - |
-| vibe | openai | YES | 64 | 2389ms | - |
-| python-pygame | gemini | YES | 140 | 2421ms | - |
-| python-pygame | openai | YES | 113 | 3968ms | - |
-| lua-love | gemini | YES | 95 | 1862ms | - |
-| lua-love | openai | YES | 109 | 3830ms | - |
+| vibe | gemini | YES | 67 | 1816ms | - |
+| vibe | openai | YES | 64 | 2432ms | - |
+| python-pygame | gemini | YES | 136 | 2570ms | - |
+| python-pygame | openai | YES | 113 | 3185ms | - |
+| lua-love | gemini | YES | 95 | 2147ms | - |
+| lua-love | openai | YES | 81 | 1666ms | - |
 
 ### Task: score_counter
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 28 | 1535ms | - |
-| vibe | openai | YES | 25 | 1496ms | - |
-| python-pygame | gemini | YES | 99 | 2260ms | - |
-| python-pygame | openai | YES | 70 | 3457ms | - |
-| lua-love | gemini | YES | 48 | 1510ms | - |
-| lua-love | openai | YES | 42 | 2461ms | - |
+| vibe | gemini | YES | 28 | 2290ms | - |
+| vibe | openai | YES | 25 | 1164ms | - |
+| python-pygame | gemini | YES | 99 | 2682ms | - |
+| python-pygame | openai | YES | 70 | 2815ms | - |
+| lua-love | gemini | YES | 48 | 2072ms | - |
+| lua-love | openai | YES | 38 | 1756ms | - |
 
 ### Task: mouse_follower
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 75 | 1926ms | - |
-| vibe | openai | YES | 72 | 3618ms | - |
-| python-pygame | gemini | YES | 152 | 2468ms | - |
-| python-pygame | openai | YES | 114 | 4616ms | - |
-| lua-love | gemini | YES | 120 | 8230ms | - |
-| lua-love | openai | YES | 98 | 4631ms | - |
+| vibe | gemini | YES | 78 | 2579ms | - |
+| vibe | openai | YES | 71 | 4435ms | - |
+| python-pygame | gemini | YES | 155 | 3387ms | - |
+| python-pygame | openai | YES | 114 | 5106ms | - |
+| lua-love | gemini | YES | 117 | 2866ms | - |
+| lua-love | openai | YES | 98 | 3107ms | - |
 
 ### Task: simple_animation
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 79 | 1913ms | - |
-| vibe | openai | YES | 78 | 3446ms | - |
-| python-pygame | gemini | YES | 135 | 2215ms | - |
-| python-pygame | openai | YES | 135 | 4479ms | - |
-| lua-love | gemini | YES | 84 | 2122ms | - |
-| lua-love | openai | YES | 95 | 2854ms | - |
+| vibe | gemini | YES | 82 | 2320ms | - |
+| vibe | openai | YES | 91 | 3317ms | - |
+| python-pygame | gemini | YES | 137 | 3322ms | - |
+| python-pygame | openai | YES | 134 | 3451ms | - |
+| lua-love | gemini | YES | 85 | 2273ms | - |
+| lua-love | openai | YES | 95 | 2415ms | - |
 
 ### Task: enemy_follow
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 131 | 2573ms | - |
-| vibe | openai | YES | 146 | 4723ms | - |
-| python-pygame | gemini | YES | 174 | 3269ms | - |
-| python-pygame | openai | YES | 163 | 5648ms | - |
-| lua-love | gemini | YES | 174 | 2491ms | - |
-| lua-love | openai | YES | 158 | 4807ms | - |
+| vibe | gemini | YES | 131 | 2864ms | - |
+| vibe | openai | YES | 168 | 4342ms | - |
+| python-pygame | gemini | YES | 172 | 3429ms | - |
+| python-pygame | openai | YES | 159 | 4153ms | - |
+| lua-love | gemini | YES | 172 | 2870ms | - |
+| lua-love | openai | YES | 160 | 4586ms | - |
 
 ### Task: shooting
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 115 | 2410ms | - |
-| vibe | openai | YES | 124 | 5769ms | - |
-| python-pygame | gemini | YES | 176 | 3162ms | - |
-| python-pygame | openai | YES | 138 | 5830ms | - |
-| lua-love | gemini | YES | 143 | 2555ms | - |
-| lua-love | openai | YES | 159 | 5190ms | - |
+| vibe | gemini | YES | 117 | 2593ms | - |
+| vibe | openai | YES | 130 | 3749ms | - |
+| python-pygame | gemini | YES | 180 | 3387ms | - |
+| python-pygame | openai | YES | 155 | 4855ms | - |
+| lua-love | gemini | YES | 143 | 3122ms | - |
+| lua-love | openai | YES | 149 | 3266ms | - |
 
 ### Task: circle_collision
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 124 | 2795ms | - |
-| vibe | openai | YES | 136 | 6633ms | - |
-| python-pygame | gemini | YES | 186 | 3101ms | - |
-| python-pygame | openai | YES | 164 | 5907ms | - |
-| lua-love | gemini | YES | 200 | 2520ms | - |
-| lua-love | openai | YES | 207 | 5487ms | - |
+| vibe | gemini | YES | 114 | 3403ms | - |
+| vibe | openai | YES | 143 | 12254ms | - |
+| python-pygame | gemini | YES | 186 | 3898ms | - |
+| python-pygame | openai | YES | 164 | 6241ms | - |
+| lua-love | gemini | YES | 200 | 3635ms | - |
+| lua-love | openai | YES | 207 | 5708ms | - |
 
 ### Task: gravity_jump
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 147 | 2389ms | - |
-| vibe | openai | YES | 127 | 4945ms | - |
-| python-pygame | gemini | YES | 161 | 2891ms | - |
-| python-pygame | openai | YES | 140 | 5658ms | - |
-| lua-love | gemini | YES | 152 | 2922ms | - |
-| lua-love | openai | YES | 114 | 2964ms | - |
+| vibe | gemini | YES | 152 | 3146ms | - |
+| vibe | openai | YES | 113 | 3078ms | - |
+| python-pygame | gemini | YES | 171 | 3962ms | - |
+| python-pygame | openai | YES | 148 | 5284ms | - |
+| lua-love | gemini | YES | 152 | 3264ms | - |
+| lua-love | openai | YES | 114 | 3392ms | - |
 
 ### Task: countdown_timer
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 46 | 1470ms | - |
-| vibe | openai | YES | 41 | 2937ms | - |
-| python-pygame | gemini | YES | 94 | 2069ms | - |
-| python-pygame | openai | YES | 84 | 3860ms | - |
-| lua-love | gemini | YES | 79 | 1991ms | - |
-| lua-love | openai | YES | 71 | 2799ms | - |
+| vibe | gemini | YES | 46 | 2092ms | - |
+| vibe | openai | YES | 41 | 1893ms | - |
+| python-pygame | gemini | YES | 83 | 2332ms | - |
+| python-pygame | openai | YES | 84 | 4540ms | - |
+| lua-love | gemini | YES | 79 | 2497ms | - |
+| lua-love | openai | YES | 75 | 2949ms | - |
 
 ### Task: health_bar
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 122 | 2102ms | - |
-| vibe | openai | YES | 128 | 4999ms | - |
-| python-pygame | gemini | YES | 193 | 2765ms | - |
-| python-pygame | openai | YES | 164 | 4595ms | - |
-| lua-love | gemini | YES | 155 | 2389ms | - |
-| lua-love | openai | YES | 160 | 5128ms | - |
+| vibe | gemini | YES | 116 | 3130ms | - |
+| vibe | openai | YES | 157 | 6496ms | - |
+| python-pygame | gemini | YES | 191 | 4028ms | - |
+| python-pygame | openai | YES | 179 | 10795ms | - |
+| lua-love | gemini | YES | 150 | 3428ms | - |
+| lua-love | openai | YES | 154 | 5140ms | - |
 
 ### Task: waypoint_patrol
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 152 | 2291ms | - |
-| vibe | openai | NO | 103 | 13680ms | expected NEWLINE, got COMMA (",") |
-| python-pygame | gemini | YES | 171 | 2311ms | - |
-| python-pygame | openai | YES | 176 | 6621ms | - |
-| lua-love | gemini | YES | 184 | 2743ms | - |
-| lua-love | openai | YES | 169 | 5405ms | - |
+| vibe | gemini | YES | 153 | 4807ms | - |
+| vibe | openai | NO | 112 | 19565ms | expected NEWLINE, got COMMA (",") |
+| python-pygame | gemini | YES | 172 | 4186ms | - |
+| python-pygame | openai | YES | 165 | 6748ms | - |
+| lua-love | gemini | YES | 184 | 3026ms | - |
+| lua-love | openai | YES | 171 | 5245ms | - |
 
 ### Task: asteroid_field
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 170 | 3194ms | - |
-| vibe | openai | YES | 228 | 33709ms | - |
-| python-pygame | gemini | YES | 218 | 3447ms | - |
-| python-pygame | openai | YES | 225 | 7334ms | - |
-| lua-love | gemini | YES | 240 | 2916ms | - |
-| lua-love | openai | YES | 272 | 7171ms | - |
+| vibe | gemini | YES | 174 | 3494ms | - |
+| vibe | openai | YES | 249 | 14959ms | - |
+| python-pygame | gemini | YES | 212 | 4328ms | - |
+| python-pygame | openai | YES | 193 | 6781ms | - |
+| lua-love | gemini | YES | 242 | 4154ms | - |
+| lua-love | openai | YES | 270 | 8799ms | - |
 
 ### Task: grid_highlight
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 157 | 2881ms | - |
-| vibe | openai | YES | 154 | 4912ms | - |
-| python-pygame | gemini | YES | 178 | 3184ms | - |
-| python-pygame | openai | YES | 187 | 7331ms | - |
-| lua-love | gemini | YES | 193 | 2831ms | - |
-| lua-love | openai | YES | 187 | 6955ms | - |
+| vibe | gemini | YES | 133 | 2802ms | - |
+| vibe | openai | YES | 153 | 4580ms | - |
+| python-pygame | gemini | YES | 197 | 3721ms | - |
+| python-pygame | openai | YES | 185 | 7095ms | - |
+| lua-love | gemini | YES | 193 | 3558ms | - |
+| lua-love | openai | YES | 187 | 4600ms | - |
 
 ### Task: state_machine_game
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 160 | 2531ms | - |
-| vibe | openai | YES | 178 | 6791ms | - |
-| python-pygame | gemini | YES | 214 | 3844ms | - |
-| python-pygame | openai | YES | 246 | 8836ms | - |
-| lua-love | gemini | YES | 199 | 2781ms | - |
-| lua-love | openai | YES | 215 | 5347ms | - |
+| vibe | gemini | YES | 160 | 3755ms | - |
+| vibe | openai | YES | 157 | 4753ms | - |
+| python-pygame | gemini | YES | 216 | 4420ms | - |
+| python-pygame | openai | YES | 243 | 7385ms | - |
+| lua-love | gemini | YES | 199 | 3785ms | - |
+| lua-love | openai | YES | 213 | 9627ms | - |
 
 ### Task: snake_movement
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 190 | 3355ms | - |
-| vibe | openai | YES | 166 | 6788ms | - |
-| python-pygame | gemini | YES | 197 | 3419ms | - |
-| python-pygame | openai | YES | 188 | 5536ms | - |
-| lua-love | gemini | YES | 190 | 2537ms | - |
-| lua-love | openai | YES | 222 | 7177ms | - |
+| vibe | gemini | YES | 190 | 2655ms | - |
+| vibe | openai | YES | 166 | 4867ms | - |
+| python-pygame | gemini | YES | 226 | 3584ms | - |
+| python-pygame | openai | YES | 198 | 6069ms | - |
+| lua-love | gemini | YES | 190 | 3187ms | - |
+| lua-love | openai | YES | 214 | 10706ms | - |
 
 ### Task: breakout_game
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 212 | 3030ms | - |
-| vibe | openai | YES | 322 | 12963ms | - |
-| python-pygame | gemini | YES | 233 | 3096ms | - |
-| python-pygame | openai | YES | 223 | 10529ms | - |
-| lua-love | gemini | YES | 271 | 3202ms | - |
-| lua-love | openai | YES | 337 | 8180ms | - |
+| vibe | gemini | YES | 210 | 4443ms | - |
+| vibe | openai | YES | 332 | 10718ms | - |
+| python-pygame | gemini | YES | 233 | 3951ms | - |
+| python-pygame | openai | YES | 225 | 6673ms | - |
+| lua-love | gemini | YES | 271 | 4621ms | - |
+| lua-love | openai | YES | 334 | 9370ms | - |
 
 ### Task: space_invaders
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 272 | 4610ms | - |
-| vibe | openai | YES | 335 | 9784ms | - |
-| python-pygame | gemini | YES | 284 | 4158ms | - |
-| python-pygame | openai | YES | 253 | 7609ms | - |
-| lua-love | gemini | YES | 339 | 1930ms | - |
-| lua-love | openai | YES | 415 | 9922ms | - |
+| vibe | gemini | YES | 272 | 3182ms | - |
+| vibe | openai | YES | 293 | 9397ms | - |
+| python-pygame | gemini | YES | 277 | 4517ms | - |
+| python-pygame | openai | YES | 297 | 8833ms | - |
+| lua-love | gemini | YES | 352 | 4734ms | - |
+| lua-love | openai | YES | 359 | 10941ms | - |
 
 ### Task: cellular_automata
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 290 | 3606ms | - |
-| vibe | openai | YES | 240 | 7164ms | - |
-| python-pygame | gemini | YES | 268 | 3230ms | - |
-| python-pygame | openai | YES | 279 | 7205ms | - |
-| lua-love | gemini | YES | 321 | 4849ms | - |
-| lua-love | openai | YES | 310 | 10950ms | - |
+| vibe | gemini | YES | 269 | 4301ms | - |
+| vibe | openai | YES | 252 | 8396ms | - |
+| python-pygame | gemini | YES | 272 | 4208ms | - |
+| python-pygame | openai | YES | 259 | 7484ms | - |
+| lua-love | gemini | YES | 318 | 4126ms | - |
+| lua-love | openai | YES | 321 | 10245ms | - |
 
 ### Task: tower_defense_path
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 336 | 5113ms | - |
-| vibe | openai | NO | 341 | 37455ms | expected NEWLINE, got COMMA (",") |
-| python-pygame | gemini | YES | 338 | 3878ms | - |
-| python-pygame | openai | YES | 476 | 13421ms | - |
-| lua-love | gemini | YES | 432 | 4653ms | - |
-| lua-love | openai | YES | 429 | 10787ms | - |
+| vibe | gemini | YES | 316 | 5742ms | - |
+| vibe | openai | NO | 333 | 29572ms | expected NEWLINE, got COMMA (",") |
+| python-pygame | gemini | YES | 329 | 5438ms | - |
+| python-pygame | openai | YES | 445 | 11825ms | - |
+| lua-love | gemini | YES | 444 | 5907ms | - |
+| lua-love | openai | YES | 485 | 17197ms | - |
 
 ### Task: bullet_hell_pattern
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 183 | 3121ms | - |
-| vibe | openai | YES | 190 | 13766ms | - |
-| python-pygame | gemini | YES | 268 | 3781ms | - |
-| python-pygame | openai | YES | 248 | 7212ms | - |
-| lua-love | gemini | YES | 288 | 2821ms | - |
-| lua-love | openai | YES | 295 | 8795ms | - |
+| vibe | gemini | YES | 173 | 3578ms | - |
+| vibe | openai | YES | 245 | 14472ms | - |
+| python-pygame | gemini | YES | 264 | 4788ms | - |
+| python-pygame | openai | YES | 234 | 6586ms | - |
+| lua-love | gemini | YES | 290 | 4059ms | - |
+| lua-love | openai | YES | 291 | 11571ms | - |
 
 ### Task: pathfinding_viz
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 468 | 11926ms | - |
-| vibe | openai | NO | 447 | 47674ms | expected NEWLINE, got KW_IN ("in") |
-| python-pygame | gemini | YES | 365 | 4557ms | - |
-| python-pygame | openai | YES | 383 | 12003ms | - |
-| lua-love | gemini | YES | 402 | 4678ms | - |
-| lua-love | openai | YES | 502 | 18023ms | - |
+| vibe | gemini | YES | 446 | 6035ms | - |
+| vibe | openai | NO | 457 | 35847ms | unexpected token KW_IF ("if") |
+| python-pygame | gemini | YES | 365 | 4719ms | - |
+| python-pygame | openai | YES | 400 | 10401ms | - |
+| lua-love | gemini | YES | 411 | 4799ms | - |
+| lua-love | openai | YES | 481 | 12692ms | - |
 
 ### Task: debug_hud
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 160 | 2889ms | - |
-| vibe | openai | YES | 151 | 5953ms | - |
-| python-pygame | gemini | YES | 183 | 3280ms | - |
-| python-pygame | openai | YES | 165 | 5154ms | - |
-| lua-love | gemini | YES | 202 | 2986ms | - |
-| lua-love | openai | YES | 157 | 6096ms | - |
+| vibe | gemini | YES | 165 | 3470ms | - |
+| vibe | openai | YES | 152 | 4612ms | - |
+| python-pygame | gemini | YES | 180 | 3498ms | - |
+| python-pygame | openai | YES | 164 | 4520ms | - |
+| lua-love | gemini | YES | 189 | 2165ms | - |
+| lua-love | openai | YES | 157 | 4297ms | - |
 
 ### Task: game_state_manager
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 194 | 3486ms | - |
-| vibe | openai | YES | 233 | 7755ms | - |
-| python-pygame | gemini | YES | 228 | 3655ms | - |
-| python-pygame | openai | YES | 303 | 12350ms | - |
-| lua-love | gemini | YES | 248 | 4066ms | - |
-| lua-love | openai | YES | 269 | 9304ms | - |
+| vibe | gemini | YES | 183 | 3788ms | - |
+| vibe | openai | YES | 238 | 7991ms | - |
+| python-pygame | gemini | YES | 225 | 3755ms | - |
+| python-pygame | openai | YES | 293 | 8584ms | - |
+| lua-love | gemini | YES | 232 | 3568ms | - |
+| lua-love | openai | YES | 271 | 6544ms | - |
 
 ### Task: combat_system
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 140 | 2984ms | - |
-| vibe | openai | YES | 105 | 6942ms | - |
-| python-pygame | gemini | YES | 261 | 4823ms | - |
-| python-pygame | openai | YES | 230 | 7521ms | - |
-| lua-love | gemini | YES | 150 | 2500ms | - |
-| lua-love | openai | YES | 178 | 6974ms | - |
+| vibe | gemini | YES | 161 | 3668ms | - |
+| vibe | openai | YES | 102 | 4017ms | - |
+| python-pygame | gemini | YES | 220 | 3995ms | - |
+| python-pygame | openai | YES | 243 | 6525ms | - |
+| lua-love | gemini | YES | 182 | 4244ms | - |
+| lua-love | openai | YES | 174 | 4414ms | - |
 
 ### Task: enemy_wave_loop
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 243 | 3317ms | - |
-| vibe | openai | YES | 332 | 15687ms | - |
-| python-pygame | gemini | YES | 318 | 4970ms | - |
-| python-pygame | openai | YES | 262 | 10062ms | - |
-| lua-love | gemini | YES | 400 | 4204ms | - |
-| lua-love | openai | YES | 396 | 13854ms | - |
+| vibe | gemini | YES | 241 | 4535ms | - |
+| vibe | openai | YES | 330 | 8683ms | - |
+| python-pygame | gemini | YES | 356 | 5838ms | - |
+| python-pygame | openai | YES | 250 | 8571ms | - |
+| lua-love | gemini | YES | 342 | 4775ms | - |
+| lua-love | openai | YES | 359 | 10027ms | - |
 
 ### Task: tic_tac_toe
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 298 | 4401ms | - |
-| vibe | openai | YES | 315 | 24581ms | - |
-| python-pygame | gemini | YES | 278 | 4027ms | - |
-| python-pygame | openai | YES | 361 | 9624ms | - |
-| lua-love | gemini | YES | 344 | 4343ms | - |
-| lua-love | openai | YES | 344 | 11554ms | - |
+| vibe | gemini | YES | 303 | 5221ms | - |
+| vibe | openai | YES | 331 | 13054ms | - |
+| python-pygame | gemini | YES | 342 | 4757ms | - |
+| python-pygame | openai | YES | 355 | 10529ms | - |
+| lua-love | gemini | YES | 309 | 4037ms | - |
+| lua-love | openai | YES | 359 | 8509ms | - |
 
 ### Task: rpg_battle
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 229 | 4051ms | - |
-| vibe | openai | YES | 268 | 8651ms | - |
-| python-pygame | gemini | YES | 251 | 4224ms | - |
-| python-pygame | openai | YES | 247 | 7623ms | - |
-| lua-love | gemini | YES | 290 | 3883ms | - |
-| lua-love | openai | YES | 249 | 7514ms | - |
+| vibe | gemini | YES | 247 | 5408ms | - |
+| vibe | openai | YES | 227 | 12833ms | - |
+| python-pygame | gemini | YES | 277 | 4780ms | - |
+| python-pygame | openai | YES | 232 | 6866ms | - |
+| lua-love | gemini | YES | 290 | 4263ms | - |
+| lua-love | openai | YES | 240 | 8797ms | - |
 
 ### Task: particle_emitter_system
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 147 | 3172ms | - |
-| vibe | openai | YES | 175 | 7664ms | - |
-| python-pygame | gemini | YES | 190 | 3594ms | - |
-| python-pygame | openai | YES | 202 | 5182ms | - |
-| lua-love | gemini | YES | 195 | 2880ms | - |
-| lua-love | openai | YES | 196 | 5819ms | - |
+| vibe | gemini | YES | 144 | 3237ms | - |
+| vibe | openai | YES | 183 | 6389ms | - |
+| python-pygame | gemini | YES | 194 | 3502ms | - |
+| python-pygame | openai | YES | 202 | 5779ms | - |
+| lua-love | gemini | YES | 207 | 3748ms | - |
+| lua-love | openai | YES | 205 | 4890ms | - |
 
 ### Task: highscore_table
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 213 | 3237ms | - |
-| vibe | openai | YES | 169 | 25942ms | - |
-| python-pygame | gemini | YES | 206 | 3993ms | - |
-| python-pygame | openai | YES | 260 | 8373ms | - |
-| lua-love | gemini | YES | 215 | 3625ms | - |
-| lua-love | openai | YES | 219 | 8145ms | - |
+| vibe | gemini | YES | 237 | 5158ms | - |
+| vibe | openai | NO | 184 | 17108ms | expected RBRACKET, got COLON (":") |
+| python-pygame | gemini | YES | 206 | 4400ms | - |
+| python-pygame | openai | YES | 239 | 6224ms | - |
+| lua-love | gemini | YES | 219 | 3853ms | - |
+| lua-love | openai | YES | 215 | 6138ms | - |
 
 ### Task: struct_basic
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 50 | 1809ms | - |
-| vibe | openai | YES | 51 | 3278ms | - |
-| python-pygame | gemini | YES | 159 | 2960ms | - |
-| python-pygame | openai | YES | 118 | 5018ms | - |
-| lua-love | gemini | YES | 99 | 4414ms | - |
-| lua-love | openai | YES | 111 | 4086ms | - |
+| vibe | gemini | YES | 50 | 2349ms | - |
+| vibe | openai | NO | 62 | 7280ms | unexpected token DEDENT ("") |
+| python-pygame | gemini | YES | 159 | 3150ms | - |
+| python-pygame | openai | YES | 123 | 2968ms | - |
+| lua-love | gemini | YES | 99 | 2572ms | - |
+| lua-love | openai | YES | 109 | 2502ms | - |
 
 ### Task: struct_methods
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 134 | 5506ms | - |
-| vibe | openai | YES | 140 | 6099ms | - |
-| python-pygame | gemini | YES | 216 | 5574ms | - |
-| python-pygame | openai | YES | 156 | 6026ms | - |
-| lua-love | gemini | YES | 156 | 4499ms | - |
-| lua-love | openai | YES | 135 | 5724ms | - |
+| vibe | gemini | YES | 123 | 5587ms | - |
+| vibe | openai | YES | 127 | 3325ms | - |
+| python-pygame | gemini | YES | 215 | 3995ms | - |
+| python-pygame | openai | YES | 156 | 4786ms | - |
+| lua-love | gemini | YES | 156 | 3958ms | - |
+| lua-love | openai | YES | 137 | 3787ms | - |
 
 ### Task: enum_state_machine
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 80 | 2388ms | - |
-| vibe | openai | YES | 68 | 5827ms | - |
-| python-pygame | gemini | YES | 164 | 2731ms | - |
-| python-pygame | openai | YES | 164 | 6911ms | - |
-| lua-love | gemini | YES | 129 | 2318ms | - |
-| lua-love | openai | YES | 117 | 3876ms | - |
+| vibe | gemini | YES | 77 | 2656ms | - |
+| vibe | openai | YES | 78 | 2924ms | - |
+| python-pygame | gemini | YES | 164 | 2190ms | - |
+| python-pygame | openai | YES | 176 | 5307ms | - |
+| lua-love | gemini | YES | 129 | 2625ms | - |
+| lua-love | openai | YES | 116 | 4707ms | - |
 
 ### Task: enum_with_data
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 133 | 2674ms | - |
-| vibe | openai | NO | 169 | 21499ms | expected NEWLINE, got LPAREN ("(") |
-| python-pygame | gemini | YES | 218 | 3618ms | - |
-| python-pygame | openai | YES | 230 | 7333ms | - |
-| lua-love | gemini | YES | 199 | 4473ms | - |
-| lua-love | openai | YES | 242 | 19480ms | - |
+| vibe | gemini | YES | 137 | 3381ms | - |
+| vibe | openai | NO | 171 | 16188ms | expected NEWLINE, got LPAREN ("(") |
+| python-pygame | gemini | YES | 215 | 4271ms | - |
+| python-pygame | openai | YES | 219 | 8138ms | - |
+| lua-love | gemini | YES | 199 | 4389ms | - |
+| lua-love | openai | YES | 210 | 6256ms | - |
 
 ### Task: struct_composition
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 115 | 2930ms | - |
-| vibe | openai | YES | 132 | 10968ms | - |
-| python-pygame | gemini | YES | 217 | 3491ms | - |
-| python-pygame | openai | YES | 169 | 6512ms | - |
-| lua-love | gemini | YES | 194 | 2903ms | - |
-| lua-love | openai | YES | 185 | 7649ms | - |
+| vibe | gemini | YES | 115 | 3059ms | - |
+| vibe | openai | YES | 117 | 3343ms | - |
+| python-pygame | gemini | YES | 210 | 4127ms | - |
+| python-pygame | openai | YES | 158 | 5046ms | - |
+| lua-love | gemini | YES | 177 | 3327ms | - |
+| lua-love | openai | YES | 202 | 5023ms | - |
 
 ### Task: trait_drawable
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 112 | 2707ms | - |
-| vibe | openai | YES | 124 | 5368ms | - |
-| python-pygame | gemini | YES | 174 | 3326ms | - |
-| python-pygame | openai | YES | 168 | 7003ms | - |
-| lua-love | gemini | YES | 145 | 3512ms | - |
-| lua-love | openai | YES | 185 | 8246ms | - |
+| vibe | gemini | YES | 116 | 2953ms | - |
+| vibe | openai | YES | 106 | 3201ms | - |
+| python-pygame | gemini | YES | 180 | 3472ms | - |
+| python-pygame | openai | YES | 169 | 4658ms | - |
+| lua-love | gemini | YES | 165 | 3575ms | - |
+| lua-love | openai | YES | 188 | 5102ms | - |
 
 ### Task: trait_updatable
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 157 | 7106ms | - |
-| vibe | openai | NO | 200 | 31548ms | expected IDENT, got LPAREN ("(") |
-| python-pygame | gemini | YES | 259 | 3996ms | - |
-| python-pygame | openai | YES | 234 | 10429ms | - |
-| lua-love | gemini | YES | 219 | 3436ms | - |
-| lua-love | openai | YES | 239 | 9622ms | - |
+| vibe | gemini | YES | 163 | 7549ms | - |
+| vibe | openai | NO | 236 | 21538ms | expected IDENT, got LPAREN ("(") |
+| python-pygame | gemini | YES | 251 | 4514ms | - |
+| python-pygame | openai | YES | 261 | 6642ms | - |
+| lua-love | gemini | YES | 219 | 4150ms | - |
+| lua-love | openai | YES | 239 | 5825ms | - |
 
 ### Task: struct_list_management
 
 | Language | LLM | Pass | Tokens | Latency | Errors |
 |----------|-----|------|--------|---------|--------|
-| vibe | gemini | YES | 108 | 2661ms | - |
-| vibe | openai | YES | 130 | 9431ms | - |
-| python-pygame | gemini | YES | 162 | 3185ms | - |
-| python-pygame | openai | YES | 204 | 6528ms | - |
-| lua-love | gemini | YES | 127 | 3091ms | - |
-| lua-love | openai | YES | 163 | 4300ms | - |
+| vibe | gemini | YES | 97 | 2717ms | - |
+| vibe | openai | YES | 142 | 4253ms | - |
+| python-pygame | gemini | YES | 162 | 4270ms | - |
+| python-pygame | openai | YES | 184 | 5727ms | - |
+| lua-love | gemini | YES | 127 | 2422ms | - |
+| lua-love | openai | YES | 167 | 3565ms | - |
