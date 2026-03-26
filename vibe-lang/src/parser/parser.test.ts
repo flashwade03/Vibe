@@ -37,6 +37,7 @@ import type {
   EnumDecl,
   TraitDecl,
   TraitImplDecl,
+  Annotation,
 } from "./ast.js";
 
 function p(source: string): Program {
@@ -749,5 +750,41 @@ fn draw()
     const enumDecl = prog2.body[0] as EnumDecl;
     expect(enumDecl.kind).toBe("EnumDecl");
     expect(enumDecl.variants).toHaveLength(2);
+  });
+
+  // ── @on annotation on FnDecl ──────────────────────────────
+
+  it("@on annotation attached to FnDecl", () => {
+    const prog = p('@on("update")\nfn player_update(p: Player, dt: Float)\n  return p');
+    expect(prog.body).toHaveLength(1);
+    const fn = prog.body[0] as FnDecl;
+    expect(fn.kind).toBe("FnDecl");
+    expect(fn.name).toBe("player_update");
+    expect(fn.annotations).toHaveLength(1);
+    expect(fn.annotations[0].name).toBe("on");
+    expect(fn.annotations[0].args).toHaveLength(1);
+    expect((fn.annotations[0].args[0] as StringLiteral).value).toBe("update");
+  });
+
+  it("@on annotation with draw event", () => {
+    const prog = p('@on("draw")\nfn draw_hud()\n  return 0');
+    const fn = prog.body[0] as FnDecl;
+    expect(fn.kind).toBe("FnDecl");
+    expect(fn.name).toBe("draw_hud");
+    expect(fn.annotations).toHaveLength(1);
+    expect(fn.annotations[0].name).toBe("on");
+    expect((fn.annotations[0].args[0] as StringLiteral).value).toBe("draw");
+  });
+
+  it("@on annotation stacking — multiple annotations on one fn", () => {
+    const prog = p('@on("key_pressed")\n@on("key_released")\nfn handler()\n  return 0');
+    const fn = prog.body[0] as FnDecl;
+    expect(fn.kind).toBe("FnDecl");
+    expect(fn.name).toBe("handler");
+    expect(fn.annotations).toHaveLength(2);
+    expect(fn.annotations[0].name).toBe("on");
+    expect((fn.annotations[0].args[0] as StringLiteral).value).toBe("key_pressed");
+    expect(fn.annotations[1].name).toBe("on");
+    expect((fn.annotations[1].args[0] as StringLiteral).value).toBe("key_released");
   });
 });

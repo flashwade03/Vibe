@@ -32,6 +32,7 @@ export interface FnDecl {
   name: string;
   params: Param[];
   body: Stmt[];
+  annotations: Annotation[];
   loc: Loc;
 }
 

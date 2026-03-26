@@ -103,3 +103,211 @@ function collides_point_circle(px, py, cx, cy, cr)
   local dy = py - cy
   return (dx * dx + dy * dy) <= cr * cr
 end
+
+-- ══════════════════════════════════════════════════════════════
+-- v0.2 Game Annotation Runtime
+-- Entity storage, scene management, event dispatch, LOVE callbacks
+-- ══════════════════════════════════════════════════════════════
+
+-- ── Entity Storage ────────────────────────────────────────────
+_vibe_entities = {}
+_vibe_next_id = 1
+_vibe_destroy_queue = {}
+
+-- ── Scene Manager ─────────────────────────────────────────────
+_vibe_current_scene = nil
+_vibe_scene_defaults = {}   -- codegen sets: { SceneName = fn(params) → scene }
+_vibe_handlers = {}          -- codegen sets: { event_name = { {entity_type, scene_type, handler}, ... } }
+_vibe_entity_defaults = {}   -- codegen sets: { TypeName = fn() → entity }
+_vibe_first_scene = nil      -- codegen sets: "SceneName" or nil
+
+-- ── Built-in Functions (5) ────────────────────────────────────
+
+function spawn(type_name, overrides)
+  local factory = _vibe_entity_defaults[type_name]
+  if not factory then
+    error("spawn: unknown entity type '" .. tostring(type_name) .. "'")
+  end
+  local entity = factory()
+  entity._type = type_name
+  entity._id = _vibe_next_id
+  entity._destroyed = false
+  _vibe_next_id = _vibe_next_id + 1
+  if overrides then
+    for k, v in pairs(overrides) do
+      entity[k] = v
+    end
+  end
+  table.insert(_vibe_entities, entity)
+  _vibe_dispatch("enter", entity)
+  return entity
+end
+
+function destroy(entity)
+  if entity._destroyed then return end
+  entity._destroyed = true
+  table.insert(_vibe_destroy_queue, entity)
+end
+
+function find_all(type_name)
+  local result = {}
+  for _, entity in ipairs(_vibe_entities) do
+    if entity._type == type_name and not entity._destroyed then
+      table.insert(result, entity)
+    end
+  end
+  return result
+end
+
+function go_to(scene_name, params)
+  -- Exit current scene
+  if _vibe_current_scene then
+    _vibe_dispatch_scene("exit", _vibe_current_scene)
+    -- Destroy all entities
+    for _, entity in ipairs(_vibe_entities) do
+      entity._destroyed = true
+    end
+    _vibe_entities = {}
+    _vibe_destroy_queue = {}
+  end
+  -- Create new scene
+  local factory = _vibe_scene_defaults[scene_name]
+  if not factory then
+    error("go_to: unknown scene '" .. tostring(scene_name) .. "'")
+  end
+  local scene = factory(params)
+  scene._type = scene_name
+  _vibe_current_scene = scene
+  _vibe_dispatch_scene("enter", _vibe_current_scene)
+end
+
+function emit(entity, signal_name, ...)
+  local handlers = _vibe_handlers[signal_name]
+  if not handlers then return end
+  for _, h in ipairs(handlers) do
+    if h.entity_type and entity._type == h.entity_type then
+      h.handler(entity, ...)
+    elseif not h.entity_type and not h.scene_type then
+      h.handler(entity, ...)
+    end
+  end
+end
+
+-- ── Event Dispatch Functions ──────────────────────────────────
+
+function _vibe_dispatch(event_name, ...)
+  local handlers = _vibe_handlers[event_name]
+  if not handlers then return end
+  for _, h in ipairs(handlers) do
+    if h.entity_type then
+      -- Per-entity handler: iterate matching entities
+      for _, entity in ipairs(_vibe_entities) do
+        if entity._type == h.entity_type and not entity._destroyed then
+          h.handler(entity, ...)
+        end
+      end
+    elseif h.scene_type then
+      -- Per-scene handler: check current scene type
+      if _vibe_current_scene and _vibe_current_scene._type == h.scene_type then
+        h.handler(_vibe_current_scene, ...)
+      end
+    else
+      -- Global handler: call directly
+      h.handler(...)
+    end
+  end
+end
+
+function _vibe_dispatch_scene(event_name, scene)
+  local handlers = _vibe_handlers[event_name]
+  if not handlers then return end
+  for _, h in ipairs(handlers) do
+    if h.scene_type and scene._type == h.scene_type then
+      h.handler(scene)
+    elseif not h.entity_type and not h.scene_type then
+      h.handler(scene)
+    end
+  end
+end
+
+function _vibe_dispatch_input(event_name, ...)
+  local handlers = _vibe_handlers[event_name]
+  if not handlers then return end
+  for _, h in ipairs(handlers) do
+    if h.entity_type then
+      for _, entity in ipairs(_vibe_entities) do
+        if entity._type == h.entity_type and not entity._destroyed then
+          h.handler(entity, ...)
+        end
+      end
+    elseif h.scene_type then
+      if _vibe_current_scene and _vibe_current_scene._type == h.scene_type then
+        h.handler(_vibe_current_scene, ...)
+      end
+    else
+      h.handler(...)
+    end
+  end
+end
+
+function _vibe_dispatch_mouse(event_name, x, y, button)
+  local handlers = _vibe_handlers[event_name]
+  if not handlers then return end
+  for _, h in ipairs(handlers) do
+    if h.entity_type then
+      for _, entity in ipairs(_vibe_entities) do
+        if entity._type == h.entity_type and not entity._destroyed then
+          h.handler(entity, x, y, button)
+        end
+      end
+    elseif h.scene_type then
+      if _vibe_current_scene and _vibe_current_scene._type == h.scene_type then
+        h.handler(_vibe_current_scene, x, y, button)
+      end
+    else
+      h.handler(x, y, button)
+    end
+  end
+end
+
+function _vibe_process_destroy_queue()
+  if #_vibe_destroy_queue == 0 then return end
+  for _, entity in ipairs(_vibe_destroy_queue) do
+    for i = #_vibe_entities, 1, -1 do
+      if _vibe_entities[i]._id == entity._id then
+        table.remove(_vibe_entities, i)
+        break
+      end
+    end
+  end
+  _vibe_destroy_queue = {}
+end
+
+-- ── LOVE Callbacks (owned by runtime in game mode) ────────────
+
+function love.load()
+  if _vibe_first_scene then
+    go_to(_vibe_first_scene)
+  end
+end
+
+function love.update(dt)
+  _vibe_dispatch("update", dt)
+  _vibe_process_destroy_queue()
+end
+
+function love.draw()
+  _vibe_dispatch("draw")
+end
+
+function love.keypressed(key)
+  _vibe_dispatch_input("key_pressed", key)
+end
+
+function love.keyreleased(key)
+  _vibe_dispatch_input("key_released", key)
+end
+
+function love.mousepressed(x, y, button)
+  _vibe_dispatch_mouse("mouse_pressed", x, y, button)
+end

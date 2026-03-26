@@ -118,6 +118,7 @@ describe("codegen", () => {
           loc,
         },
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -132,6 +133,7 @@ describe("codegen", () => {
       name: "update",
       params: [mkParam("dt")],
       body: [],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function love.update(dt)\nend");
@@ -144,6 +146,7 @@ describe("codegen", () => {
       name: "draw",
       params: [],
       body: [],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function love.draw()\nend");
@@ -163,6 +166,7 @@ describe("codegen", () => {
           loc,
         } as IfStmt,
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -184,6 +188,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [ifStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -212,6 +217,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [ifStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -234,6 +240,7 @@ describe("codegen", () => {
           loc,
         } as Assignment,
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  x = 5\nend");
@@ -247,6 +254,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(expr)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  a ~= b\nend");
@@ -260,6 +268,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(call)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -275,6 +284,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(call)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -290,6 +300,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(call)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -305,6 +316,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(call)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -329,6 +341,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [forStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -353,6 +366,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [forStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -376,6 +390,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [forStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -464,6 +479,7 @@ describe("codegen", () => {
               loc,
             } as IfStmt,
           ],
+          annotations: [],
           loc,
         },
         {
@@ -475,6 +491,7 @@ describe("codegen", () => {
               mkCall("draw_rect", [mkId("x"), mkInt(200), mkInt(40), mkInt(40)])
             ),
           ],
+          annotations: [],
           loc,
         },
       ],
@@ -509,6 +526,7 @@ describe("codegen", () => {
       name: "keypressed",
       params: [mkParam("key")],
       body: [],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function love.keypressed(key)\nend");
@@ -521,6 +539,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("str", [mkId("x")]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  tostring(x)\nend");
@@ -533,6 +552,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("int", [mkId("timer")]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  math.floor(timer)\nend");
@@ -545,6 +565,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("sqrt", [mkId("x")]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  math.sqrt(x)\nend");
@@ -564,6 +585,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(expr)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe('function test()\n  "hello " .. "world"\nend');
@@ -583,6 +605,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(expr)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe('function test()\n  "Score: " .. tostring(score)\nend');
@@ -602,6 +625,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(expr)],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  x + speed\nend");
@@ -659,6 +683,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [matchStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -690,6 +715,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [matchStmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe(
@@ -768,6 +794,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [{ kind: "BreakStmt", loc } as Stmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  break\nend");
@@ -780,6 +807,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [{ kind: "ContinueStmt", loc } as Stmt],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  -- continue\nend");
@@ -810,6 +838,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [forStmt],
+      annotations: [],
       loc,
     });
     const result = generate(ast);
@@ -890,6 +919,7 @@ describe("codegen", () => {
           name: "move",
           params: [mkParam("dx")],
           body: [mkExprStmt(mkId("dx"))],
+          annotations: [],
           loc,
         },
       ],
@@ -966,6 +996,7 @@ describe("codegen", () => {
           name: "draw",
           params: [mkParam("p")],
           body: [mkExprStmt(mkCall("draw_rect", [mkInt(0), mkInt(0), mkInt(32), mkInt(32)]))],
+          annotations: [],
           loc,
         },
       ],
@@ -985,6 +1016,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("len", [mkId("xs")]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  #xs\nend");
@@ -1004,6 +1036,7 @@ describe("codegen", () => {
           loc,
         }),
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  xs[1]\nend");
@@ -1023,6 +1056,7 @@ describe("codegen", () => {
           loc,
         }),
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  xs[i + 1]\nend");
@@ -1042,6 +1076,7 @@ describe("codegen", () => {
           loc,
         }),
       ],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe('function test()\n  m["key"]\nend');
@@ -1065,6 +1100,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("append", [mkId("list"), mkInt(1)]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  table.insert(list, 1)\nend");
@@ -1077,6 +1113,7 @@ describe("codegen", () => {
       name: "test",
       params: [],
       body: [mkExprStmt(mkCall("set_color", [mkFloat(1.0), mkFloat(0.0), mkFloat(0.0)]))],
+      annotations: [],
       loc,
     });
     expect(generate(ast)).toBe("function test()\n  love.graphics.setColor(1.0, 0.0, 0.0)\nend");

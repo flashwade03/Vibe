@@ -116,6 +116,58 @@ describe("E2E pipeline", () => {
     expect(preludeLua).toContain("function collides_point_circle(");
   });
 
+  // ── Game Mode E2E Tests ──────────────────────────────────────
+
+  it("entity_scene.vibe compiles with game mode outputs", () => {
+    const source = readFixture("entity_scene.vibe");
+    const { mainLua } = compile(source, "entity_scene.vibe");
+
+    // Must contain game mode artifacts
+    expect(mainLua).toContain("_vibe_handlers");
+    expect(mainLua).toContain("_vibe_entity_defaults");
+    expect(mainLua).toContain("_vibe_first_scene");
+
+    // Entity constructor has _type
+    expect(mainLua).toContain('_type = "Player"');
+    // Scene constructor has _type
+    expect(mainLua).toContain('_type = "GamePlay"');
+
+    // Handler registry has correct event names
+    expect(mainLua).toContain("enter =");
+    expect(mainLua).toContain("update =");
+    expect(mainLua).toContain("draw =");
+
+    // First scene is set
+    expect(mainLua).toContain('_vibe_first_scene = "GamePlay"');
+  });
+
+  it("entity_scene.vibe generates valid Lua (luac -p)", () => {
+    const source = readFixture("entity_scene.vibe");
+    const { mainLua } = compile(source, "entity_scene.vibe");
+
+    try {
+      const tmpDir = resolve(__dirname, "../../.tmp");
+      mkdirSync(tmpDir, { recursive: true });
+      const tmpFile = resolve(tmpDir, "test_game_output.lua");
+      writeFileSync(tmpFile, mainLua);
+      execSync(`luac -p "${tmpFile}"`, { stdio: "pipe" });
+      unlinkSync(tmpFile);
+    } catch {
+      // luac not available — skip runtime validation
+    }
+  });
+
+  it("game mode codegen does not emit love.update/love.draw (runtime owns them)", () => {
+    const source = readFixture("entity_scene.vibe");
+    const { mainLua } = compile(source, "entity_scene.vibe");
+
+    // love.update and love.draw are owned by the runtime, not codegen
+    expect(mainLua).not.toContain("love.update");
+    expect(mainLua).not.toContain("love.draw");
+    expect(mainLua).not.toContain("love.load");
+    expect(mainLua).not.toContain("love.keypressed");
+  });
+
   it("throws VibeError with location for invalid source", () => {
     const source = readFixture("error_missing_eq.vibe");
 

@@ -40,6 +40,8 @@ import type {
   MapLiteral,
   MatchExpr,
 } from "../parser/ast.js";
+import { analyzeAnnotations } from "./annotation-analyzer.js";
+import { generateGameMode } from "./game-codegen.js";
 
 // ── Constants ───────────────────────────────────────────────
 
@@ -108,6 +110,26 @@ export function generate(program: Program, options?: GenerateOptions): string {
   _continueLabelStack.length = 0;
   _emitSourceMap = options?.sourceMap ?? false;
   _sourceFile = options?.sourceFile ?? "source.vibe";
+
+  // Check for game annotations — route to game mode if present
+  const metadata = analyzeAnnotations(program);
+  if (metadata.hasGameAnnotations) {
+    return generateGameMode(program, metadata, options);
+  }
+
+  return generatePlainMode(program, options);
+}
+
+/**
+ * Plain mode code generation — no game annotations.
+ * Exported for use by game-codegen.ts when emitting non-annotated declarations.
+ */
+export function generatePlainMode(program: Program, options?: GenerateOptions): string {
+  _continueCounter = 0;
+  _continueLabelStack.length = 0;
+  _emitSourceMap = options?.sourceMap ?? false;
+  _sourceFile = options?.sourceFile ?? "source.vibe";
+
   const parts: string[] = [];
 
   for (let i = 0; i < program.body.length; i++) {

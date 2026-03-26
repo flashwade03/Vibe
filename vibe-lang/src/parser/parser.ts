@@ -190,7 +190,7 @@ class Parser {
 
     switch (tok.type) {
       case TokenType.KW_FN:
-        return this.parseFnDecl();
+        return this.parseFnDecl(annotations);
       case TokenType.KW_LET:
         return this.parseLetDecl();
       case TokenType.KW_CONST:
@@ -215,7 +215,7 @@ class Parser {
 
   // ── FnDecl ──────────────────────────────────────────────
 
-  private parseFnDecl(): FnDecl {
+  private parseFnDecl(annotations: Annotation[] = []): FnDecl {
     const kwTok = this.expect(TokenType.KW_FN);
     const nameTok = this.expect(TokenType.IDENT);
     this.expect(TokenType.LPAREN);
@@ -236,6 +236,7 @@ class Parser {
       name: nameTok.value,
       params,
       body,
+      annotations,
       loc: this.loc(kwTok),
     };
   }
@@ -335,7 +336,7 @@ class Parser {
 
       while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
         if (this.at(TokenType.KW_FN)) {
-          methods.push(this.parseFnDecl());
+          methods.push(this.parseFnDecl([]));
         } else {
           fields.push(this.parseStructField());
         }
@@ -477,7 +478,7 @@ class Parser {
         this.advance();
         this.skipNewlines();
         while (!this.at(TokenType.DEDENT) && !this.at(TokenType.EOF)) {
-          methods.push(this.parseFnDecl());
+          methods.push(this.parseFnDecl([]));
           this.skipNewlines();
         }
         this.expect(TokenType.DEDENT);
@@ -545,6 +546,7 @@ class Parser {
       name: nameTok.value,
       params,
       body,
+      annotations: [],
       loc: this.loc(kwTok),
     };
   }

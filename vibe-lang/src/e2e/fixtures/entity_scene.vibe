@@ -1,0 +1,29 @@
+@component
+struct Position
+    x: Float = 0.0
+    y: Float = 0.0
+
+@entity
+struct Player
+    name: String = "Hero"
+    pos: Position
+
+@scene
+struct GamePlay
+    score: Int = 0
+
+@on("enter")
+fn setup_game(scene: GamePlay)
+    spawn("Player")
+
+@on("update")
+fn move_player(player: Player, dt: Float)
+    player.pos.x = player.pos.x + 100.0 * dt
+
+@on("draw")
+fn draw_player(player: Player)
+    draw_rect(player.pos.x, player.pos.y, 32.0, 32.0)
+
+@on("draw")
+fn draw_hud(scene: GamePlay)
+    draw_text("Score: " + str(scene.score), 10.0, 10.0)
