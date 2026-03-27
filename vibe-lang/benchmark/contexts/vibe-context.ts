@@ -289,6 +289,60 @@ fn draw()
             draw_text("Game Over! Score: " + str(score), 250.0, 280.0)
 \\\`\\\`\\\`
 
+## Game Annotations (ECS Mode)
+
+Vibe supports game annotations for entity-component-scene architecture.
+When you use @entity, @component, @scene, or @on, the engine handles the game loop automatically.
+
+### Annotations
+\`\`\`
+@component
+struct Position
+    x: Float = 0.0
+    y: Float = 0.0
+
+@entity
+struct Player
+    name: String = "Hero"
+    pos: Position
+
+@scene
+struct GamePlay
+    score: Int = 0
+\`\`\`
+
+### Event Handlers
+\`\`\`
+@on("enter")
+fn setup(scene: GamePlay)
+    spawn("Player")
+
+@on("update")
+fn move_player(player: Player, dt: Float)
+    if key_down("right")
+        player.pos.x = player.pos.x + 200.0 * dt
+
+@on("draw")
+fn draw_player(player: Player)
+    draw_rect(player.pos.x, player.pos.y, 32.0, 32.0)
+
+@on("draw")
+fn draw_hud(scene: GamePlay)
+    draw_text("Score: " + str(scene.score), 10.0, 10.0)
+
+@on("key_pressed")
+fn on_key(player: Player, key: String)
+    if key == "space"
+        player.pos.y = player.pos.y - 50.0
+\`\`\`
+
+### Annotation Rules
+- @on handler's FIRST parameter type determines the target: @entity type = per-entity, @scene type = per-scene, no params = global
+- spawn("TypeName") creates an entity instance. destroy(entity) removes it. find_all("TypeName") returns all instances
+- go_to("SceneName") transitions to a new scene (exits current, destroys entities, enters new)
+- DO NOT define fn update() or fn draw() directly when using annotations — the runtime handles it
+- Available events: "update", "draw", "enter", "exit", "key_pressed", "key_released", "mouse_pressed"
+
 ## CRITICAL: DO NOT USE
 - Do NOT use \`while\`. Use \`for condition\` instead: \`for x > 0\`
 - \`+=\`, \`-=\`, \`*=\`, \`/=\`, \`%=\` are supported. \`x += 1\` is equivalent to \`x = x + 1\`

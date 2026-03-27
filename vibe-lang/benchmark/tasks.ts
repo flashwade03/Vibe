@@ -622,4 +622,73 @@ export const tasks: Task[] = [
       "Active asteroid count displayed",
     ],
   },
+
+  // ══════════════════════════════════════════════════════════════
+  // ANNOTATION (4) — Tests @entity, @component, @scene, @on
+  // These tasks use game annotations for entity-component-scene
+  // architecture. The engine handles the game loop automatically.
+  // ══════════════════════════════════════════════════════════════
+
+  {
+    id: "annotation_entity_move",
+    name: "Annotation: Moving Entity",
+    difficulty: "easy",
+    description:
+      "Write a program using game annotations. Define a @component struct Position with x: Float = 400.0, y: Float = 300.0. Define a @entity struct Player with pos: Position. Define a @scene struct Game. Use @on(\"enter\") to spawn a Player when the Game scene starts: spawn(\"Player\"). Use @on(\"update\") with a Player parameter to move the player with arrow keys at 200 px/s using key_down. Use @on(\"draw\") with a Player parameter to draw a 32x32 rectangle at the player position. Do NOT define fn update() or fn draw() directly — the annotation system handles the game loop.",
+    expectedBehaviors: [
+      "@component struct Position defined",
+      "@entity struct Player with pos: Position",
+      "@scene struct Game defined",
+      "Player spawned on scene enter",
+      "Arrow keys move player at 200 px/s",
+      "Player drawn as 32x32 rectangle",
+    ],
+  },
+
+  {
+    id: "annotation_scene_transition",
+    name: "Annotation: Scene Transition",
+    difficulty: "medium",
+    description:
+      "Write a program using game annotations with two scenes. Define a @scene struct Menu with title: String = \"My Game\". Define a @scene struct Playing with score: Int = 0. Use @on(\"draw\") with a Menu parameter to draw the title text at (300, 250) and \"Press SPACE to start\" at (280, 300). Use @on(\"key_pressed\") with a Menu parameter to check if key == \"space\" and call go_to(\"Playing\") to transition. Use @on(\"draw\") with a Playing parameter to draw \"Score: \" + str(scene.score) at (10, 10). Use @on(\"key_pressed\") with a Playing parameter to increment score when space is pressed, and call go_to(\"Menu\") when escape is pressed. Do NOT define fn update() or fn draw() directly.",
+    expectedBehaviors: [
+      "@scene struct Menu and Playing defined",
+      "Menu shows title and start instruction",
+      "Space transitions from Menu to Playing",
+      "Playing shows score, space increments it",
+      "Escape returns to Menu via go_to",
+    ],
+  },
+
+  {
+    id: "annotation_multi_entity",
+    name: "Annotation: Multiple Entity Types",
+    difficulty: "medium",
+    description:
+      "Write a program using game annotations with multiple entity types. Define a @component struct Position with x: Float = 0.0, y: Float = 0.0. Define a @entity struct Player with pos: Position, speed: Float = 200.0. Define a @entity struct Coin with pos: Position, value: Int = 10. Define a @scene struct Game with score: Int = 0. Use @on(\"enter\") with Game parameter to spawn one Player and 5 Coins at random positions using rand_float. Use @on(\"update\") with Player parameter to move with arrow keys. Use @on(\"update\") with Coin parameter to check distance to each player from find_all(\"Player\") — if distance < 20, increment the scene score and destroy the coin. Use @on(\"draw\") with Player parameter to draw a blue 16x16 rectangle. Use @on(\"draw\") with Coin parameter to draw a yellow circle with radius 8. Use @on(\"draw\") with Game parameter to draw the score. Do NOT define fn update() or fn draw() directly.",
+    expectedBehaviors: [
+      "@entity Player and Coin defined",
+      "Player and 5 Coins spawned on scene enter",
+      "Player moves with arrow keys",
+      "Coins collected when player is close",
+      "Score incremented on collection",
+      "Different draw for Player vs Coin",
+    ],
+  },
+
+  {
+    id: "annotation_spawn_destroy",
+    name: "Annotation: Spawn and Destroy",
+    difficulty: "hard",
+    description:
+      "Write a program using game annotations with dynamic entity spawning and destruction. Define a @component struct Position with x: Float = 0.0, y: Float = 0.0. Define a @component struct Velocity with vx: Float = 0.0, vy: Float = 0.0. Define a @entity struct Bullet with pos: Position, vel: Velocity. Define a @entity struct Player with pos: Position. Define a @scene struct Game with spawn_timer: Float = 0.0. Use @on(\"enter\") with Game parameter to spawn a Player at (400, 550). Use @on(\"update\") with Player parameter to move left/right with arrow keys at 250 px/s, clamping x between 0 and 768. Use @on(\"key_pressed\") with Player parameter to spawn a Bullet at the player position with vy = -400.0 when space is pressed. Use @on(\"update\") with Bullet parameter to move by velocity * dt, and destroy the bullet if pos.y < 0. Use @on(\"draw\") with Player parameter to draw a 32x32 rectangle. Use @on(\"draw\") with Bullet parameter to draw a 4x8 rectangle. Use @on(\"draw\") with Game parameter to draw the count of active bullets using len(find_all(\"Bullet\")). Do NOT define fn update() or fn draw() directly.",
+    expectedBehaviors: [
+      "@entity Player and Bullet defined",
+      "Player spawned at (400, 550)",
+      "Space spawns bullet at player position",
+      "Bullets move upward and destroyed off-screen",
+      "Player moves left/right with arrow keys",
+      "Active bullet count displayed",
+    ],
+  },
 ];
